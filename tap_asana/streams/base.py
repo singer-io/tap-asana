@@ -3,12 +3,10 @@ import functools
 import datetime
 import sys
 import backoff
-import pyactiveresource
-import pyactiveresource.formats
 import simplejson
 import singer
 import time
-from tap_asana.asana2 import Asana
+from tap_asana.asana import Asana
 from asana.error import AsanaError, NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
 from singer import utils
 from tap_asana.context import Context
@@ -57,7 +55,15 @@ def retry_after_wait_gen(**kwargs):
     yield math.floor(float(sleep_time_str))
 
 
+def invalid_token_handler(details):
+    LOGGER.info("Received InvalidTokenError, refreshing access token")
+    Context.asana.refresh_access_token()
+
+
 def asana_error_handling(fnc):
+    @backoff.on_exception(backoff.expo,
+                          InvalidTokenError,
+                          on_backoff=invalid_token_handler)
     @backoff.on_exception(backoff.expo,
                           (simplejson.scanner.JSONDecodeError,
                           RetryableAsanaError),
