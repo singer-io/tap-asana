@@ -163,9 +163,17 @@ def main():
     args = utils.parse_args(REQUIRED_CONFIG_KEYS)
 
     # Set context.
-    Context.config = args.config
+    creds = {
+        "start_date": args.config['start_date'],
+        "client_id": args.config['client_id'],
+        "client_secret": args.config['client_secret'],
+        "redirect_uri": args.config['redirect_uri'],
+        "refresh_token": args.config['refresh_token']
+    }
+
+    Context.config = creds
     Context.state = args.state
-    Context.asana = Asana(**Context.config)
+    Context.asana = Asana(**creds)
 
 
     # If discover flag was passed, run discovery mode and dump output to stdout
