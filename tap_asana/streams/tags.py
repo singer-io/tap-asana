@@ -7,6 +7,7 @@ from tap_asana.streams.base import Stream
 class Tags(Stream):
   name = 'tags'
   replication_key = "created_at"
+  replication_method = 'INCREMENTAL'
   fields = [
     "id",
     "created_at",

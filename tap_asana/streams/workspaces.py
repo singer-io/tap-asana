@@ -5,13 +5,13 @@ from tap_asana.streams.base import Stream
 
 class Workspaces(Stream):
   name = 'workspaces'
+  replication_method = 'FULL_TABLE'
 
   fields = [
     "id",
     "name",
     "is_organization"
   ]
-
 
   def get_objects(self):
     opt_fields = ",".join(self.fields)

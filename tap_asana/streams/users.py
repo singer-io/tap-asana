@@ -5,6 +5,7 @@ from tap_asana.streams.base import Stream
 
 class Users(Stream):
   name = 'users'
+  replication_method = 'FULL_TABLE'
   fields = [
     "id",
     "name",

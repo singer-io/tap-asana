@@ -7,6 +7,7 @@ from tap_asana.streams.base import Stream
 class Tasks(Stream):
   name = 'tasks'
   replication_key = "modified_at"
+  replication_method = 'INCREMENTAL'
   fields = [
     "id",
     "assignee",

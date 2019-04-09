@@ -7,6 +7,7 @@ from tap_asana.streams.base import Stream
 class Projects(Stream):
   name = "projects"
   replication_key = "modified_at"
+  replication_method = 'INCREMENTAL'
   fields = [
     "name",
     "id",

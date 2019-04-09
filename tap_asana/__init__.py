@@ -68,6 +68,7 @@ def get_discovery_metadata(stream, schema):
 def discover():
     LOGGER.info("Starting discover")
     raw_schemas = load_schemas()
+
     streams = []
 
     refs = {}
@@ -93,6 +94,7 @@ def discover():
 
     return {'streams': streams}
 
+
 def shuffle_streams(stream_name):
     '''
     Takes the name of the first stream to sync and reshuffles the order
@@ -106,30 +108,27 @@ def shuffle_streams(stream_name):
     bottom_half = Context.catalog["streams"][:matching_index]
     Context.catalog["streams"] = top_half + bottom_half
 
+
 def sync():
     # Emit all schemas first so we have them for child streams
     for stream in Context.catalog["streams"]:
         if Context.is_selected(stream["tap_stream_id"]):
-            singer.write_schema(stream["tap_stream_id"],
-                                stream["schema"],
-                                stream["key_properties"],
-                                bookmark_properties=stream["replication_key"])
             Context.counts[stream["tap_stream_id"]] = 0
 
     # If there is a currently syncing stream bookmark, shuffle the
     # stream order so it gets sync'd first
-    currently_sync_stream_name = Context.state.get('bookmarks', {}).get('currently_sync_stream')
-    if currently_sync_stream_name:
-        shuffle_streams(currently_sync_stream_name)
+    # currently_sync_stream_name = Context.state.get('bookmarks', {}).get('currently_sync_stream')
+    # if currently_sync_stream_name:
+    #     shuffle_streams(currently_sync_stream_name)
 
     # Loop over streams in catalog
     for catalog_entry in Context.catalog['streams']:
         stream_id = catalog_entry['tap_stream_id']
         stream = Context.stream_objects[stream_id]()
 
-        # if not Context.is_selected(stream_id):
-        #     LOGGER.info('Skipping stream: %s', stream_id)
-        #     continue
+        if not Context.is_selected(stream_id):
+            LOGGER.info('Skipping stream: %s', stream_id)
+            continue
 
         LOGGER.info('Syncing stream: %s', stream_id)
 
@@ -174,7 +173,6 @@ def main():
     Context.config = creds
     Context.state = args.state
     Context.asana = Asana(**creds)
-
 
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:

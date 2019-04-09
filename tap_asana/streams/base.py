@@ -6,6 +6,7 @@ import backoff
 import simplejson
 import singer
 import time
+from singer.messages import StateMessage
 from tap_asana.asana import Asana
 from asana.error import AsanaError, NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
 from singer import utils
@@ -86,8 +87,8 @@ class Stream():
     # Used for bookmarking and stream identification. Is overridden by
     # subclasses to change the bookmark key.
     name = None
-    replication_method = 'INCREMENTAL'
-    replication_key = 'created_at'
+    replication_method = None
+    replication_key = None
     key_properties = ['id']
     # Controls which SDK object we use to call the API by default.
     # 
@@ -121,6 +122,7 @@ class Stream():
                 value
             )
             singer.write_state(Context.state)
+        singer.write_message(StateMessage(Context.state))
 
 
     @asana_error_handling
