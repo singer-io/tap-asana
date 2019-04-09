@@ -1,4 +1,5 @@
 
+import time
 from singer import utils
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
@@ -25,10 +26,9 @@ class Tags(Stream):
     session_bookmark = bookmark
     for workspace in self.call_api("workspaces"):
       for tag in self.call_api("tags", workspace=workspace["gid"], opt_fields=opt_fields):
-        if utils.strptime_with_tz(tag[self.replication_key]) > session_bookmark:
-          session_bookmark = utils.strptime_with_tz(tag[self.replication_key])
+        session_bookmark = self.get_updated_session_bookmark(session_bookmark, tag[self.replication_key])
         yield tag
-    self.update_bookmark(tag[self.replication_key])
+    self.update_bookmark(session_bookmark)
 
 
 Context.stream_objects['tags'] = Tags

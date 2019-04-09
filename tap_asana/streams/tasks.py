@@ -40,10 +40,9 @@ class Tasks(Stream):
     for workspace in self.call_api("workspaces"):
       for project in self.call_api("projects", workspace=workspace["gid"]):
         for task in self.call_api("tasks", project=project["gid"], opt_fields=opt_fields, modified_since=modified_since): 
-          if utils.strptime_with_tz(task[self.replication_key]) > session_bookmark:
-            session_bookmark = utils.strptime_with_tz(task[self.replication_key])
+          session_bookmark = self.get_updated_session_bookmark(session_bookmark, task[self.replication_key])
           yield task
-    self.update_bookmark(task[self.replication_key])
+    self.update_bookmark(session_bookmark)
 
 
 Context.stream_objects['tasks'] = Tasks

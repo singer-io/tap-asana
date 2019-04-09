@@ -33,10 +33,9 @@ class Projects(Stream):
     opt_fields = ",".join(self.fields)
     for workspace in Context.asana.client.workspaces.find_all():
       for project in Context.asana.client.projects.find_all(workspace=workspace["gid"], opt_fields=opt_fields):
-        if utils.strptime_with_tz(project[self.replication_key]) > session_bookmark:
-          session_bookmark = utils.strptime_with_tz(project[self.replication_key])
+        session_bookmark = self.get_updated_session_bookmark(session_bookmark, project[self.replication_key])
         yield project
-    self.update_bookmark(project[self.replication_key])
+    self.update_bookmark(session_bookmark)
 
 
 Context.stream_objects["projects"] = Projects

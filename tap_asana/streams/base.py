@@ -99,7 +99,6 @@ class Stream():
                                         self.name,
                                         self.replication_key)
                     or Context.config["start_date"])
-
         return utils.strptime_to_utc(bookmark)
 
 
@@ -113,6 +112,11 @@ class Stream():
         # recent thing it saw the next time you run, because the querying
         # only allows greater than or equal semantics.
 
+        try:
+            value = value.strftime("%Y-%m-%dT%H:%M:%S.%f")
+        except TypeError:
+            pass
+
         if self.is_bookmark_old(value):
             singer.write_bookmark(
                 Context.state,
@@ -122,7 +126,22 @@ class Stream():
                 value
             )
             singer.write_state(Context.state)
-        singer.write_message(StateMessage(Context.state))
+
+
+    def get_updated_session_bookmark(self, session_bookmark, value):
+        try:
+            session_bookmark = utils.strptime_with_tz(session_bookmark)
+        except TypeError:
+            pass
+
+        try:
+            value = utils.strptime_with_tz(value)
+        except TypeError:
+            pass
+
+        if value > session_bookmark:
+            return value
+        return session_bookmark
 
 
     @asana_error_handling
