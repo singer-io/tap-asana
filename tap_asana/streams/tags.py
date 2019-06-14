@@ -27,7 +27,8 @@ class Tags(Stream):
     for workspace in self.call_api("workspaces"):
       for tag in self.call_api("tags", workspace=workspace["gid"], opt_fields=opt_fields):
         session_bookmark = self.get_updated_session_bookmark(session_bookmark, tag[self.replication_key])
-        yield tag
+        if self.is_bookmark_old(tag[self.replication_key]):
+          yield tag
     self.update_bookmark(session_bookmark)
 
 
