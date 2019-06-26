@@ -25,7 +25,7 @@ jobs:
                        --email=harrison+sandboxtest@stitchdata.com \
                        --password=$SANDBOX_PASSWORD \
                        --client-id=50 \
-                       tap_tester.suites.asana
+                       tap_tester_asana_base
 workflows:
   version: 2
   commit:
