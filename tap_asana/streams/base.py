@@ -104,7 +104,7 @@ class Stream():
 
     def is_bookmark_old(self, value):
         bookmark = self.get_bookmark()
-        return utils.strptime_to_utc(value) > bookmark
+        return utils.strptime_to_utc(value) >= bookmark
 
 
     def update_bookmark(self, value):
