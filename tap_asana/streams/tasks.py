@@ -28,7 +28,8 @@ class Tasks(Stream):
     "projects",
     "parent",
     "workspace",
-    "memberships"
+    "memberships",
+    "tags"
   ]
 
 
