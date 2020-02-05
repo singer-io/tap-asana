@@ -15,6 +15,8 @@ class Tasks(Stream):
     "created_at",
     "completed",
     "completed_at",
+    "custom_fields",
+    "tags",
     "due_on",
     "due_at",
     "external",
