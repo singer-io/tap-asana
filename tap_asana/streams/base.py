@@ -151,12 +151,19 @@ class Stream():
             return fn.find_all(**query_params)
         return fn.find_all()
 
+    def _safe_int_convert(self, obj, key):
+        try:
+            return int(obj[key])
+        except:
+            return obj[key]
+
     def _patch_ids(self, obj):
         # NB: Asana has moved to a string 'gid' in place of the existing int 'id'
         # - This is a workaround to keep the existing functionality
         # More Info: https://forum.asana.com/t/reminder-about-two-big-upcoming-api-changes-string-ids-and-new-sections/50416
         if 'id' not in obj and 'gid' in obj:
-            obj['id'] = int(obj['gid'])
+            # Fallback to string if `gid` stops being int-convertible
+            obj['id'] = self._safe_int_convert(obj, 'gid')
         for k, v in obj.items():
             # Recurse into sub-objects (e.g., 'workspace')
             if isinstance(v, dict):
