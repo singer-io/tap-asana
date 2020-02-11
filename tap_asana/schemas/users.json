@@ -7,7 +7,8 @@
     "id": {
       "type": [
         "null",
-        "integer"
+        "integer",
+        "string"
       ]
     },
     "name": {
@@ -80,7 +81,8 @@
           "id": {
             "type": [
               "null",
-              "integer"
+              "integer",
+              "string"
             ]
           },
           "gid": {

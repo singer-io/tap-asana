@@ -7,7 +7,8 @@
     "id": {
       "type": [
         "null",
-        "integer"
+        "integer",
+        "string"
       ]
     },
     "gid": {
@@ -25,7 +26,8 @@
         "id": {
           "type": [
             "null",
-            "integer"
+            "integer",
+            "string"
           ]
         },
         "gid": {
@@ -102,7 +104,8 @@
           "id": {
             "type": [
               "null",
-              "integer"
+              "integer",
+              "string"
             ]
           },
           "gid": {
@@ -171,7 +174,8 @@
           "id": {
             "type": [
               "null",
-              "integer"
+              "integer",
+              "string"
             ]
           },
           "gid": {
@@ -204,7 +208,8 @@
         "id": {
           "type": [
             "null",
-            "integer"
+            "integer",
+            "string"
           ]
         },
         "gid": {
@@ -240,7 +245,8 @@
           "id": {
             "type": [
               "null",
-              "integer"
+              "integer",
+              "string"
             ]
           },
           "gid": {
@@ -272,7 +278,8 @@
           "id": {
             "type": [
               "null",
-              "integer"
+              "integer",
+              "string"
             ]
           },
           "gid": {
@@ -319,7 +326,8 @@
                 "id": {
                   "type": [
                     "null",
-                    "integer"
+                    "integer",
+                    "string"
                   ]
                 },
                 "gid": {
@@ -365,7 +373,8 @@
               "id": {
                 "type": [
                   "null",
-                  "integer"
+                  "integer",
+                  "string"
                 ]
               },
               "gid": {
