@@ -152,12 +152,14 @@ class Stream():
         return fn.find_all()
 
     def _safe_int_convert(self, obj, key):
+        # HACK: This is a workaround method
         try:
             return int(obj[key])
         except:
             return obj[key]
 
     def _patch_ids(self, obj):
+        # HACK: This is a workaround method
         # NB: Asana has moved to a string 'gid' in place of the existing int 'id'
         # - This is a workaround to keep the existing functionality
         # More Info: https://forum.asana.com/t/reminder-about-two-big-upcoming-api-changes-string-ids-and-new-sections/50416
