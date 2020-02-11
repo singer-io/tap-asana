@@ -151,9 +151,21 @@ class Stream():
             return fn.find_all(**query_params)
         return fn.find_all()
 
+    def _patch_ids(self, obj):
+        # NB: Asana has moved to a string 'gid' in place of the existing int 'id'
+        # - This is a workaround to keep the existing functionality
+        # More Info: https://forum.asana.com/t/reminder-about-two-big-upcoming-api-changes-string-ids-and-new-sections/50416
+        if 'id' not in obj and 'gid' in obj:
+            obj['id'] = int(obj['gid'])
+        for k, v in obj.items():
+            # Recurse into sub-objects (e.g., 'workspace')
+            if isinstance(v, dict):
+                obj[k] = self._patch_ids(v)
+        return obj
 
     def sync(self):
         """Yield's processed SDK object dicts to the caller.
         """
         for obj in self.get_objects():
+            obj = self._patch_ids(obj)
             yield obj
