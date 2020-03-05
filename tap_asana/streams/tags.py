@@ -10,7 +10,7 @@ class Tags(Stream):
   replication_key = "created_at"
   replication_method = 'INCREMENTAL'
   fields = [
-    "id",
+    "gid",
     "created_at",
     "followers",
     "name",

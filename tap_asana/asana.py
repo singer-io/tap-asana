@@ -15,7 +15,6 @@ class Asana(object):
     self.refresh_token = refresh_token
     self.access_token = access_token
     self._client = self._oauth_auth() or self._access_token_auth()
-    self._client.headers={'asana-disable': 'string_ids'}
     self.refresh_access_token()
 
   def _oauth_auth(self):

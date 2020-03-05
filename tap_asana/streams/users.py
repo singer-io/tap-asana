@@ -7,7 +7,7 @@ class Users(Stream):
   name = 'users'
   replication_method = 'FULL_TABLE'
   fields = [
-    "id",
+    "gid",
     "name",
     "email",
     "photo",

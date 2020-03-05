@@ -9,7 +9,7 @@ class Tasks(Stream):
   replication_key = "modified_at"
   replication_method = 'INCREMENTAL'
   fields = [
-    "id",
+    "gid",
     "assignee",
     "assignee_status",
     "created_at",
