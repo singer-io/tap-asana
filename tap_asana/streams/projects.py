@@ -10,7 +10,7 @@ class Projects(Stream):
   replication_method = 'INCREMENTAL'
   fields = [
     "name",
-    "id",
+    "gid",
     "owner",
     "current_status",
     "due_date",

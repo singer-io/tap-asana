@@ -10,13 +10,6 @@
         "string"
       ]
     },
-    "id": {
-      "type": [
-        "null",
-        "integer",
-        "string"
-      ]
-    },
     "gid": {
       "type": [
         "null",
@@ -29,13 +22,6 @@
         "object"
       ],
       "properties": {
-        "id": {
-          "type": [
-            "null",
-            "integer",
-            "string"
-          ]
-        },
         "gid": {
           "type": [
             "null",
@@ -100,13 +86,6 @@
           "object"
         ],
         "properties": {
-          "id": {
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ]
-          },
           "gid": {
             "type": [
               "null",
@@ -133,13 +112,6 @@
           "object"
         ],
         "properties": {
-          "id": {
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ]
-          },
           "gid": {
             "type": [
               "null",
@@ -173,13 +145,6 @@
         "object"
       ],
       "properties": {
-        "id": {
-          "type": [
-            "null",
-            "integer",
-            "string"
-          ]
-        },
         "gid": {
           "type": [
             "null",
@@ -200,13 +165,6 @@
         "object"
       ],
       "properties": {
-        "id": {
-          "type": [
-            "null",
-            "integer",
-            "string"
-          ]
-        },
         "gid": {
           "type": [
             "null",

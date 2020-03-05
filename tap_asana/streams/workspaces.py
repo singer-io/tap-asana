@@ -8,7 +8,7 @@ class Workspaces(Stream):
   replication_method = 'FULL_TABLE'
 
   fields = [
-    "id",
+    "gid",
     "name",
     "is_organization"
   ]

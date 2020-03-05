@@ -4,13 +4,6 @@
     "object"
   ],
   "properties": {
-    "id": {
-      "type": [
-        "null",
-        "integer",
-        "string"
-      ]
-    },
     "gid": {
       "type": [
         "null",
@@ -23,13 +16,6 @@
         "object"
       ],
       "properties": {
-        "id": {
-          "type": [
-            "null",
-            "integer",
-            "string"
-          ]
-        },
         "gid": {
           "type": [
             "null",
@@ -101,13 +87,6 @@
           "object"
         ],
         "properties": {
-          "id": {
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ]
-          },
           "gid": {
             "type": [
               "null",
@@ -171,13 +150,6 @@
           "object"
         ],
         "properties": {
-          "id": {
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ]
-          },
           "gid": {
             "type": [
               "null",
@@ -205,13 +177,6 @@
         "object"
       ],
       "properties": {
-        "id": {
-          "type": [
-            "null",
-            "integer",
-            "string"
-          ]
-        },
         "gid": {
           "type": [
             "null",
@@ -242,13 +207,6 @@
           "object"
         ],
         "properties": {
-          "id": {
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ]
-          },
           "gid": {
             "type": [
               "null",
@@ -275,13 +233,6 @@
         ],
         "additionalProperties": false,
         "properties": {
-          "id": {
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ]
-          },
           "gid": {
             "type": [
               "null",
@@ -323,13 +274,6 @@
               ],
               "additionalProperties": false,
               "properties": {
-                "id": {
-                  "type": [
-                    "null",
-                    "integer",
-                    "string"
-                  ]
-                },
                 "gid": {
                   "type": [
                     "null",
@@ -370,13 +314,6 @@
             ],
             "additionalProperties": false,
             "properties": {
-              "id": {
-                "type": [
-                  "null",
-                  "integer",
-                  "string"
-                ]
-              },
               "gid": {
                 "type": [
                   "null",
