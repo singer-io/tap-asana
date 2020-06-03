@@ -19,6 +19,7 @@ class Tasks(Stream):
     "tags",
     "due_on",
     "due_at",
+    "start_on",
     "external",
     "followers",
     "hearted",

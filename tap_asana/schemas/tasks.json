@@ -70,6 +70,13 @@
       ],
       "format": "date-time"
     },
+    "start_on": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
     "external": {
       "type": [
         "null",
