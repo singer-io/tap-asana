@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.1
+ * Added start_on field to tasks schema
+
 ## 2.0.0
  * Deprecated `id` for `gid` [#16](https://github.com/singer-io/tap-asana/pull/16)
 
