@@ -13,6 +13,7 @@ class Projects(Stream):
     "gid",
     "owner",
     "current_status",
+    "custom_fields",
     "due_date",
     "created_at",
     "modified_at",

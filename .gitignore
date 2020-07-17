@@ -137,6 +137,9 @@ pip-selfcheck.json
 # End of https://www.gitignore.io/api/python
 
 # Tap config.
+tap_target_commands.sh
+tap_config.json
+target_config.json
 catalog*.json
 config*.json
 state*.json
