@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.2
+ * Added `custom_fields` to projects schema
+
 ## 2.0.1
  * Added start_on field to tasks schema
 
