@@ -204,6 +204,12 @@
         "string"
       ]
     },
+    "resource_subtype": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
     "tags": {
       "type": [
         "null",

@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.23
+ * Added `resource_subtype` field to tasks schema
+
 ## 2.0.2
  * Added `custom_fields` to projects schema
 
