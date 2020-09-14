@@ -144,6 +144,8 @@ catalog*.json
 config*.json
 state*.json
 */schemas/fixtures.json
+singer-check-tap-data
+.vscode
 
 # ds store.
 .DS_Store

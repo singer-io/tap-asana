@@ -10,12 +10,14 @@ class Workspaces(Stream):
   fields = [
     "gid",
     "name",
-    "is_organization"
+    "is_organization",
+    "resource_type",
+    "email_domains"
   ]
 
   def get_objects(self):
     opt_fields = ",".join(self.fields)
-    for workspace in self.call_api("workspaces"):
+    for workspace in self.call_api("workspaces", opt_fields=opt_fields):
       yield workspace
 
 

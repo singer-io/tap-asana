@@ -3,6 +3,7 @@
     "null",
     "object"
   ],
+  "additionalProperties": false,
   "properties": {
     "gid": {
       "type": [
@@ -10,38 +11,29 @@
         "string"
       ]
     },
-    "assignee": {
+    "resource_type": {
       "type": [
         "null",
-        "object"
-      ],
-      "properties": {
-        "gid": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "resource_type": {
-          "type": [
-            "null",
-            "string"
-          ]
-        }
-      }
+        "string"
+      ]
+    },
+    "name": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "approval_status": {
+      "type": [
+        "null",
+        "string"
+      ]
     },
     "assignee_status": {
       "type": [
         "null",
         "string"
       ]
-    },
-    "created_at": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
     },
     "completed": {
       "type": [
@@ -56,34 +48,41 @@
       ],
       "format": "date-time"
     },
-    "due_on": {
+    "completed_by": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gid": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "created_at": {
       "type": [
         "null",
         "string"
       ],
       "format": "date-time"
     },
-    "due_at": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "start_on": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "external": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "followers": {
+    "dependencies": {
       "type": [
         "null",
         "array"
@@ -93,6 +92,7 @@
           "null",
           "object"
         ],
+        "additionalProperties": false,
         "properties": {
           "gid": {
             "type": [
@@ -105,7 +105,81 @@
               "null",
               "string"
             ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
+        }
+      }
+    },
+    "dependents": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "due_at": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "due_on": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "external": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gid": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "data": {
+          "type": [
+            "null",
+            "string"
+          ]
         }
       }
     },
@@ -116,9 +190,183 @@
       ]
     },
     "hearts": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": ["null", "object"],
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "type": ["null", "string"]
+              },
+              "user": {
+                "type": [
+                  "null",
+                  "object"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "gid": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "resource_type": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "html_notes": {
       "type": [
         "null",
         "string"
+      ]
+    },
+    "is_rendered_as_seperator": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "liked": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "likes": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": ["null", "object"],
+            "additionalProperties": false,
+            "properties": {
+              "gid": {
+                "type": ["null", "string"]
+              },
+              "user": {
+                "type": [
+                  "null",
+                  "object"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "gid": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "resource_type": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "memberships": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": ["null", "object"],
+            "additionalProperties": false,
+            "properties": {
+              "project": {
+                "type": [
+                  "null",
+                  "object"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "gid": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "resource_type": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              },
+              "section": {
+                "type": [
+                  "null",
+                  "object"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "gid": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "resource_type": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  },
+                  "name": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
       ]
     },
     "modified_at": {
@@ -127,12 +375,6 @@
         "string"
       ],
       "format": "date-time"
-    },
-    "name": {
-      "type": [
-        "null",
-        "string"
-      ]
     },
     "notes": {
       "type": [
@@ -146,43 +388,36 @@
         "integer"
       ]
     },
-    "projects": {
+    "num_likes": {
       "type": [
         "null",
-        "array"
-      ],
-      "items": {
-        "type": [
-          "null",
-          "object"
-        ],
-        "properties": {
-          "gid": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "resource_type": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
-      }
+        "integer"
+      ]
     },
-    "parent": {
+    "num_subtasks": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
+    "resource_subtype": {
       "type": [
         "null",
         "string"
       ]
     },
-    "workspace": {
+    "start_on": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "assignee": {
       "type": [
         "null",
         "object"
       ],
+      "additionalProperties": false,
       "properties": {
         "gid": {
           "type": [
@@ -195,37 +430,12 @@
             "null",
             "string"
           ]
-        }
-      }
-    },
-    "memberships": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "tags": {
-      "type": [
-        "null",
-        "array"
-      ],
-      "items": {
-        "type": [
-          "object"
-        ],
-        "properties": {
-          "gid": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "resource_type": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
+        },
+        "name": {
+          "type": [
+            "null",
+            "string"
+          ]
         }
       }
     },
@@ -236,6 +446,7 @@
       ],
       "items": {
         "type": [
+          "null",
           "object"
         ],
         "additionalProperties": false,
@@ -277,6 +488,7 @@
             ],
             "items": {
               "type": [
+                "null",
                 "object"
               ],
               "additionalProperties": false,
@@ -395,6 +607,165 @@
               "boolean"
             ]
           }
+        }
+      }
+    },
+    "followers": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "parent": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gid": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "permalink_url": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "projects": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "tags": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "workspace": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gid": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
+          "type": [
+            "null",
+            "string"
+          ]
         }
       }
     }

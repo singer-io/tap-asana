@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.4
+ * Added endpoints: `portfolios`, `sections`, `stories`, and `teams`. Add missing fields to other endpoints.
+
+## 2.0.3
+ * Added `resource_subtype` field to tasks schema
+
 ## 2.0.2
  * Added `custom_fields` to projects schema
 
