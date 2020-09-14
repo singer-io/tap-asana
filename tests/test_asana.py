@@ -59,6 +59,7 @@ class AsanaBase(unittest.TestCase):
             'stories',
             'tags',
             'tasks',
+            'teams',
             'users',
             'workspaces'
         }
@@ -72,6 +73,7 @@ class AsanaBase(unittest.TestCase):
             'stories': 'INCREMENTAL',
             'tags': 'INCREMENTAL',
             'tasks': 'INCREMENTAL',
+            'teams': 'FULL_TABLE',
             'users': 'FULL_TABLE',
             'workspaces': 'FULL_TABLE'
         }
@@ -85,6 +87,7 @@ class AsanaBase(unittest.TestCase):
             'stories': {'gid'},
             'tags': {'gid'},
             'tasks': {'gid'},
+            'teams': {'gid'},
             'users': {'gid'},
             'workspaces': {'gid'}
         }
@@ -98,6 +101,7 @@ class AsanaBase(unittest.TestCase):
             'stories': {'created_at'},
             'tags': {'created_at'},
             'tasks': {'modified_at'},
+            'teams': {},
             'users': {},
             'workspaces': {}
         }
