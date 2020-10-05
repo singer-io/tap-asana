@@ -23,50 +23,33 @@
         "string"
       ]
     },
-    "email": {
+    "created_at": {
       "type": [
         "null",
         "string"
-      ]
+      ],
+      "format": "date-time"
     },
-    "photo": {
+    "project": {
       "type": [
         "null",
         "object"
       ],
       "additionalProperties": false,
       "properties": {
-        "image_21x21": {
+        "gid": {
           "type": [
             "null",
             "string"
           ]
         },
-        "image_27x27": {
+        "resource_type": {
           "type": [
             "null",
             "string"
           ]
         },
-        "image_36x36": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "image_60x60": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "image_128x128": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "image_1024x1024": {
+        "name": {
           "type": [
             "null",
             "string"
@@ -74,7 +57,7 @@
         }
       }
     },
-    "workspaces": {
+    "projects": {
       "type": [
         "null",
         "array"

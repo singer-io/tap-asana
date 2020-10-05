@@ -3,6 +3,7 @@
     "null",
     "object"
   ],
+  "additionalProperties": false,
   "properties": {
     "name": {
       "type": [
@@ -16,11 +17,18 @@
         "string"
       ]
     },
+    "resource_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
     "owner": {
       "type": [
         "null",
         "object"
       ],
+      "additionalProperties": false,
       "properties": {
         "gid": {
           "type": [
@@ -29,6 +37,12 @@
           ]
         },
         "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
           "type": [
             "null",
             "string"
@@ -41,143 +55,6 @@
         "null",
         "string"
       ]
-    },
-    "due_date": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "created_at": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "modified_at": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "archived": {
-      "type": [
-        "null",
-        "boolean"
-      ]
-    },
-    "public": {
-      "type": [
-        "null",
-        "boolean"
-      ]
-    },
-    "members": {
-      "type": [
-        "null",
-        "array"
-      ],
-      "items": {
-        "type": [
-          "null",
-          "object"
-        ],
-        "properties": {
-          "gid": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "resource_type": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
-      }
-    },
-    "followers": {
-      "type": [
-        "null",
-        "array"
-      ],
-      "items": {
-        "type": [
-          "null",
-          "object"
-        ],
-        "properties": {
-          "gid": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "resource_type": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
-      }
-    },
-    "color": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "notes": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "workspace": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "properties": {
-        "gid": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "resource_type": {
-          "type": [
-            "null",
-            "string"
-          ]
-        }
-      }
-    },
-    "team": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "properties": {
-        "gid": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "resource_type": {
-          "type": [
-            "null",
-            "string"
-          ]
-        }
-      }
     },
     "custom_fields": {
       "type": [
@@ -345,6 +222,212 @@
               "boolean"
             ]
           }
+        }
+      }
+    },
+    "default_view": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "due_date": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "due_on": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "html_notes": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "is_template": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "created_at": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "modified_at": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "start_on": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "archived": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "public": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "members": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "followers": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "color": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "notes": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "icon": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "permalink_url": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "workspace": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gid": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "team": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gid": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
+          "type": [
+            "null",
+            "string"
+          ]
         }
       }
     }

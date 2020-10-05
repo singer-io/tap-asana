@@ -11,11 +11,13 @@ class Tags(Stream):
   replication_method = 'INCREMENTAL'
   fields = [
     "gid",
+    "resource_type",
     "created_at",
     "followers",
     "name",
     "color",
     "notes",
+    "permalink_url",
     "workspace"
   ]  
 

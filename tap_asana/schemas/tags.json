@@ -3,8 +3,15 @@
     "null",
     "object"
   ],
+  "additionalProperties": false,
   "properties": {
     "gid": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "resource_type": {
       "type": [
         "null",
         "string"
@@ -27,6 +34,7 @@
           "null",
           "object"
         ],
+        "additionalProperties": false,
         "properties": {
           "gid": {
             "type": [
@@ -35,6 +43,12 @@
             ]
           },
           "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
             "type": [
               "null",
               "string"
@@ -61,11 +75,18 @@
         "string"
       ]
     },
+    "permalink_url": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
     "workspace": {
       "type": [
         "null",
         "object"
       ],
+      "additionalProperties": false,
       "properties": {
         "gid": {
           "type": [
@@ -74,6 +95,12 @@
           ]
         },
         "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
           "type": [
             "null",
             "string"

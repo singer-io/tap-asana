@@ -6,13 +6,18 @@ spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
 
 This tap:
 
-- Pulls raw data from [Asana](https://asana.com/developers/)
+- Pulls raw data from [Asana v.1.0 API](https://developers.asana.com/docs)
 - Extracts the following resources:
-  - [Projects](https://asana.com/developers/api-reference/projects)
-  - [Tags](https://asana.com/developers/api-reference/tags)
-  - [Tasks](https://asana.com/developers/api-reference/tasks)
-  - [Users](https://asana.com/developers/api-reference/users)
-  - [Workspaces](https://asana.com/developers/api-reference/workspaces)
+  - [Portfolios](https://developers.asana.com/docs/portfolios) with [Portfolio Items](https://developers.asana.com/docs/get-portfolio-items)
+    - Only available for [Business and Enterprise Subscriptions](https://asana.com/pricing)
+  - [Projects](https://developers.asana.com/docs/projects)
+  - [Sections](https://developers.asana.com/docs/sections)
+  - [Stories](https://developers.asana.com/docs/stories)
+  - [Tags](https://developers.asana.com/docs/tags)
+  - [Tasks](https://developers.asana.com/docs/tasks)
+  - [Teams](https://developers.asana.com/docs/teams)
+  - [Users](https://developers.asana.com/docs/users)
+  - [Workspaces](https://developers.asana.com/docs/workspaces)
 - Outputs the schema for each resource
 - Incrementally pulls data based on the input state
 
@@ -41,7 +46,7 @@ $ pip install tap-asana
    The `start_date` specifies the date at which the tap will begin pulling data
    (for those resources that support this).
 
-   The `client_id`, `client_secret`, `redirect_uri`, and `refresh_token` can be generated following these [Asana instructions](https://asana.com/developers/documentation/getting-started/auth#oauth).
+   The `client_id`, `client_secret`, `redirect_uri`, and `refresh_token` can be generated following these [Asana OAuth instructions](https://developers.asana.com/docs/oauth).
 
 4. Run the Tap in Discovery Mode
 

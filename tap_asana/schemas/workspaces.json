@@ -27,6 +27,19 @@
         "null",
         "string"
       ]
+    },
+    "email_domains": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   }
 }

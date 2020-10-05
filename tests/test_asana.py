@@ -53,9 +53,13 @@ class AsanaBase(unittest.TestCase):
 
     def expected_sync_streams(self):
         return {
+            'portfolios',
             'projects',
+            'sections',
+            'stories',
             'tags',
             'tasks',
+            'teams',
             'users',
             'workspaces'
         }
@@ -63,9 +67,13 @@ class AsanaBase(unittest.TestCase):
 
     def expected_replication_method(self):
         return {
+            'portfolios': 'FULL_TABLE',
             'projects': 'INCREMENTAL',
+            'sections': 'FULL_TABLE',
+            'stories': 'INCREMENTAL',
             'tags': 'INCREMENTAL',
             'tasks': 'INCREMENTAL',
+            'teams': 'FULL_TABLE',
             'users': 'FULL_TABLE',
             'workspaces': 'FULL_TABLE'
         }
@@ -73,9 +81,13 @@ class AsanaBase(unittest.TestCase):
 
     def expected_pks(self):
         return {
+            'portfolios': {'gid'},
             'projects': {'gid'},
+            'sections': {'gid'},
+            'stories': {'gid'},
             'tags': {'gid'},
             'tasks': {'gid'},
+            'teams': {'gid'},
             'users': {'gid'},
             'workspaces': {'gid'}
         }
@@ -83,9 +95,13 @@ class AsanaBase(unittest.TestCase):
 
     def expected_rks(self):
         return {
+            'portfolios': {},
             'projects': {'modified_at'},
+            'sections': {},
+            'stories': {'created_at'},
             'tags': {'created_at'},
             'tasks': {'modified_at'},
+            'teams': {},
             'users': {},
             'workspaces': {}
         }
