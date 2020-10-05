@@ -21,7 +21,6 @@ class Context():
 
     @classmethod
     def is_selected(cls, stream_name):
-        return True
-        # stream = cls.get_catalog_entry(stream_name)
-        # stream_metadata = metadata.to_map(stream['metadata'])
-        # return metadata.get(stream_metadata, (), 'selected')
+        stream = cls.get_catalog_entry(stream_name)
+        stream_metadata = metadata.to_map(stream['metadata'])
+        return metadata.get(stream_metadata, (), 'selected')
