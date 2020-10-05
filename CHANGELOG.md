@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1.1
+ * Fixed issue where stream selection wasn't applying [#29](https://github.com/singer-io/tap-asana/pull/29)
+
 ## 2.1.0
  * Added endpoints: `portfolios`, `sections`, `stories`, and `teams`. Add missing fields to other endpoints.
 
