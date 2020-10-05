@@ -18,7 +18,6 @@ class AsanaBase(unittest.TestCase):
     def setUp(self):
         required_envs = ['TAP_ASANA_CLIENT_ID',
                          'TAP_ASANA_CLIENT_SECRET',
-                         'TAP_ASANA_START_DATE',
                          'TAP_ASANA_REDIRECT_URI',
                          'TAP_ASANA_REFRESH_TOKEN']
         missing_envs = [k for k, v
@@ -26,7 +25,7 @@ class AsanaBase(unittest.TestCase):
                         if v == None]
         if len(missing_envs) != 0:
             #pylint: disable=line-too-long
-            raise Exception("set TAP_ASANA_CLIENT_ID, TAP_ASANA_CLIENT_SECRET, TAP_ASANA_START_DATE, TAP_ASANA_REDIRECT_URI, TAP_ASANA_REFRESH_TOKEN. Missing: {}".format(missing_envs))
+            raise Exception("set TAP_ASANA_CLIENT_ID, TAP_ASANA_CLIENT_SECRET, TAP_ASANA_REDIRECT_URI, TAP_ASANA_REFRESH_TOKEN. Missing: {}".format(missing_envs))
 
         self.conn_id = connections.ensure_connection(self)
 
@@ -45,7 +44,7 @@ class AsanaBase(unittest.TestCase):
 
 
     def get_properties(self):
-        return {'start_date': os.getenv('TAP_ASANA_START_DATE'),
+        return {'start_date': "2018-04-11T00:00:00Z",
                 'client_id': os.getenv('TAP_ASANA_CLIENT_ID'),
                 'redirect_uri': os.getenv('TAP_ASANA_REDIRECT_URI')}
 
@@ -186,7 +185,7 @@ class AsanaBase(unittest.TestCase):
 
         # Get and check streams.
         self.found_catalogs = menagerie.get_catalogs(self.conn_id)
-        self.assertEqual(len(self.found_catalogs), 5, msg="unable to locate schemas for connection {}".format(self.conn_id))
+        self.assertEqual(len(self.found_catalogs), 9, msg="unable to locate schemas for connection {}".format(self.conn_id))
 
         # Match streams.
         our_catalogs = [c for c in self.found_catalogs if c.get('tap_stream_id') in self.expected_sync_streams()]

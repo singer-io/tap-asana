@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.4
+## 2.1.0
  * Added endpoints: `portfolios`, `sections`, `stories`, and `teams`. Add missing fields to other endpoints.
 
 ## 2.0.3
