@@ -26,7 +26,9 @@ This tap:
 1. Install
 
 ```
-$ pip install tap-asana
+$ git clone https://github.com/j-oflaherty/tap-asana.git tap-asana
+$ cd tap-asana
+$ pip install -e '.[dev]'
 ```
 
 2. Create the config file
