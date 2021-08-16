@@ -70,6 +70,10 @@ $ mkvirtualenv -p python3 tap-asana
 $ make dev
 ```
 
+## Modification
+
+To go around the Bearer token expiration error the script has been modified to refresh it's token if 45 minutes have passed since the last update. 
+
 ---
 
 Copyright &copy; 2019 Stitch
