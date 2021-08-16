@@ -146,7 +146,7 @@ class Stream():
 
     @asana_error_handling
     def call_api(self, resource, **query_params):
-        Context.asana.refresh_access_token()    # Check if refresh needed every call
+        Context.asana.refresh_access_token()        # Check if refresh needed every call
         fn = getattr(Context.asana.client, resource)
         if query_params:
             return fn.find_all(**query_params)

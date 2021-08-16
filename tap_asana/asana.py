@@ -35,7 +35,7 @@ class Asana(object):
     def refresh_access_token(self):
         if datetime.datetime.now() - self._last_refresh < datetime.timedelta(minutes=45):
             return
-        LOGGER.info("Refreshing access token")
+        LOGGER.info("Refreshing access token.")
         self._last_refresh = datetime.datetime.now()
         return self._client.session.refresh_token(self._client.session.token_url, client_id=self.client_id,
                                                   client_secret=self.client_secret, refresh_token=self.refresh_token)
