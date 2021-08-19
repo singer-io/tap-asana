@@ -26,9 +26,7 @@ This tap:
 1. Install
 
 ```
-$ git clone https://github.com/j-oflaherty/tap-asana.git tap-asana
-$ cd tap-asana
-$ pip install -e '.[dev]'
+$ pip install tap-asana
 ```
 
 2. Create the config file
@@ -69,10 +67,6 @@ First, clone this repo. Then, in the directory:
 $ mkvirtualenv -p python3 tap-asana
 $ make dev
 ```
-
-## Modification
-
-To go around the Bearer token expiration error the script has been modified to refresh it's token if 45 minutes have passed since the last update. 
 
 ---
 
