@@ -53,12 +53,20 @@ class Tasks(Stream):
     session_bookmark = bookmark
     modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
     opt_fields = ",".join(self.fields)
+
+    # list of project ids
+    project_ids = []
     for workspace in self.call_api("workspaces"):
       for project in self.call_api("projects", workspace=workspace["gid"]):
-        for task in self.call_api("tasks", project=project["gid"], opt_fields=opt_fields, modified_since=modified_since): 
-          session_bookmark = self.get_updated_session_bookmark(session_bookmark, task[self.replication_key])
-          if self.is_bookmark_old(task[self.replication_key]):
-            yield task
+        project_ids.append(project["gid"])
+
+    # iterate over all project ids and continue fetching
+    for project_id in project_ids:
+      for task in self.call_api("tasks", project=project_id, opt_fields=opt_fields, modified_since=modified_since): 
+        session_bookmark = self.get_updated_session_bookmark(session_bookmark, task[self.replication_key])
+        if self.is_bookmark_old(task[self.replication_key]):
+          yield task
+
     self.update_bookmark(session_bookmark)
 
 
