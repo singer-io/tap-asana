@@ -1,12 +1,8 @@
-import datetime
 from dateutil.parser import parse
 from base import AsanaBase
 import tap_tester.connections as connections
 import tap_tester.menagerie as menagerie
 import tap_tester.runner as runner
-import datetime
-import dateutil.parser
-import pytz
 
 class AsanaBookmarksTest(AsanaBase):
 

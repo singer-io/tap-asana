@@ -10,12 +10,9 @@ class AsanaStartDateTest(AsanaBase):
         return "tap_tester_asana_start_date_test"
 
     def test_run(self):
-        self.run_test('2019-01-01T00:00:00Z', '2020-08-10T00:00:00Z', self.expected_streams())
 
-    def run_test(self, start_dt_1, start_dt_2, streams):
-
-        start_date_1 = start_dt_1
-        start_date_2 = start_dt_2
+        start_date_1 = '2019-01-01T00:00:00Z'
+        start_date_2 = '2020-08-10T00:00:00Z'
         start_date_1_epoch = self.dt_to_ts(start_date_1)
         start_date_2_epoch = self.dt_to_ts(start_date_2)
 
@@ -29,7 +26,7 @@ class AsanaStartDateTest(AsanaBase):
         ### Frist Sync
         ##########################################################################
 
-        expected_streams = streams
+        expected_streams = self.expected_streams()
 
         conn_id_1 = connections.ensure_connection(self, original_properties=False)
         runner.run_check_mode(self, conn_id_1)
