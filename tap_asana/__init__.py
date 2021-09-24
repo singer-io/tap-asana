@@ -167,7 +167,7 @@ def main():
         "refresh_token": args.config['refresh_token']
     }
 
-    Context.config = creds
+    Context.config = args.config
     Context.state = args.state
     Context.asana = Asana(**creds)
 

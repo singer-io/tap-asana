@@ -19,11 +19,11 @@ class Teams(Stream):
 
   def get_objects(self):
     opt_fields = ",".join(self.fields)
-    for workspace in Context.asana.client.workspaces.find_all(opt_fields="gid,is_organization"):
+    for workspace in Context.asana.client.workspaces.find_all(opt_fields="gid,is_organization", page_size=self.results_per_page):
       if workspace.get('is_organization', False) == True:
-        for team in Context.asana.client.teams.find_by_organization(organization=workspace["gid"], opt_fields=opt_fields):
+        for team in Context.asana.client.teams.find_by_organization(organization=workspace["gid"], opt_fields=opt_fields, page_size=self.results_per_page):
           users = []
-          for user in Context.asana.client.teams.users(team=team["gid"]):
+          for user in Context.asana.client.teams.users(team=team["gid"], page_size=self.results_per_page):
             users.append(user)
           team['users'] = users
           yield team

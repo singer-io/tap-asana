@@ -31,7 +31,8 @@ class Projects(Stream):
     "icon",
     "permalink_url",
     "workspace",
-    "team"
+    "team",
+    "resource_type"
   ]
 
 
@@ -39,8 +40,8 @@ class Projects(Stream):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
     opt_fields = ",".join(self.fields)
-    for workspace in Context.asana.client.workspaces.find_all():
-      for project in Context.asana.client.projects.find_all(workspace=workspace["gid"], opt_fields=opt_fields):
+    for workspace in Context.asana.client.workspaces.find_all(page_size=self.results_per_page):
+      for project in Context.asana.client.projects.find_all(workspace=workspace["gid"], opt_fields=opt_fields, page_size=self.results_per_page):
         session_bookmark = self.get_updated_session_bookmark(session_bookmark, project[self.replication_key])
         if self.is_bookmark_old(project[self.replication_key]):
           yield project
