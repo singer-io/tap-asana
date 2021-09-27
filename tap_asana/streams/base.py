@@ -9,6 +9,7 @@ import time
 from singer.messages import StateMessage
 from tap_asana.asana import Asana
 from asana.error import AsanaError, NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
+from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
 from tap_asana.context import Context
 
@@ -57,14 +58,18 @@ def retry_after_wait_gen(**kwargs):
 
 
 def invalid_token_handler(details):
-    LOGGER.info("Received InvalidTokenError, refreshing access token")
+    # LOGGER.info("Received InvalidTokenError, refreshing access token")
+    LOGGER.info("Received invalid or expired token error, refreshing access token")
     Context.asana.refresh_access_token()
 
 
 def asana_error_handling(fnc):
     @backoff.on_exception(backoff.expo,
-                          InvalidTokenError,
-                          on_backoff=invalid_token_handler)
+                          (InvalidTokenError, 
+                          NoAuthorizationError,
+                          TokenExpiredError),
+                          on_backoff=invalid_token_handler,
+                          max_tries=2)
     @backoff.on_exception(backoff.expo,
                           (simplejson.scanner.JSONDecodeError,
                           RetryableAsanaError),
@@ -148,8 +153,10 @@ class Stream():
     def call_api(self, resource, **query_params):
         fn = getattr(Context.asana.client, resource)
         if query_params:
-            return fn.find_all(**query_params)
-        return fn.find_all()
+            data = list(fn.find_all(**query_params))
+            return data
+        data = list(fn.find_all())
+        return data
 
     def sync(self):
         """Yield's processed SDK object dicts to the caller.

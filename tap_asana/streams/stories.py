@@ -1,8 +1,14 @@
 
 from singer import utils
 from tap_asana.context import Context
-from tap_asana.streams.base import Stream
+from tap_asana.streams.base import Stream, asana_error_handling
 
+
+@asana_error_handling
+def get_stories_for_tasks(task_gid, opt_fields):
+  stories = list(Context.asana.client.stories.get_stories_for_task(task_gid=task_gid,
+                                                                   opt_fields=opt_fields))
+  return stories
 
 class Stories(Stream):
   name = "stories"
@@ -63,7 +69,7 @@ class Stories(Stream):
       for project in self.call_api("projects", workspace=workspace["gid"]):
         for task in self.call_api("tasks", project=project["gid"]): 
           task_gid = task.get('gid')
-          for story in Context.asana.client.stories.get_stories_for_task(task_gid=task_gid, opt_fields=opt_fields):
+          for story in get_stories_for_tasks(task_gid, opt_fields):
             session_bookmark = self.get_updated_session_bookmark(session_bookmark, story[self.replication_key])
             if self.is_bookmark_old(story[self.replication_key]):
               yield story
