@@ -1,5 +1,4 @@
 
-from singer import utils
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 

@@ -12,6 +12,11 @@ jobs:
             source /usr/local/share/virtualenvs/tap-asana/bin/activate
             pip install -U 'pip<19.2' 'setuptools<51.0.0'
             pip install .[test]
+      - run:
+          name: 'pylint'
+          command: |
+            source /usr/local/share/virtualenvs/tap-asana/bin/activate
+            pylint tap_asana -d bad-indentation,missing-docstring,line-too-long,no-member
       - add_ssh_keys
       - run:
           name: 'Integration Tests'
