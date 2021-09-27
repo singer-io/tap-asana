@@ -58,7 +58,6 @@ def retry_after_wait_gen(**kwargs):
 
 
 def invalid_token_handler(details):
-    # LOGGER.info("Received InvalidTokenError, refreshing access token")
     LOGGER.info("Received invalid or expired token error, refreshing access token")
     Context.asana.refresh_access_token()
 
