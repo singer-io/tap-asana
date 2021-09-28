@@ -1,5 +1,4 @@
 import unittest
-import tap_asana
 import asana
 import oauthlib
 import tap_asana.streams.portfolios as portfolios
@@ -9,7 +8,6 @@ import tap_asana.streams.teams as teams
 from unittest import mock
 from tap_asana.context import Context
 from tap_asana.asana import Asana
-from oauthlib.oauth2 import TokenExpiredError
 
 
 WORKSPACE_OBJECT = Context.stream_objects['workspaces']()
@@ -92,6 +90,67 @@ class TestCallAPIRefreshAccessToken(unittest.TestCase):
         self.assertEqual(mocked_refresh_access_token.call_count, 1)
         self.assertEqual(mocked_get_attr.call_count, 1)
 
+    def test_invalid_token_error_for_query_with_params(self, mocked_get_attr, mocked_refresh_access_token):
+        '''
+            Verify that refresh_access_token is called two time each for Asana initialization and
+            refresh access_token due to InvalidTokenError error
+        '''
+        # Set asana client in Context before test
+        Context.asana = Asana('test', 'test', 'test', 'test', 'test')
+        mocked_find_all = mocked_get_attr.return_value
+        mocked_find_all.find_all.side_effect = invalid_token_error_raiser # raise InvalidTokenError
+
+        try:
+            workspaces = WORKSPACE_OBJECT.call_api("projects", workspace="test")
+        except asana.error.InvalidTokenError as e:
+            self.assertEqual(mocked_refresh_access_token.call_count, 2)
+            self.assertEqual(mocked_get_attr.call_count, 2)
+
+    def test_no_authorized_error_for_query_with_params(self, mocked_get_attr, mocked_refresh_access_token):
+        '''
+            Verify that refresh_access_token is called two time each for Asana initialization and
+            refresh access_token due to NoAuthorizationError error
+        '''
+        # Set asana client in Context before test
+        Context.asana = Asana('test', 'test', 'test', 'test', 'test')
+        mocked_find_all = mocked_get_attr.return_value
+        mocked_find_all.find_all.side_effect = no_authorized_error_raiser # raise NoAuthorizationError
+
+        try:
+            workspaces = WORKSPACE_OBJECT.call_api("projects", workspace="test")
+        except asana.error.NoAuthorizationError as e:
+            self.assertEqual(mocked_refresh_access_token.call_count, 2)
+            self.assertEqual(mocked_get_attr.call_count, 2)
+
+    def test_token_expired_error_for_query_with_params(self, mocked_get_attr, mocked_refresh_access_token):
+        '''
+            Verify that refresh_access_token is called two time each for Asana initialization and
+            refresh access_token due to TokenExpiredError error
+        '''
+        # Set asana client in Context before test
+        Context.asana = Asana('test', 'test', 'test', 'test', 'test')
+        mocked_find_all = mocked_get_attr.return_value
+        mocked_find_all.find_all.side_effect = token_expired_error_raiser # raise TokenExpiredError
+
+        try:
+            workspaces = WORKSPACE_OBJECT.call_api("projects", workspace="test")
+        except oauthlib.oauth2.TokenExpiredError as e:
+            self.assertEqual(mocked_refresh_access_token.call_count, 2)
+            self.assertEqual(mocked_get_attr.call_count, 2)
+
+    def test_no_error_for_query_with_params(self, mocked_get_attr, mocked_refresh_access_token):
+        '''
+            Verify that refresh_access_token is called one time for Asana initialization and
+            no exception is thrown
+        '''
+        # Set asana client in Context before test
+        Context.asana = Asana('test', 'test', 'test', 'test', 'test')
+        mocked_find_all = mocked_get_attr.return_value
+        mocked_find_all.find_all.side_effect = "data"
+
+        workspaces = WORKSPACE_OBJECT.call_api("projects", workspace="test")
+        self.assertEqual(mocked_refresh_access_token.call_count, 1)
+        self.assertEqual(mocked_get_attr.call_count, 1)
 
 @mock.patch("tap_asana.asana.Asana.refresh_access_token")
 class TestGetItemForPortfolio(unittest.TestCase):
