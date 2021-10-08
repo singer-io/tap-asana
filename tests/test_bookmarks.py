@@ -98,7 +98,8 @@ class AsanaBookmarksTest(AsanaBase):
                             replication_key_value_parsed, second_bookmark_value_parsed,
                             msg="Second sync bookmark was set incorrectly, a record with a greater replication-key value was synced."
                         )
-                        # the data of the second sync is greater-equal to the bookmark from the first sync
+
+                        # Verify the data of the second sync is greater-equal to the bookmark from the first sync
                         self.assertGreaterEqual(
                             replication_key_value_parsed, parse(self.second_start_date).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             msg="Sync did not respect the bookmark, a record with a smaller replication-key value was synced."
