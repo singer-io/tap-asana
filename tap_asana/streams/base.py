@@ -68,7 +68,7 @@ def asana_error_handling(fnc):
                           NoAuthorizationError,
                           TokenExpiredError),
                           on_backoff=invalid_token_handler,
-                          max_tries=2)
+                          max_tries=MAX_RETRIES)
     @backoff.on_exception(backoff.expo,
                           (simplejson.scanner.JSONDecodeError,
                           RetryableAsanaError),
