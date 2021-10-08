@@ -149,6 +149,9 @@ class Stream():
         return session_bookmark
 
 
+    # as we added page_size, we need to pass it in the query param
+    # hence removed the condition: 'if query_params', as
+    # there will be atleast 1 param: 'page_size'
     @asana_error_handling
     def call_api(self, resource, **query_params):
         function = getattr(Context.asana.client, resource)

@@ -10,17 +10,17 @@ class AsanaDiscoveryTest(AsanaBase):
     def test_run(self):
         """
         Testing that discovery creates the appropriate catalog with valid metadata.
-        • Verify number of actual streams discovered match expected
-        • Verify the stream names discovered were what we expect
-        • Verify stream names follow naming convention
+        - Verify number of actual streams discovered match expected
+        - Verify the stream names discovered were what we expect
+        - Verify stream names follow naming convention
           streams should only have lowercase alphas and underscores
-        • verify there is only 1 top level breadcrumb
-        • verify replication key(s)
-        • verify primary key(s)
-        • verify that if there is a replication key we are doing INCREMENTAL otherwise FULL
-        • verify the actual replication matches our expected replication method
-        • verify that primary, replication keys are given the inclusion of automatic.
-        • verify that all other fields have inclusion of available metadata.
+        - verify there is only 1 top level breadcrumb
+        - verify replication key(s)
+        - verify primary key(s)
+        - verify that if there is a replication key we are doing INCREMENTAL otherwise FULL
+        - verify the actual replication matches our expected replication method
+        - verify that primary, replication keys are given the inclusion of automatic.
+        - verify that all other fields have inclusion of available metadata.
         """
         streams_to_test = self.expected_streams()
 

@@ -7,12 +7,18 @@ class AsanaAutomaticFieldsTest(AsanaBase):
         return "tap_tester_asana_automatic_fields_test"
 
     def test_run(self):
+        """
+        Testing that all the automatic fields are replicated despite de-selecting them
+        - Verify that only the automatic fields are sent to the target.
+        - Verify that all replicated records have unique primary key values.
+        """
         conn_id = connections.ensure_connection(self)
         expected_streams = self.expected_streams()
 
         # run check mode
         found_catalogs = self.run_and_verify_check_mode(conn_id)
 
+        # de-select all the fields
         self.select_found_catalogs(conn_id, found_catalogs, deselect_all_fields=True)
 
         # run sync

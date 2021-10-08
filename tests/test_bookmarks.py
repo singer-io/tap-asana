@@ -10,7 +10,15 @@ class AsanaBookmarksTest(AsanaBase):
         return "tap_tester_asana_bookmarks_test"
 
     def test_run(self):
-
+        """
+        Testing that the bookmarking for the tap works as expected
+        - Verify for each incremental stream you can do a sync which records bookmarks
+        - Verify that a bookmark doesn't exist for full table streams.
+        - Verify the bookmark is the max value sent to the target for the a given replication key.
+        - Verify 2nd sync respects the bookmark
+        - All data of the 2nd sync is >= the bookmark from the first sync
+        - The number of records in the 2nd sync is less then the first
+        """
         conn_id = connections.ensure_connection(self)
         runner.run_check_mode(self, conn_id)
 
@@ -28,12 +36,13 @@ class AsanaBookmarksTest(AsanaBase):
         ### Update State
         ##########################################################################
 
+        # setting 'second_start_date' as bookmark for running 2nd sync
         new_state = {'bookmarks': dict()}
         replication_keys = self.expected_replication_keys()
         for stream in expected_streams:
             if self.is_incremental(stream):
                 new_state['bookmarks'][stream] = dict()
-                new_state['bookmarks'][stream][next(iter(replication_keys[stream]))] = '2020-08-10T00:00:00Z'
+                new_state['bookmarks'][stream][next(iter(replication_keys[stream]))] = self.second_start_date
 
         # Set state for next sync
         menagerie.set_state(conn_id, new_state)
@@ -88,6 +97,11 @@ class AsanaBookmarksTest(AsanaBase):
                         self.assertLessEqual(
                             replication_key_value_parsed, second_bookmark_value_parsed,
                             msg="Second sync bookmark was set incorrectly, a record with a greater replication-key value was synced."
+                        )
+                        # the data of the second sync is greater-equal to the bookmark from the first sync
+                        self.assertGreaterEqual(
+                            replication_key_value_parsed, parse(self.second_start_date).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                            msg="Sync did not respect the bookmark, a record with a smaller replication-key value was synced."
                         )
 
                     for record in first_sync_messages:

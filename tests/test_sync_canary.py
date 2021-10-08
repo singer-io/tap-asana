@@ -7,6 +7,10 @@ class AsanaSyncTest(AsanaBase):
         return "tap_tester_asana_sync_test"
 
     def test_run(self):
+        """
+        Testing that tap is syncing data
+        - Verify we got atleast 1 record for each stream
+        """
         conn_id = connections.ensure_connection(self)
 
         expected_streams = self.expected_streams()

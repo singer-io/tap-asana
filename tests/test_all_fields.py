@@ -7,6 +7,11 @@ class AsanaAllFieldsTest(AsanaBase):
         return "tap_tester_asana_all_fields_test"
 
     def test_run(self):
+        """
+        Testing that all fields mentioned in the catalog are synced from the tap
+        - Verify no unexpected streams were replicated
+        - Verify that more than just the automatic fields are replicated for each stream
+        """
         expected_streams = self.expected_streams()
         
         # instantiate connection
@@ -60,7 +65,7 @@ class AsanaAllFieldsTest(AsanaBase):
                 self.assertGreater(len(expected_all_keys), len(expected_automatic_keys))
                 self.assertTrue(expected_automatic_keys.issubset(expected_all_keys), msg=f'{expected_automatic_keys-expected_all_keys} is not in "expected_all_keys"')
 
-                # remove fields as data cannot be generated
+                # removd below fields as data cannot be generated
                 if stream == 'tasks':
                     expected_all_keys.remove('is_rendered_as_seperator')
                     expected_all_keys.remove('external')

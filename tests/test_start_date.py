@@ -10,17 +10,25 @@ class AsanaStartDateTest(AsanaBase):
         return "tap_tester_asana_start_date_test"
 
     def test_run(self):
+        """
+        Testing that the tap respects the start date
+        - INCREMENTAL
+            - Verify 1st sync (start date=today-N days) record count > 2nd sync (start date=today) record count.
+            - Verify minimum bookmark sent to the target for incremental streams >= start date for both syncs.
+            - Verify by primary key values, that all records in the 2nd sync are included in the 1st sync since 2nd sync has a later start date.
+        - FULL TABLE
+            - Verify that the 2nd sync includes the same number of records as the 1st sync.
+            - Verify by primary key values, that the 2nd sync and 1st sync replicated the same records.
+        """
 
-        start_date_1 = '2019-01-01T00:00:00Z'
-        start_date_2 = '2020-08-10T00:00:00Z'
-        start_date_1_epoch = self.dt_to_ts(start_date_1)
-        start_date_2_epoch = self.dt_to_ts(start_date_2)
+        start_date_1_epoch = self.dt_to_ts(self.first_start_date)
+        start_date_2_epoch = self.dt_to_ts(self.second_start_date)
 
         ##########################################################################
         ### Update Start Date for 1st sync
         ##########################################################################
 
-        self.START_DATE = start_date_1
+        self.START_DATE = self.first_start_date
 
         ##########################################################################
         ### Frist Sync
@@ -42,7 +50,7 @@ class AsanaStartDateTest(AsanaBase):
         ### Update Start Date for 2nd sync
         ##########################################################################
 
-        self.START_DATE = start_date_2
+        self.START_DATE = self.second_start_date
 
         ##########################################################################
         ### Second Sync

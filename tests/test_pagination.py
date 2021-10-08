@@ -12,6 +12,11 @@ class AsanaPaginationTest(AsanaBase):
         return props
 
     def test_run(self):
+        """
+        Testing that the pagination works when there are records greater than the page size
+        - Verify for each stream you can get multiple pages of data
+        - Verify by pks that the data replicated matches the data we expect.
+        """
         # to get data from more than 1 'workspaces' we need to upgrade asana plan
         expected_streams = self.expected_streams() - {'workspaces'}
         conn_id = connections.ensure_connection(self)
