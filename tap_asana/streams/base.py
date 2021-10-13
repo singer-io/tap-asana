@@ -97,7 +97,7 @@ class Stream():
             # Documentation: https://developers.asana.com/docs/pagination
             if self.results_per_page > 100:
                 # warn user that he entered page size greater than 100
-                LOGGER.warn("The page size cannot be greater than 100, hence setting to maximum page size: 100.")
+                LOGGER.warning("The page size cannot be greater than 100, hence setting to maximum page size: 100.")
                 # set the maximum possible page size
                 self.results_per_page = 100
 
