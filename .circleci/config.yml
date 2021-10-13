@@ -17,6 +17,11 @@ jobs:
           command: |
             source /usr/local/share/virtualenvs/tap-asana/bin/activate
             pylint tap_asana -d bad-indentation,missing-docstring,line-too-long,no-member
+      - run:
+          name: 'Unit Tests'
+          command: |
+            source /usr/local/share/virtualenvs/tap-asana/bin/activate
+            nosetests tests/unittests
       - add_ssh_keys
       - run:
           name: 'Integration Tests'
