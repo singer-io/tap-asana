@@ -93,9 +93,13 @@ class Stream():
         self.results_per_page = RESULTS_PER_PAGE
         if Context.config.get('results_per_page'):
             self.results_per_page = int(Context.config.get('results_per_page'))
-            # page size cannot be greater than 100
+            # page size must be between 1-100
             # Documentation: https://developers.asana.com/docs/pagination
-            self.results_per_page = min(self.results_per_page, 100)
+            if self.results_per_page > 100:
+                # warn user that he entered page size greater than 100
+                LOGGER.warn("The page size cannot be greater than 100, hence setting to maximum page size: 100.")
+                # set the maximum possible page size
+                self.results_per_page = 100
 
     def get_bookmark(self):
         bookmark = (singer.get_bookmark(Context.state,
