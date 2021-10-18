@@ -1,16 +1,17 @@
 
 from tap_asana.context import Context
-from tap_asana.streams.base import Stream, asana_error_handling
+from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 
 @asana_error_handling
 def find_team_by_organization(organization, opt_fields):
   teams = list(Context.asana.client.teams.find_by_organization(organization=organization,
-                                                               opt_fields=opt_fields))
+                                                               opt_fields=opt_fields,
+                                                               timeout=REQUEST_TIMEOUT))
   return teams
 
 @asana_error_handling
 def get_users_for_teams(team):
-  users = list(Context.asana.client.teams.users(team=team))
+  users = list(Context.asana.client.teams.users(team=team, timeout=REQUEST_TIMEOUT))
   return users
 
 class Teams(Stream):

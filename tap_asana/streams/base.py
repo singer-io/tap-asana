@@ -6,6 +6,7 @@ import backoff
 import simplejson
 import singer
 import time
+import requests
 from singer.messages import StateMessage
 from tap_asana.asana import Asana
 from asana.error import AsanaError, NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
@@ -15,6 +16,9 @@ from tap_asana.context import Context
 
 
 LOGGER = singer.get_logger()
+
+# timeout request after 300 seconds
+REQUEST_TIMEOUT = 300
 
 RESULTS_PER_PAGE = 250
 
@@ -63,6 +67,10 @@ def invalid_token_handler(details):
 
 
 def asana_error_handling(fnc):
+    @backoff.on_exception(backoff.expo,
+                          requests.Timeout,
+                          max_tries=MAX_RETRIES,
+                          factor=2)
     @backoff.on_exception(backoff.expo,
                           (InvalidTokenError, 
                           NoAuthorizationError,
@@ -148,13 +156,15 @@ class Stream():
         return session_bookmark
 
 
+    # as we added timeout, we need to pass it in the query param
+    # hence removed the condition: 'if query_params', as
+    # there will be atleast 1 param: 'timeout'
     @asana_error_handling
     def call_api(self, resource, **query_params):
         fn = getattr(Context.asana.client, resource)
-        if query_params:
-            data = list(fn.find_all(**query_params))
-            return data
-        data = list(fn.find_all())
+        query_params['timeout'] = REQUEST_TIMEOUT
+        # 'fn.find_all' returns a generator, hence iterating over it to raise any error caused during API call
+        data = list(fn.find_all(**query_params))
         return data
 
     def sync(self):

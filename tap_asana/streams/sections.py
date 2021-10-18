@@ -1,13 +1,14 @@
 
 from singer import utils
 from tap_asana.context import Context
-from tap_asana.streams.base import Stream, asana_error_handling
+from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 
 @asana_error_handling
 def get_sections_for_projects(project_gid, owner, opt_fields):
   sections = list(Context.asana.client.sections.get_sections_for_project(project_gid=project_gid,
                                                                          owner=owner,
-                                                                         opt_fields=opt_fields))
+                                                                         opt_fields=opt_fields,
+                                                                         timeout=REQUEST_TIMEOUT))
   return sections
 
 class Sections(Stream):

@@ -1,13 +1,14 @@
 
 from singer import utils
 from tap_asana.context import Context
-from tap_asana.streams.base import Stream, asana_error_handling
+from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 
 
 @asana_error_handling
 def get_stories_for_tasks(task_gid, opt_fields):
   stories = list(Context.asana.client.stories.get_stories_for_task(task_gid=task_gid,
-                                                                   opt_fields=opt_fields))
+                                                                   opt_fields=opt_fields,
+                                                                   timeout=REQUEST_TIMEOUT))
   return stories
 
 class Stories(Stream):
