@@ -167,7 +167,8 @@ def main():
         "refresh_token": args.config['refresh_token']
     }
 
-    Context.config = creds
+    # as we passed 'request_timeout', we need to add whole 'args.config' rather than adding 'creds'
+    Context.config = args.config
     Context.state = args.state
     Context.asana = Asana(**creds)
 
