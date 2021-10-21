@@ -162,7 +162,7 @@ class Stream():
     @asana_error_handling
     def call_api(self, resource, **query_params):
         fn = getattr(Context.asana.client, resource)
-        query_params['timeout'] = REQUEST_TIMEOUT
+        query_params['timeout'] = Context.config.get('request_timeout', REQUEST_TIMEOUT)
         # 'fn.find_all' returns a generator, hence iterating over it to raise any error caused during API call
         data = list(fn.find_all(**query_params))
         return data
