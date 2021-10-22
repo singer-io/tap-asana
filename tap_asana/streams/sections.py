@@ -8,7 +8,7 @@ def get_sections_for_projects(project_gid, owner, opt_fields):
   sections = list(Context.asana.client.sections.get_sections_for_project(project_gid=project_gid,
                                                                          owner=owner,
                                                                          opt_fields=opt_fields,
-                                                                         timeout=Context.config.get('request_timeout', REQUEST_TIMEOUT)))
+                                                                         timeout=float(Context.config.get('request_timeout', REQUEST_TIMEOUT))))
   return sections
 
 class Sections(Stream):

@@ -6,12 +6,12 @@ from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 def find_team_by_organization(organization, opt_fields):
   teams = list(Context.asana.client.teams.find_by_organization(organization=organization,
                                                                opt_fields=opt_fields,
-                                                               timeout=Context.config.get('request_timeout', REQUEST_TIMEOUT)))
+                                                               timeout=float(Context.config.get('request_timeout', REQUEST_TIMEOUT))))
   return teams
 
 @asana_error_handling
 def get_users_for_teams(team):
-  users = list(Context.asana.client.teams.users(team=team, timeout=Context.config.get('request_timeout', REQUEST_TIMEOUT)))
+  users = list(Context.asana.client.teams.users(team=team, timeout=float(Context.config.get('request_timeout', REQUEST_TIMEOUT))))
   return users
 
 class Teams(Stream):
