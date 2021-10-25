@@ -6,7 +6,7 @@ from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 
 @asana_error_handling
 def get_items_for_portfolio(portfolio_gid):
-  portfolio_items = list(Context.asana.client.portfolios.get_items_for_portfolio(portfolio_gid=portfolio_gid, timeout=float(Context.config.get('request_timeout', REQUEST_TIMEOUT))))
+  portfolio_items = list(Context.asana.client.portfolios.get_items_for_portfolio(portfolio_gid=portfolio_gid, timeout=float(Context.config.get('request_timeout') or REQUEST_TIMEOUT)))
   return portfolio_items
 
 @asana_error_handling
@@ -14,7 +14,7 @@ def get_portfolies_for_workspace(workspace_id, owner, opt_fields):
   portfolios = list(Context.asana.client.portfolios.get_portfolios(workspace=workspace_id,
                                                                    owner=owner,
                                                                    opt_fields=opt_fields,
-                                                                   timeout=float(Context.config.get('request_timeout', REQUEST_TIMEOUT))))
+                                                                   timeout=float(Context.config.get('request_timeout') or REQUEST_TIMEOUT)))
   return portfolios
 
 class Portfolios(Stream):

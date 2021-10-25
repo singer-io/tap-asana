@@ -8,7 +8,7 @@ from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 def get_stories_for_tasks(task_gid, opt_fields):
   stories = list(Context.asana.client.stories.get_stories_for_task(task_gid=task_gid,
                                                                    opt_fields=opt_fields,
-                                                                   timeout=float(Context.config.get('request_timeout', REQUEST_TIMEOUT))))
+                                                                   timeout=float(Context.config.get('request_timeout') or REQUEST_TIMEOUT)))
   return stories
 
 class Stories(Stream):
