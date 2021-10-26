@@ -40,7 +40,7 @@ $ pip install tap-asana
   "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
   "refresh_token": "yyy",
   "start_date" : "2018-02-22T02:06:58.147Z",
-  "request_timeout": 100
+  "request_timeout": 300
 }
 ```
 

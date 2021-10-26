@@ -4,14 +4,24 @@ from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 
 @asana_error_handling
 def find_team_by_organization(organization, opt_fields):
+  # Set request timeout to config param `request_timeout` value.
+  # If value is 0,"0", "" or None then it will set default to default to 300.0 seconds if not passed in config.
+  config_request_timeout = Context.config.get('request_timeout')
+  request_timeout = config_request_timeout and float(config_request_timeout) or REQUEST_TIMEOUT # pylint: disable=consider-using-ternary
+
   teams = list(Context.asana.client.teams.find_by_organization(organization=organization,
                                                                opt_fields=opt_fields,
-                                                               timeout=float(Context.config.get('request_timeout') or REQUEST_TIMEOUT)))
+                                                               timeout=request_timeout))
   return teams
 
 @asana_error_handling
 def get_users_for_teams(team):
-  users = list(Context.asana.client.teams.users(team=team, timeout=float(Context.config.get('request_timeout') or REQUEST_TIMEOUT)))
+  # Set request timeout to config param `request_timeout` value.
+  # If value is 0,"0", "" or None then it will set default to default to 300.0 seconds if not passed in config.
+  config_request_timeout = Context.config.get('request_timeout')
+  request_timeout = config_request_timeout and float(config_request_timeout) or REQUEST_TIMEOUT # pylint: disable=consider-using-ternary
+
+  users = list(Context.asana.client.teams.users(team=team, timeout=request_timeout))
   return users
 
 class Teams(Stream):
