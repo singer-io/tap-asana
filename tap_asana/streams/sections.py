@@ -5,6 +5,7 @@ from tap_asana.streams.base import Stream, asana_error_handling
 
 @asana_error_handling
 def get_sections_for_projects(project_gid, owner, opt_fields):
+  # Get and return a list sections for provided project
   sections = list(Context.asana.client.sections.get_sections_for_project(project_gid=project_gid,
                                                                          owner=owner,
                                                                          opt_fields=opt_fields))

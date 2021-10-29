@@ -4,12 +4,14 @@ from tap_asana.streams.base import Stream, asana_error_handling
 
 @asana_error_handling
 def find_team_by_organization(organization, opt_fields):
+  # Get and return a list of teams for provided organization
   teams = list(Context.asana.client.teams.find_by_organization(organization=organization,
                                                                opt_fields=opt_fields))
   return teams
 
 @asana_error_handling
 def get_users_for_teams(team):
+  # Get and return a list of users for provided team
   users = list(Context.asana.client.teams.users(team=team))
   return users
 

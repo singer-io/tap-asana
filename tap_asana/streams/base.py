@@ -148,6 +148,9 @@ class Stream():
         return session_bookmark
 
 
+    # The function fn.find_all returns the generator so it will throw an error at a time of iteration over it.
+    # Due to this exceptions can't be thrown from the call_api() function so error handling is not utilized.
+    # Converted generator to list below so it will throw an exception in that line only and exception handling can be utilize.
     @asana_error_handling
     def call_api(self, resource, **query_params):
         fn = getattr(Context.asana.client, resource)

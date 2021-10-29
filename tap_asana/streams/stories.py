@@ -6,6 +6,7 @@ from tap_asana.streams.base import Stream, asana_error_handling
 
 @asana_error_handling
 def get_stories_for_tasks(task_gid, opt_fields):
+  # Get and return a list of stories for provided task
   stories = list(Context.asana.client.stories.get_stories_for_task(task_gid=task_gid,
                                                                    opt_fields=opt_fields))
   return stories

@@ -6,11 +6,13 @@ from tap_asana.streams.base import Stream, asana_error_handling
 
 @asana_error_handling
 def get_items_for_portfolio(portfolio_gid):
+  # Get and return a list of portfolio items for provided portfolio_gid
   portfolio_items = list(Context.asana.client.portfolios.get_items_for_portfolio(portfolio_gid=portfolio_gid))
   return portfolio_items
 
 @asana_error_handling
 def get_portfolies_for_workspace(workspace_id, owner, opt_fields):
+  # Get and return a list of portfolios for provided workspace
   portfolios = list(Context.asana.client.portfolios.get_portfolios(workspace=workspace_id,
                                                                    owner=owner,
                                                                    opt_fields=opt_fields))
