@@ -156,14 +156,18 @@ class Stream():
         return session_bookmark
 
 
-    # as we added timeout, we need to pass it in the query param
+    # As we added timeout, we need to pass it in the query param
     # hence removed the condition: 'if query_params', as
     # there will be atleast 1 param: 'timeout'
+    # ------------------------------------------
+    # The function fn.find_all returns the generator so it will throw an error at a time of iteration over it.
+    # Due to this exceptions can't be thrown from the call_api() function so error handling is not utilized.
+    # Converted generator to list below so it will throw an exception in that line only and exception handling can be utilize.
     @asana_error_handling
     def call_api(self, resource, **query_params):
         fn = getattr(Context.asana.client, resource)
         # Set request timeout to config param `request_timeout` value.
-        # If value is 0,"0", "" or None then it will set default to default to 300.0 seconds if not passed in config.
+        # If value is 0,"0", "" or None then it will set default to default to 300 seconds if not passed in config.
         config_request_timeout = Context.config.get('request_timeout')
         request_timeout = config_request_timeout and float(config_request_timeout) or REQUEST_TIMEOUT # pylint: disable=consider-using-ternary
 

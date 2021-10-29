@@ -7,10 +7,11 @@ from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 @asana_error_handling
 def get_stories_for_tasks(task_gid, opt_fields):
   # Set request timeout to config param `request_timeout` value.
-  # If value is 0,"0", "" or None then it will set default to default to 300.0 seconds if not passed in config.
+  # If value is 0,"0", "" or None then it will set default to default to 300 seconds if not passed in config.
   config_request_timeout = Context.config.get('request_timeout')
   request_timeout = config_request_timeout and float(config_request_timeout) or REQUEST_TIMEOUT # pylint: disable=consider-using-ternary
 
+  # Get and return a list of stories for provided task
   stories = list(Context.asana.client.stories.get_stories_for_task(task_gid=task_gid,
                                                                    opt_fields=opt_fields,
                                                                    timeout=request_timeout))
