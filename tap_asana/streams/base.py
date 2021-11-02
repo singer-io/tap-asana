@@ -167,9 +167,11 @@ class Stream():
     def call_api(self, resource, **query_params):
         fn = getattr(Context.asana.client, resource)
         # Set request timeout to config param `request_timeout` value.
-        # If value is 0,"0", "" or None then it will set default to default to 300 seconds if not passed in config.
         config_request_timeout = Context.config.get('request_timeout')
-        request_timeout = config_request_timeout and float(config_request_timeout) or REQUEST_TIMEOUT # pylint: disable=consider-using-ternary
+        if config_request_timeout and float(config_request_timeout):
+            request_timeout = float(config_request_timeout)
+        else:
+            request_timeout = REQUEST_TIMEOUT # If value is 0,"0","" or not passed then it set default to 300 seconds.
 
         query_params['timeout'] = request_timeout
         # 'fn.find_all' returns a generator, hence iterating over it to raise any error caused during API call
