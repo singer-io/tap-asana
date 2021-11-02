@@ -32,6 +32,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         try:
             workspaces = WORKSPACE_OBJECT.call_api("workspaces")
         except requests.Timeout:
+            # catch Timeout error
             pass
 
         self.assertEqual(mocked_get_attr.call_count, 5)
@@ -137,6 +138,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         try:
             items_for_portfolios = portfolios.get_items_for_portfolio('test')
         except requests.Timeout:
+            # catch Timeout error
             pass
 
         self.assertEqual(Context.asana.client.portfolios.get_items_for_portfolio.call_count, 5)
@@ -160,6 +162,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         try:
             portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
         except requests.Timeout:
+            # catch Timeout error
             pass
 
         self.assertEqual(Context.asana.client.portfolios.get_portfolios.call_count, 5)
@@ -343,6 +346,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         try:
             sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
         except requests.Timeout:
+            # catch Timeout error
             pass
 
         self.assertEqual(Context.asana.client.sections.get_sections_for_project.call_count, 5)
@@ -448,6 +452,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         try:
             stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
         except requests.Timeout:
+            # catch Timeout error
             pass
 
         self.assertEqual(Context.asana.client.stories.get_stories_for_task.call_count, 5)
@@ -553,6 +558,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         try:
             team_by_organization = teams.find_team_by_organization('test', ['test'])
         except requests.Timeout:
+            # catch Timeout error
             pass
 
         self.assertEqual(Context.asana.client.teams.find_by_organization.call_count, 5)
@@ -576,6 +582,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         try:
             users_for_team = teams.get_users_for_teams('test')
         except requests.Timeout:
+            # catch Timeout error
             pass
 
         self.assertEqual(Context.asana.client.teams.users.call_count, 5)

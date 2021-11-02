@@ -17,8 +17,11 @@ from tap_asana.context import Context
 
 LOGGER = singer.get_logger()
 
-# timeout request after 300 seconds
+# Setting default timeout as 300 second
 REQUEST_TIMEOUT = 300
+
+# Retry the request in the factor of 2 ie. 2, 4, 8, ...
+FACTOR = 2
 
 RESULTS_PER_PAGE = 250
 
@@ -70,7 +73,7 @@ def asana_error_handling(fnc):
     @backoff.on_exception(backoff.expo,
                           requests.Timeout,
                           max_tries=MAX_RETRIES,
-                          factor=2)
+                          factor=FACTOR)
     @backoff.on_exception(backoff.expo,
                           (InvalidTokenError, 
                           NoAuthorizationError,
@@ -168,10 +171,11 @@ class Stream():
         fn = getattr(Context.asana.client, resource)
         # Set request timeout to config param `request_timeout` value.
         config_request_timeout = Context.config.get('request_timeout')
+        # If value is 0,"0","" or not passed then it set default to 300 seconds.
         if config_request_timeout and float(config_request_timeout):
             request_timeout = float(config_request_timeout)
         else:
-            request_timeout = REQUEST_TIMEOUT # If value is 0,"0","" or not passed then it set default to 300 seconds.
+            request_timeout = REQUEST_TIMEOUT
 
         query_params['timeout'] = request_timeout
         # 'fn.find_all' returns a generator, hence iterating over it to raise any error caused during API call

@@ -7,10 +7,11 @@ from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 def get_sections_for_projects(project_gid, owner, opt_fields):
   # Set request timeout to config param `request_timeout` value.
   config_request_timeout = Context.config.get('request_timeout')
+  # If value is 0,"0","" or not passed then it set default to 300 seconds.
   if config_request_timeout and float(config_request_timeout):
     request_timeout = float(config_request_timeout)
   else:
-    request_timeout = REQUEST_TIMEOUT # If value is 0,"0","" or not passed then it set default to 300 seconds.
+    request_timeout = REQUEST_TIMEOUT
 
   # Get and return a list sections for provided project
   sections = list(Context.asana.client.sections.get_sections_for_project(project_gid=project_gid,

@@ -8,10 +8,11 @@ from tap_asana.streams.base import Stream, asana_error_handling, REQUEST_TIMEOUT
 def get_items_for_portfolio(portfolio_gid):
   # Set request timeout to config param `request_timeout` value.
   config_request_timeout = Context.config.get('request_timeout')
+  # If value is 0,"0","" or not passed then it set default to 300 seconds.
   if config_request_timeout and float(config_request_timeout):
       request_timeout = float(config_request_timeout)
   else:
-      request_timeout = REQUEST_TIMEOUT # If value is 0,"0","" or not passed then it set default to 300 seconds.
+      request_timeout = REQUEST_TIMEOUT
 
   # Get and return a list of portfolio items for provided portfolio_gid
   portfolio_items = list(Context.asana.client.portfolios.get_items_for_portfolio(portfolio_gid=portfolio_gid, timeout=request_timeout))
@@ -21,10 +22,11 @@ def get_items_for_portfolio(portfolio_gid):
 def get_portfolies_for_workspace(workspace_id, owner, opt_fields):
   # Set request timeout to config param `request_timeout` value.
   config_request_timeout = Context.config.get('request_timeout')
+  # If value is 0,"0","" or not passed then it set default to 300 seconds.
   if config_request_timeout and float(config_request_timeout):
     request_timeout = float(config_request_timeout)
   else:
-    request_timeout = REQUEST_TIMEOUT # If value is 0,"0","" or not passed then it set default to 300 seconds.
+    request_timeout = REQUEST_TIMEOUT
 
   # Get and return a list of portfolios for provided workspace
   portfolios = list(Context.asana.client.portfolios.get_portfolios(workspace=workspace_id,
