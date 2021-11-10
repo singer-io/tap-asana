@@ -1,10 +1,10 @@
 import unittest
 import asana
 import oauthlib
-import tap_asana.streams.portfolios as portfolios
-import tap_asana.streams.sections as sections
-import tap_asana.streams.stories as stories
-import tap_asana.streams.teams as teams
+from tap_asana.streams.portfolios import Portfolios
+from tap_asana.streams.sections import Sections
+from tap_asana.streams.stories import Stories
+from tap_asana.streams.teams import Teams
 from unittest import mock
 from tap_asana.context import Context
 from tap_asana.asana import Asana
@@ -160,7 +160,7 @@ class TestGetItemForPortfolio(unittest.TestCase):
         Context.asana.client.portfolios.get_items_for_portfolio = invalid_token_error_raiser # raise InvalidTokenError
 
         try:
-            portfolio_items = portfolios.get_items_for_portfolio('test')
+            portfolio_items = Portfolios().get_items_for_portfolio('test')
         except asana.error.InvalidTokenError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -173,7 +173,7 @@ class TestGetItemForPortfolio(unittest.TestCase):
         Context.asana.client.portfolios.get_items_for_portfolio = no_authorized_error_raiser # raise NoAuthorizationError
 
         try:
-            portfolio_items = portfolios.get_items_for_portfolio('test')
+            portfolio_items = Portfolios().get_items_for_portfolio('test')
         except asana.error.NoAuthorizationError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -186,7 +186,7 @@ class TestGetItemForPortfolio(unittest.TestCase):
         Context.asana.client.portfolios.get_items_for_portfolio = token_expired_error_raiser # raise TokenExpiredError
 
         try:
-            portfolio_items = portfolios.get_items_for_portfolio('test')
+            portfolio_items = Portfolios().get_items_for_portfolio('test')
         except oauthlib.oauth2.TokenExpiredError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -199,7 +199,7 @@ class TestGetItemForPortfolio(unittest.TestCase):
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
         Context.asana.client.portfolios.get_items_for_portfolio = valid_data
 
-        portfolio_items = portfolios.get_items_for_portfolio('test')
+        portfolio_items = Portfolios().get_items_for_portfolio('test')
         self.assertEqual(mocked_refresh_access_token.call_count, 1)
 
 
@@ -216,7 +216,7 @@ class TestGetPortfoliosForWorkspaces(unittest.TestCase):
         Context.asana.client.portfolios.get_portfolios = invalid_token_error_raiser # raise InvalidTokenError
 
         try:
-            portfolio = portfolios.get_portfolies_for_workspace('test', 'test', 'test')
+            portfolio = Portfolios().get_portfolies_for_workspace('test', 'test', 'test')
         except asana.error.InvalidTokenError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -229,7 +229,7 @@ class TestGetPortfoliosForWorkspaces(unittest.TestCase):
         Context.asana.client.portfolios.get_portfolios = no_authorized_error_raiser # raise NoAuthorizationError
 
         try:
-            portfolio = portfolios.get_portfolies_for_workspace('test', 'test', 'test')
+            portfolio = Portfolios().get_portfolies_for_workspace('test', 'test', 'test')
         except asana.error.NoAuthorizationError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -242,7 +242,7 @@ class TestGetPortfoliosForWorkspaces(unittest.TestCase):
         Context.asana.client.portfolios.get_portfolios = token_expired_error_raiser # raise TokenExpiredError
 
         try:
-            portfolio = portfolios.get_portfolies_for_workspace('test', 'test', 'test')
+            portfolio = Portfolios().get_portfolies_for_workspace('test', 'test', 'test')
         except oauthlib.oauth2.TokenExpiredError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -255,7 +255,7 @@ class TestGetPortfoliosForWorkspaces(unittest.TestCase):
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
         Context.asana.client.portfolios.get_portfolios = valid_data
 
-        portfolio = portfolios.get_portfolies_for_workspace('test', 'test', 'test')
+        portfolio = Portfolios().get_portfolies_for_workspace('test', 'test', 'test')
         self.assertEqual(mocked_refresh_access_token.call_count, 1)
 
 
@@ -272,7 +272,7 @@ class TestGetSectionsForProject(unittest.TestCase):
         Context.asana.client.sections.get_sections_for_project = invalid_token_error_raiser # raise InvalidTokenError
 
         try:
-            section = sections.get_sections_for_projects('test', 'test', 'test')
+            section = Sections().get_sections_for_projects('test', 'test', 'test')
         except asana.error.InvalidTokenError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -285,7 +285,7 @@ class TestGetSectionsForProject(unittest.TestCase):
         Context.asana.client.sections.get_sections_for_project = no_authorized_error_raiser # raise NoAuthorizationError
 
         try:
-            section = sections.get_sections_for_projects('test', 'test', 'test')
+            section= Sections().get_sections_for_projects('test', 'test', 'test')
         except asana.error.NoAuthorizationError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -298,7 +298,7 @@ class TestGetSectionsForProject(unittest.TestCase):
         Context.asana.client.sections.get_sections_for_project = token_expired_error_raiser # raise TokenExpiredError
 
         try:
-            section = sections.get_sections_for_projects('test', 'test', 'test')
+            section= Sections().get_sections_for_projects('test', 'test', 'test')
         except oauthlib.oauth2.TokenExpiredError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -311,7 +311,7 @@ class TestGetSectionsForProject(unittest.TestCase):
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
         Context.asana.client.sections.get_sections_for_project = valid_data
 
-        section = sections.get_sections_for_projects('test', 'test', 'test')
+        section= Sections().get_sections_for_projects('test', 'test', 'test')
         self.assertEqual(mocked_refresh_access_token.call_count, 1)
 
 
@@ -328,7 +328,7 @@ class TestGetStoriesForTask(unittest.TestCase):
         Context.asana.client.stories.get_stories_for_task = invalid_token_error_raiser # raise InvalidTokenError
 
         try:
-            story = stories.get_stories_for_tasks('test', 'test')
+            story = Stories().get_stories_for_tasks('test', 'test')
         except asana.error.InvalidTokenError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -341,7 +341,7 @@ class TestGetStoriesForTask(unittest.TestCase):
         Context.asana.client.stories.get_stories_for_task = no_authorized_error_raiser # raise NoAuthorizationError
 
         try:
-            story = stories.get_stories_for_tasks('test', 'test')
+            story = Stories().get_stories_for_tasks('test', 'test')
         except asana.error.NoAuthorizationError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -354,7 +354,7 @@ class TestGetStoriesForTask(unittest.TestCase):
         Context.asana.client.stories.get_stories_for_task = token_expired_error_raiser # raise TokenExpiredError
 
         try:
-            story = stories.get_stories_for_tasks('test', 'test')
+            story = Stories().get_stories_for_tasks('test', 'test')
         except oauthlib.oauth2.TokenExpiredError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -367,7 +367,7 @@ class TestGetStoriesForTask(unittest.TestCase):
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
         Context.asana.client.stories.get_stories_for_task = valid_data
 
-        story = stories.get_stories_for_tasks('test', 'test')
+        story = Stories().get_stories_for_tasks('test', 'test')
         self.assertEqual(mocked_refresh_access_token.call_count, 1)
 
 
@@ -384,7 +384,7 @@ class TestFindTeamByOrganization(unittest.TestCase):
         Context.asana.client.teams.find_by_organization = invalid_token_error_raiser # raise InvalidTokenError
 
         try:
-            team = teams.find_team_by_organization('test', 'test')
+            team = Teams().find_team_by_organization('test', 'test')
         except asana.error.InvalidTokenError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -397,7 +397,7 @@ class TestFindTeamByOrganization(unittest.TestCase):
         Context.asana.client.teams.find_by_organization = no_authorized_error_raiser # raise NoAuthorizationError
 
         try:
-            team = teams.find_team_by_organization('test', 'test')
+            team = Teams().find_team_by_organization('test', 'test')
         except asana.error.NoAuthorizationError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -410,7 +410,7 @@ class TestFindTeamByOrganization(unittest.TestCase):
         Context.asana.client.teams.find_by_organization = token_expired_error_raiser # raise TokenExpiredError
 
         try:
-            team = teams.find_team_by_organization('test', 'test')
+            team = Teams().find_team_by_organization('test', 'test')
         except oauthlib.oauth2.TokenExpiredError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -423,7 +423,7 @@ class TestFindTeamByOrganization(unittest.TestCase):
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
         Context.asana.client.teams.find_by_organization = valid_data
 
-        team = teams.find_team_by_organization('test', 'test')
+        team = Teams().find_team_by_organization('test', 'test')
         self.assertEqual(mocked_refresh_access_token.call_count, 1)
 
 
@@ -440,7 +440,7 @@ class TestGetUsersForTeams(unittest.TestCase):
         Context.asana.client.teams.users = invalid_token_error_raiser # raise InvalidTokenError
 
         try:
-            team = teams.get_users_for_teams('test')
+            team = Teams().get_users_for_teams('test')
         except asana.error.InvalidTokenError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -453,7 +453,7 @@ class TestGetUsersForTeams(unittest.TestCase):
         Context.asana.client.teams.users = no_authorized_error_raiser # raise NoAuthorizationError
 
         try:
-            team = teams.get_users_for_teams('test')
+            team = Teams().get_users_for_teams('test')
         except asana.error.NoAuthorizationError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -466,7 +466,7 @@ class TestGetUsersForTeams(unittest.TestCase):
         Context.asana.client.teams.users = token_expired_error_raiser # raise TokenExpiredError
 
         try:
-            team = teams.get_users_for_teams('test')
+            team = Teams().get_users_for_teams('test')
         except oauthlib.oauth2.TokenExpiredError as e:
             self.assertEqual(mocked_refresh_access_token.call_count, 5)
 
@@ -479,5 +479,5 @@ class TestGetUsersForTeams(unittest.TestCase):
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
         Context.asana.client.teams.users = valid_data
 
-        team = teams.get_users_for_teams('test')
+        team = Teams().get_users_for_teams('test')
         self.assertEqual(mocked_refresh_access_token.call_count, 1)
