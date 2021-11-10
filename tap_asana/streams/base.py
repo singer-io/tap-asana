@@ -108,6 +108,14 @@ class Stream():
     # Controls which SDK object we use to call the API by default.
     # 
 
+    def __init__(self):
+        self.request_timeout = REQUEST_TIMEOUT
+        # Set request timeout to config param `request_timeout` value.
+        config_request_timeout = Context.config.get('request_timeout')
+        # If value is 0,"0","" or not passed then it set default to 300 seconds.
+        if config_request_timeout and float(config_request_timeout):
+            self.request_timeout = float(config_request_timeout)
+
     def get_bookmark(self):
         bookmark = (singer.get_bookmark(Context.state,
                                         # name is overridden by some substreams
@@ -169,15 +177,7 @@ class Stream():
     @asana_error_handling
     def call_api(self, resource, **query_params):
         fn = getattr(Context.asana.client, resource)
-        # Set request timeout to config param `request_timeout` value.
-        config_request_timeout = Context.config.get('request_timeout')
-        # If value is 0,"0","" or not passed then it set default to 300 seconds.
-        if config_request_timeout and float(config_request_timeout):
-            request_timeout = float(config_request_timeout)
-        else:
-            request_timeout = REQUEST_TIMEOUT
-
-        query_params['timeout'] = request_timeout
+        query_params['timeout'] = self.request_timeout
         # 'fn.find_all' returns a generator, hence iterating over it to raise any error caused during API call
         data = list(fn.find_all(**query_params))
         return data

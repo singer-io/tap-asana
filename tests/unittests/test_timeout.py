@@ -1,14 +1,12 @@
 import unittest
 import requests
-import tap_asana.streams.portfolios as portfolios
-import tap_asana.streams.sections as sections
-import tap_asana.streams.stories as stories
-import tap_asana.streams.teams as teams
+from tap_asana.streams.portfolios import Portfolios
+from tap_asana.streams.sections import Sections
+from tap_asana.streams.stories import Stories
+from tap_asana.streams.teams import Teams
 from unittest import mock
 from tap_asana.context import Context
 from tap_asana.asana import Asana
-
-WORKSPACE_OBJECT = Context.stream_objects['workspaces']()
 
 # raise requests.Timeout error
 def raise_Timeout_error(*args, **kwargs):
@@ -30,7 +28,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         mocked_find_all.find_all.side_effect = raise_Timeout_error
 
         try:
-            workspaces = WORKSPACE_OBJECT.call_api("workspaces")
+            workspaces = Context.stream_objects.get('workspaces')().call_api("workspaces")
         except requests.Timeout:
             # catch Timeout error
             pass
@@ -43,7 +41,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         mocked_find_all = mocked_get_attr.return_value
         mocked_find_all.find_all.side_effect = valid_data
 
-        workspaces = WORKSPACE_OBJECT.call_api("workspaces")
+        workspaces = Context.stream_objects.get('workspaces')().call_api("workspaces")
 
         self.assertEqual(workspaces, list(valid_data()))
 
@@ -55,7 +53,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         mocked_find_all = mocked_get_attr.return_value
         mocked_find_all.find_all.side_effect = valid_data
 
-        workspaces = WORKSPACE_OBJECT.call_api("workspaces")
+        workspaces = Context.stream_objects.get('workspaces')().call_api("workspaces")
 
         # verify if the default timeout was passed as, timeout was not passed in the config
         mocked_find_all.find_all.assert_called_with(timeout=300.0)
@@ -68,7 +66,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         mocked_find_all = mocked_get_attr.return_value
         mocked_find_all.find_all.side_effect = valid_data
 
-        workspaces = WORKSPACE_OBJECT.call_api("workspaces")
+        workspaces = Context.stream_objects.get('workspaces')().call_api("workspaces")
 
         # verify if the timeout was passed as expected from the config file
         mocked_find_all.find_all.assert_called_with(timeout=100.0)
@@ -81,7 +79,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         mocked_find_all = mocked_get_attr.return_value
         mocked_find_all.find_all.side_effect = valid_data
 
-        workspaces = WORKSPACE_OBJECT.call_api("workspaces")
+        workspaces = Context.stream_objects.get('workspaces')().call_api("workspaces")
 
         # verify if the timeout was passed as expected from the config file
         mocked_find_all.find_all.assert_called_with(timeout=100.0)
@@ -94,7 +92,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         mocked_find_all = mocked_get_attr.return_value
         mocked_find_all.find_all.side_effect = valid_data
 
-        workspaces = WORKSPACE_OBJECT.call_api("workspaces")
+        workspaces = Context.stream_objects.get('workspaces')().call_api("workspaces")
 
         # verify if the timeout was passed as expected from the config file
         mocked_find_all.find_all.assert_called_with(timeout=300.0)
@@ -107,7 +105,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         mocked_find_all = mocked_get_attr.return_value
         mocked_find_all.find_all.side_effect = valid_data
 
-        workspaces = WORKSPACE_OBJECT.call_api("workspaces")
+        workspaces = Context.stream_objects.get('workspaces')().call_api("workspaces")
 
         # verify if the timeout was passed as expected from the config file
         mocked_find_all.find_all.assert_called_with(timeout=300.0)
@@ -120,7 +118,7 @@ class TestTimeoutErrorBase(unittest.TestCase):
         mocked_find_all = mocked_get_attr.return_value
         mocked_find_all.find_all.side_effect = valid_data
 
-        workspaces = WORKSPACE_OBJECT.call_api("workspaces")
+        workspaces = Context.stream_objects.get('workspaces')().call_api("workspaces")
 
         # verify if the timeout was passed as expected from the config file
         mocked_find_all.find_all.assert_called_with(timeout=300.0)
@@ -136,7 +134,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios.get_items_for_portfolio.side_effect = raise_Timeout_error
 
         try:
-            items_for_portfolios = portfolios.get_items_for_portfolio('test')
+            items_for_portfolios = Portfolios().get_items_for_portfolio('test')
         except requests.Timeout:
             # catch Timeout error
             pass
@@ -149,7 +147,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_items_for_portfolio.side_effect = valid_data
 
-        items_for_portfolios = portfolios.get_items_for_portfolio('test')
+        items_for_portfolios = Portfolios().get_items_for_portfolio('test')
 
         self.assertEqual(items_for_portfolios, list(valid_data()))
 
@@ -160,7 +158,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios.get_portfolios.side_effect = raise_Timeout_error
 
         try:
-            portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
+            portfolios_for_workspace = Portfolios().get_portfolies_for_workspace('test', 'test', ['test'])
         except requests.Timeout:
             # catch Timeout error
             pass
@@ -173,7 +171,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_portfolios.side_effect = valid_data
 
-        portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
+        portfolios_for_workspace = Portfolios().get_portfolies_for_workspace('test', 'test', ['test'])
 
         self.assertEqual(portfolios_for_workspace, list(valid_data()))
 
@@ -185,7 +183,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_items_for_portfolio.side_effect = valid_data
 
-        items_for_portfolios = portfolios.get_items_for_portfolio('test')
+        items_for_portfolios = Portfolios().get_items_for_portfolio('test')
 
         # verify if the default timeout was passed as, timeout was not passed in the config
         Context.asana.client.portfolios.get_items_for_portfolio.assert_called_with(portfolio_gid='test', timeout=300.0)
@@ -198,7 +196,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_items_for_portfolio.side_effect = valid_data
 
-        items_for_portfolios = portfolios.get_items_for_portfolio('test')
+        items_for_portfolios = Portfolios().get_items_for_portfolio('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_items_for_portfolio.assert_called_with(portfolio_gid='test', timeout=100.0)
@@ -211,7 +209,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_items_for_portfolio.side_effect = valid_data
 
-        items_for_portfolios = portfolios.get_items_for_portfolio('test')
+        items_for_portfolios = Portfolios().get_items_for_portfolio('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_items_for_portfolio.assert_called_with(portfolio_gid='test', timeout=100.0)
@@ -224,7 +222,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_items_for_portfolio.side_effect = valid_data
 
-        items_for_portfolios = portfolios.get_items_for_portfolio('test')
+        items_for_portfolios = Portfolios().get_items_for_portfolio('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_items_for_portfolio.assert_called_with(portfolio_gid='test', timeout=300.0)
@@ -237,7 +235,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_items_for_portfolio.side_effect = valid_data
 
-        items_for_portfolios = portfolios.get_items_for_portfolio('test')
+        items_for_portfolios = Portfolios().get_items_for_portfolio('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_items_for_portfolio.assert_called_with(portfolio_gid='test', timeout=300.0)
@@ -250,7 +248,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_items_for_portfolio.side_effect = valid_data
 
-        items_for_portfolios = portfolios.get_items_for_portfolio('test')
+        items_for_portfolios = Portfolios().get_items_for_portfolio('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_items_for_portfolio.assert_called_with(portfolio_gid='test', timeout=300.0)
@@ -263,7 +261,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_portfolios.side_effect = valid_data
 
-        portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
+        portfolios_for_workspace = Portfolios().get_portfolies_for_workspace('test', 'test', ['test'])
 
         # verify if the default timeout was passed as, timeout was not passed in the config
         Context.asana.client.portfolios.get_portfolios.assert_called_with(opt_fields=['test'], owner='test', timeout=300.0, workspace='test')
@@ -276,7 +274,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_portfolios.side_effect = valid_data
 
-        portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
+        portfolios_for_workspace = Portfolios().get_portfolies_for_workspace('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_portfolios.assert_called_with(opt_fields=['test'], owner='test', timeout=100.0, workspace='test')
@@ -289,7 +287,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_portfolios.side_effect = valid_data
 
-        portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
+        portfolios_for_workspace = Portfolios().get_portfolies_for_workspace('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_portfolios.assert_called_with(opt_fields=['test'], owner='test', timeout=100.0, workspace='test')
@@ -302,7 +300,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_portfolios.side_effect = valid_data
 
-        portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
+        portfolios_for_workspace = Portfolios().get_portfolies_for_workspace('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_portfolios.assert_called_with(opt_fields=['test'], owner='test', timeout=300.0, workspace='test')
@@ -315,7 +313,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_portfolios.side_effect = valid_data
 
-        portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
+        portfolios_for_workspace = Portfolios().get_portfolies_for_workspace('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_portfolios.assert_called_with(opt_fields=['test'], owner='test', timeout=300.0, workspace='test')
@@ -328,7 +326,7 @@ class TestTimeoutErrorPortfolios(unittest.TestCase):
         Context.asana.client.portfolios = mock.MagicMock()
         Context.asana.client.portfolios.get_portfolios.side_effect = valid_data
 
-        portfolios_for_workspace = portfolios.get_portfolies_for_workspace('test', 'test', ['test'])
+        portfolios_for_workspace = Portfolios().get_portfolies_for_workspace('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.portfolios.get_portfolios.assert_called_with(opt_fields=['test'], owner='test', timeout=300.0, workspace='test')
@@ -344,7 +342,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         Context.asana.client.sections.get_sections_for_project.side_effect = raise_Timeout_error
 
         try:
-            sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
+            sections_for_projects = Sections().get_sections_for_projects('test', 'test', ['test'])
         except requests.Timeout:
             # catch Timeout error
             pass
@@ -357,7 +355,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         Context.asana.client.sections = mock.MagicMock()
         Context.asana.client.sections.get_sections_for_project.side_effect = valid_data
 
-        sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
+        sections_for_projects = Sections().get_sections_for_projects('test', 'test', ['test'])
 
         self.assertEqual(sections_for_projects, list(valid_data()))
 
@@ -369,7 +367,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         Context.asana.client.sections = mock.MagicMock()
         Context.asana.client.sections.get_sections_for_project.side_effect = valid_data
 
-        sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
+        sections_for_projects = Sections().get_sections_for_projects('test', 'test', ['test'])
 
         # verify if the default timeout was passed as, timeout was not passed in the config
         Context.asana.client.sections.get_sections_for_project.assert_called_with(opt_fields=['test'], owner='test', project_gid='test', timeout=300.0)
@@ -382,7 +380,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         Context.asana.client.sections = mock.MagicMock()
         Context.asana.client.sections.get_sections_for_project.side_effect = valid_data
 
-        sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
+        sections_for_projects = Sections().get_sections_for_projects('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.sections.get_sections_for_project.assert_called_with(opt_fields=['test'], owner='test', project_gid='test', timeout=100.0)
@@ -395,7 +393,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         Context.asana.client.sections = mock.MagicMock()
         Context.asana.client.sections.get_sections_for_project.side_effect = valid_data
 
-        sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
+        sections_for_projects = Sections().get_sections_for_projects('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.sections.get_sections_for_project.assert_called_with(opt_fields=['test'], owner='test', project_gid='test', timeout=100.0)
@@ -408,7 +406,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         Context.asana.client.sections = mock.MagicMock()
         Context.asana.client.sections.get_sections_for_project.side_effect = valid_data
 
-        sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
+        sections_for_projects = Sections().get_sections_for_projects('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.sections.get_sections_for_project.assert_called_with(opt_fields=['test'], owner='test', project_gid='test', timeout=300.0)
@@ -421,7 +419,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         Context.asana.client.sections = mock.MagicMock()
         Context.asana.client.sections.get_sections_for_project.side_effect = valid_data
 
-        sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
+        sections_for_projects = Sections().get_sections_for_projects('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.sections.get_sections_for_project.assert_called_with(opt_fields=['test'], owner='test', project_gid='test', timeout=300.0)
@@ -434,7 +432,7 @@ class TestTimeoutErrorSections(unittest.TestCase):
         Context.asana.client.sections = mock.MagicMock()
         Context.asana.client.sections.get_sections_for_project.side_effect = valid_data
 
-        sections_for_projects = sections.get_sections_for_projects('test', 'test', ['test'])
+        sections_for_projects = Sections().get_sections_for_projects('test', 'test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.sections.get_sections_for_project.assert_called_with(opt_fields=['test'], owner='test', project_gid='test', timeout=300.0)
@@ -450,7 +448,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         Context.asana.client.stories.get_stories_for_task.side_effect = raise_Timeout_error
 
         try:
-            stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
+            stories_for_tasks = Stories().get_stories_for_tasks('test', ['test'])
         except requests.Timeout:
             # catch Timeout error
             pass
@@ -463,7 +461,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         Context.asana.client.stories = mock.MagicMock()
         Context.asana.client.stories.get_stories_for_task.side_effect = valid_data
 
-        stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
+        stories_for_tasks = Stories().get_stories_for_tasks('test', ['test'])
 
         self.assertEqual(stories_for_tasks, list(valid_data()))
 
@@ -475,7 +473,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         Context.asana.client.stories = mock.MagicMock()
         Context.asana.client.stories.get_stories_for_task.side_effect = valid_data
 
-        stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
+        stories_for_tasks = Stories().get_stories_for_tasks('test', ['test'])
 
         # verify if the default timeout was passed as, timeout was not passed in the config
         Context.asana.client.stories.get_stories_for_task.assert_called_with(opt_fields=['test'], task_gid='test', timeout=300.0)
@@ -488,7 +486,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         Context.asana.client.stories = mock.MagicMock()
         Context.asana.client.stories.get_stories_for_task.side_effect = valid_data
 
-        stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
+        stories_for_tasks = Stories().get_stories_for_tasks('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.stories.get_stories_for_task.assert_called_with(opt_fields=['test'], task_gid='test', timeout=100.0)
@@ -501,7 +499,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         Context.asana.client.stories = mock.MagicMock()
         Context.asana.client.stories.get_stories_for_task.side_effect = valid_data
 
-        stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
+        stories_for_tasks = Stories().get_stories_for_tasks('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.stories.get_stories_for_task.assert_called_with(opt_fields=['test'], task_gid='test', timeout=100.0)
@@ -514,7 +512,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         Context.asana.client.stories = mock.MagicMock()
         Context.asana.client.stories.get_stories_for_task.side_effect = valid_data
 
-        stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
+        stories_for_tasks = Stories().get_stories_for_tasks('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.stories.get_stories_for_task.assert_called_with(opt_fields=['test'], task_gid='test', timeout=300.0)
@@ -527,7 +525,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         Context.asana.client.stories = mock.MagicMock()
         Context.asana.client.stories.get_stories_for_task.side_effect = valid_data
 
-        stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
+        stories_for_tasks = Stories().get_stories_for_tasks('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.stories.get_stories_for_task.assert_called_with(opt_fields=['test'], task_gid='test', timeout=300.0)
@@ -540,7 +538,7 @@ class TestTimeoutErrorStories(unittest.TestCase):
         Context.asana.client.stories = mock.MagicMock()
         Context.asana.client.stories.get_stories_for_task.side_effect = valid_data
 
-        stories_for_tasks = stories.get_stories_for_tasks('test', ['test'])
+        stories_for_tasks = Stories().get_stories_for_tasks('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.stories.get_stories_for_task.assert_called_with(opt_fields=['test'], task_gid='test', timeout=300.0)
@@ -556,7 +554,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams.find_by_organization.side_effect = raise_Timeout_error
 
         try:
-            team_by_organization = teams.find_team_by_organization('test', ['test'])
+            team_by_organization = Teams().find_team_by_organization('test', ['test'])
         except requests.Timeout:
             # catch Timeout error
             pass
@@ -569,7 +567,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.find_by_organization.side_effect = valid_data
 
-        team_by_organization = teams.find_team_by_organization('test', ['test'])
+        team_by_organization = Teams().find_team_by_organization('test', ['test'])
 
         self.assertEqual(team_by_organization, list(valid_data()))
 
@@ -580,7 +578,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams.users.side_effect = raise_Timeout_error
 
         try:
-            users_for_team = teams.get_users_for_teams('test')
+            users_for_team = Teams().get_users_for_teams('test')
         except requests.Timeout:
             # catch Timeout error
             pass
@@ -593,7 +591,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.users.side_effect = valid_data
 
-        users_for_team = teams.get_users_for_teams('test')
+        users_for_team = Teams().get_users_for_teams('test')
 
         self.assertEqual(users_for_team, list(valid_data()))
 
@@ -605,7 +603,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.find_by_organization.side_effect = valid_data
 
-        team_by_organization = teams.find_team_by_organization('test', ['test'])
+        team_by_organization = Teams().find_team_by_organization('test', ['test'])
 
         # verify if the default timeout was passed as, timeout was not passed in the config
         Context.asana.client.teams.find_by_organization.assert_called_with(opt_fields=['test'], organization='test', timeout=300.0)
@@ -618,7 +616,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.find_by_organization.side_effect = valid_data
 
-        team_by_organization = teams.find_team_by_organization('test', ['test'])
+        team_by_organization = Teams().find_team_by_organization('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.find_by_organization.assert_called_with(opt_fields=['test'], organization='test', timeout=100.0)
@@ -631,7 +629,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.find_by_organization.side_effect = valid_data
 
-        team_by_organization = teams.find_team_by_organization('test', ['test'])
+        team_by_organization = Teams().find_team_by_organization('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.find_by_organization.assert_called_with(opt_fields=['test'], organization='test', timeout=100.0)
@@ -644,7 +642,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.find_by_organization.side_effect = valid_data
 
-        team_by_organization = teams.find_team_by_organization('test', ['test'])
+        team_by_organization = Teams().find_team_by_organization('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.find_by_organization.assert_called_with(opt_fields=['test'], organization='test', timeout=300.0)
@@ -657,7 +655,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.find_by_organization.side_effect = valid_data
 
-        team_by_organization = teams.find_team_by_organization('test', ['test'])
+        team_by_organization = Teams().find_team_by_organization('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.find_by_organization.assert_called_with(opt_fields=['test'], organization='test', timeout=300.0)
@@ -670,7 +668,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.find_by_organization.side_effect = valid_data
 
-        team_by_organization = teams.find_team_by_organization('test', ['test'])
+        team_by_organization = Teams().find_team_by_organization('test', ['test'])
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.find_by_organization.assert_called_with(opt_fields=['test'], organization='test', timeout=300.0)
@@ -683,7 +681,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.users.side_effect = valid_data
 
-        users_for_team = teams.get_users_for_teams('test')
+        users_for_team = Teams().get_users_for_teams('test')
 
         # verify if the default timeout was passed as, timeout was not passed in the config
         Context.asana.client.teams.users.assert_called_with(team='test', timeout=300.0)
@@ -696,7 +694,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.users.side_effect = valid_data
 
-        users_for_team = teams.get_users_for_teams('test')
+        users_for_team = Teams().get_users_for_teams('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.users.assert_called_with(team='test', timeout=100.0)
@@ -709,7 +707,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.users.side_effect = valid_data
 
-        users_for_team = teams.get_users_for_teams('test')
+        users_for_team = Teams().get_users_for_teams('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.users.assert_called_with(team='test', timeout=100.0)
@@ -722,7 +720,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.users.side_effect = valid_data
 
-        users_for_team = teams.get_users_for_teams('test')
+        users_for_team = Teams().get_users_for_teams('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.users.assert_called_with(team='test', timeout=300.0)
@@ -735,7 +733,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.users.side_effect = valid_data
 
-        users_for_team = teams.get_users_for_teams('test')
+        users_for_team = Teams().get_users_for_teams('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.users.assert_called_with(team='test', timeout=300.0)
@@ -748,7 +746,7 @@ class TestTimeoutErrorTeams(unittest.TestCase):
         Context.asana.client.teams = mock.MagicMock()
         Context.asana.client.teams.users.side_effect = valid_data
 
-        users_for_team = teams.get_users_for_teams('test')
+        users_for_team = Teams().get_users_for_teams('test')
 
         # verify if the timeout was passed as expected from the config file
         Context.asana.client.teams.users.assert_called_with(team='test', timeout=300.0)
