@@ -6,17 +6,15 @@ class AsanaPaginationTest(AsanaBase):
     def name(self):
         return "tap_tester_asana_pagination_test"
 
-    def get_properties(self, *args, **kwargs):
-        props = super().get_properties(*args, **kwargs)
-        props['results_per_page'] = 1
-        return props
-
     def test_run(self):
         """
         Testing that the pagination works when there are records greater than the page size
         - Verify for each stream you can get multiple pages of data
         - Verify by pks that the data replicated matches the data we expect.
         """
+
+        # the default page size is 50: https://github.com/Asana/python-asana/blob/master/asana/client.py#L41
+        # we have more than 50 records for all the stream except 'workspace'
         # to get data from more than 1 'workspaces' we need to upgrade asana plan
         expected_streams = self.expected_streams() - {'workspaces'}
         conn_id = connections.ensure_connection(self)
@@ -35,7 +33,7 @@ class AsanaPaginationTest(AsanaBase):
             with self.subTest(stream=stream):
 
                 # verify that we can paginate with all fields selected
-                minimum_record_count = self.get_properties().get('results_per_page')
+                minimum_record_count = 50
 
                 self.assertGreater(record_count_by_stream.get(stream, -1), minimum_record_count,
                     msg="The number of records is not over the stream max limit")

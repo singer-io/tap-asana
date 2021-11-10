@@ -11,8 +11,7 @@ from tap_asana.context import Context
 
 LOGGER = singer.get_logger()
 
-# default page size
-RESULTS_PER_PAGE = 50
+RESULTS_PER_PAGE = 250
 
 # We've observed 500 errors returned if this is too large (30 days was too
 # large for a customer)
@@ -89,11 +88,6 @@ class Stream():
     key_properties = ['gid']
     # Controls which SDK object we use to call the API by default.
 
-    def __init__(self):
-        self.results_per_page = RESULTS_PER_PAGE
-        if Context.config.get('results_per_page'):
-            self.results_per_page = int(Context.config.get('results_per_page'))
-
     def get_bookmark(self):
         bookmark = (singer.get_bookmark(Context.state,
                                         # name is overridden by some substreams
@@ -146,14 +140,12 @@ class Stream():
         return session_bookmark
 
 
-    # as we added page_size, we need to pass it in the query param
-    # hence removed the condition: 'if query_params', as
-    # there will be atleast 1 param: 'page_size'
     @asana_error_handling
     def call_api(self, resource, **query_params):
-        function = getattr(Context.asana.client, resource)
-        query_params['page_size'] = self.results_per_page
-        return function.find_all(**query_params)
+        fn = getattr(Context.asana.client, resource)
+        if query_params:
+            return fn.find_all(**query_params)
+        return fn.find_all()
 
     def sync(self):
         """Yield's processed SDK object dicts to the caller.

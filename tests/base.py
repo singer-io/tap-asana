@@ -20,7 +20,7 @@ class AsanaBase(unittest.TestCase):
     INCREMENTAL = "INCREMENTAL"
 
     first_start_date = '2019-01-01T00:00:00Z'
-    second_start_date = '2020-08-10T00:00:00Z'
+    second_start_date = '2020-08-15T00:00:00Z'
 
     def name(self):
         return "tap_tester_asana_base"

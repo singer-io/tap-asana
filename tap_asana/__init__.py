@@ -166,14 +166,6 @@ def main():
         "refresh_token": args.config['refresh_token']
     }
 
-    # page size must be between 1-100
-    # Documentation: https://developers.asana.com/docs/pagination
-    if args.config.get('results_per_page') and args.config.get('results_per_page') > 100:
-        # warn user that he entered page size greater than 100
-        LOGGER.warning("The page size cannot be greater than 100, hence setting to maximum page size: 100.")
-        # set the maximum possible page size
-        args.config['results_per_page'] = 100
-
     Context.config = args.config
     Context.state = args.state
     Context.asana = Asana(**creds)
