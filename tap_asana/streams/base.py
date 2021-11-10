@@ -141,11 +141,11 @@ class Stream():
 
 
     @asana_error_handling
-    def call_api(self, resource, **query_params):
-        fn = getattr(Context.asana.client, resource)
+    def call_api(self, resource, **query_params): # pylint: disable=no-self-use
+        api_function = getattr(Context.asana.client, resource)
         if query_params:
-            return fn.find_all(**query_params)
-        return fn.find_all()
+            return api_function.find_all(**query_params)
+        return api_function.find_all()
 
     def sync(self):
         """Yield's processed SDK object dicts to the caller.
