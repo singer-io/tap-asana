@@ -74,6 +74,7 @@ class AsanaStartDateTest(AsanaBase):
                 # expected values
                 expected_primary_keys = self.expected_primary_keys()[stream]
                 expected_replication_keys = self.expected_replication_keys()[stream]
+                expected_metadata = self.expected_metadata()[stream]
 
                 # collect information for assertions from syncs 1 & 2 base on expected values
                 record_count_sync_1 = sync_record_count_1.get(stream, 0)
@@ -88,7 +89,7 @@ class AsanaStartDateTest(AsanaBase):
                 primary_keys_sync_1 = set(primary_keys_list_1)
                 primary_keys_sync_2 = set(primary_keys_list_2)
 
-                if self.is_incremental(stream):
+                if expected_metadata.get(self.OBEYS_START_DATE):
                     # Expected bookmark key is one element in set so directly access it
                     start_date_keys_list_1 = [message.get('data').get(next(iter(expected_replication_keys))) for message in synced_records_1.get(stream).get('messages')
                                               if message.get('action') == 'upsert']

@@ -18,6 +18,7 @@ class AsanaBase(unittest.TestCase):
     REPLICATION_KEYS = "valid-replication-keys"
     FULL_TABLE = "FULL_TABLE"
     INCREMENTAL = "INCREMENTAL"
+    OBEYS_START_DATE = "obey-start-date"
 
     first_start_date = '2019-01-01T00:00:00Z'
     second_start_date = '2020-08-15T00:00:00Z'
@@ -65,43 +66,52 @@ class AsanaBase(unittest.TestCase):
         return {
             "portfolios": {
                 self.PRIMARY_KEYS: {"gid"},
-                self.REPLICATION_METHOD: self.FULL_TABLE
+                self.REPLICATION_METHOD: self.FULL_TABLE,
+                self.OBEYS_START_DATE: False
             },
             "projects": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
-                self.REPLICATION_KEYS: {"modified_at"}
+                self.REPLICATION_KEYS: {"modified_at"},
+                self.OBEYS_START_DATE: True
             },
             "sections": {
                 self.PRIMARY_KEYS: {"gid"},
-                self.REPLICATION_METHOD: self.FULL_TABLE
+                self.REPLICATION_METHOD: self.FULL_TABLE,
+                self.OBEYS_START_DATE: False
             },
             "stories": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
-                self.REPLICATION_KEYS: {"created_at"}
+                self.REPLICATION_KEYS: {"created_at"},
+                self.OBEYS_START_DATE: True
             },
             "tags": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
-                self.REPLICATION_KEYS: {"created_at"}
+                self.REPLICATION_KEYS: {"created_at"},
+                self.OBEYS_START_DATE: True
             },
             "tasks": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
-                self.REPLICATION_KEYS: {"modified_at"}
+                self.REPLICATION_KEYS: {"modified_at"},
+                self.OBEYS_START_DATE: True
             },
             "teams": {
                 self.PRIMARY_KEYS: {"gid"},
-                self.REPLICATION_METHOD: self.FULL_TABLE
+                self.REPLICATION_METHOD: self.FULL_TABLE,
+                self.OBEYS_START_DATE: False
             },
             "users": {
                 self.PRIMARY_KEYS: {"gid"},
-                self.REPLICATION_METHOD: self.FULL_TABLE
+                self.REPLICATION_METHOD: self.FULL_TABLE,
+                self.OBEYS_START_DATE: False
             },
             "workspaces": {
                 self.PRIMARY_KEYS: {"gid"},
-                self.REPLICATION_METHOD: self.FULL_TABLE
+                self.REPLICATION_METHOD: self.FULL_TABLE,
+                self.OBEYS_START_DATE: False
             }
         }
 
