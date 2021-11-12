@@ -115,9 +115,6 @@ class AsanaBookmarksTest(AsanaBase):
                             msg="First sync bookmark was set incorrectly, a record with a greater replication-key value was synced."
                         )
 
-                    # Verify the number of records in the 2nd sync is less then or equal to the first
-                    self.assertLessEqual(second_sync_count, first_sync_count)
-
                 else:
 
                     # Verify the syncs do not set a bookmark for full table streams

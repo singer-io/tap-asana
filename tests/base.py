@@ -23,9 +23,6 @@ class AsanaBase(unittest.TestCase):
     first_start_date = '2019-01-01T00:00:00Z'
     second_start_date = '2020-08-15T00:00:00Z'
 
-    def name(self):
-        return "tap_tester_asana_base"
-
     def tap_name(self):
         return "tap-asana"
 
