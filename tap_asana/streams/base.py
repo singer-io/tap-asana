@@ -10,6 +10,7 @@ import requests
 from singer.messages import StateMessage
 from tap_asana.asana import Asana
 from asana.error import AsanaError, NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
+from asana.page_iterator import CollectionPageIterator
 from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
 from tap_asana.context import Context
@@ -97,6 +98,12 @@ def asana_error_handling(fnc):
         return fnc(*args, **kwargs)
     return wrapper
 
+# Added decorator over functions of asana SDK as functions from SDK returns generator and
+# tap is yielding data from that function so backoff is not working over tap functions.
+# Decorator can be put above get_objects() functions of every stream file but
+# it has multiple for loops so it's expensive to backoff everything.
+CollectionPageIterator.get_initial = asana_error_handling(CollectionPageIterator.get_initial)
+CollectionPageIterator.get_next = asana_error_handling(CollectionPageIterator.get_next)
 
 class Stream():
     # Used for bookmarking and stream identification. Is overridden by
@@ -170,17 +177,11 @@ class Stream():
     # As we added timeout, we need to pass it in the query param
     # hence removed the condition: 'if query_params', as
     # there will be atleast 1 param: 'timeout'
-    # ------------------------------------------
-    # The function fn.find_all returns the generator so it will throw an error at a time of iteration over it.
-    # Due to this exceptions can't be thrown from the call_api() function so error handling is not utilized.
-    # Converted generator to list below so it will throw an exception in that line only and exception handling can be utilize.
     @asana_error_handling
     def call_api(self, resource, **query_params):
         fn = getattr(Context.asana.client, resource)
         query_params['timeout'] = self.request_timeout
-        # 'fn.find_all' returns a generator, hence iterating over it to raise any error caused during API call
-        data = list(fn.find_all(**query_params))
-        return data
+        return fn.find_all(**query_params)
 
     def sync(self):
         """Yield's processed SDK object dicts to the caller.
