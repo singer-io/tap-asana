@@ -39,8 +39,8 @@ class Projects(Stream):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
     opt_fields = ",".join(self.fields)
-    for workspace in self.call_api("workspaces"):
-      for project in self.call_api("projects", workspace=workspace["gid"], opt_fields=opt_fields):
+    for workspace in Context.asana.client.workspaces.find_all():
+      for project in Context.asana.client.projects.find_all(workspace=workspace["gid"], opt_fields=opt_fields):
         session_bookmark = self.get_updated_session_bookmark(session_bookmark, project[self.replication_key])
         if self.is_bookmark_old(project[self.replication_key]):
           yield project
