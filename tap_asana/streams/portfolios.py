@@ -31,7 +31,7 @@ class Portfolios(Stream):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
     opt_fields = ",".join(self.fields)
-    for workspace in Context.asana.client.workspaces.find_all():
+    for workspace in self.call_api("workspaces"):
       # NOTE: Currently, API users can only get a list of portfolios that they themselves own; owner="me"
       for portfolio in Context.asana.client.portfolios.get_portfolios(workspace=workspace["gid"], owner="me", opt_fields=opt_fields, timeout=self.request_timeout):
         # portfolio_items are typically the projects in a portfolio
