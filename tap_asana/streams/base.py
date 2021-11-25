@@ -118,7 +118,7 @@ class Stream():
     def __init__(self):
         # Set request timeout to config param `request_timeout` value.
         config_request_timeout = Context.config.get('request_timeout')
-        # If value is 0,"0","" or not passed then it set default to 300 seconds.
+        # If value is 0, "0", "" or not passed then it sets default to 300 seconds.
         if config_request_timeout and float(config_request_timeout):
             self.request_timeout = float(config_request_timeout)
         else:
