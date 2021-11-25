@@ -116,12 +116,13 @@ class Stream():
     # 
 
     def __init__(self):
-        self.request_timeout = REQUEST_TIMEOUT
         # Set request timeout to config param `request_timeout` value.
         config_request_timeout = Context.config.get('request_timeout')
         # If value is 0,"0","" or not passed then it set default to 300 seconds.
         if config_request_timeout and float(config_request_timeout):
             self.request_timeout = float(config_request_timeout)
+        else:
+            self.request_timeout = REQUEST_TIMEOUT
 
     def get_bookmark(self):
         bookmark = (singer.get_bookmark(Context.state,
