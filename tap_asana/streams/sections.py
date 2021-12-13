@@ -17,6 +17,11 @@ class Sections(Stream):
     "projects"
   ]
 
+  # send list of project ids
+  def get_project_ids(self):
+    for workspace in self.call_api("workspaces"):
+      for project in self.call_api("projects", workspace=workspace["gid"]):
+        yield project["gid"]
 
   def get_objects(self):
     bookmark = self.get_bookmark()
@@ -24,14 +29,8 @@ class Sections(Stream):
     modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
     opt_fields = ",".join(self.fields)
 
-    # collect list of project ids
-    project_ids = []
-    for workspace in self.call_api("workspaces"):
-      for project in self.call_api("projects", workspace=workspace["gid"]):
-        project_ids.append(project["gid"])
-
     # iterate on all project ids and execute rest of the sync
-    for project_id in project_ids:
+    for project_id in self.get_project_ids():
       for section in Context.asana.client.sections.get_sections_for_project(project_gid=project_id, owner="me", opt_fields=opt_fields):
         yield section
 

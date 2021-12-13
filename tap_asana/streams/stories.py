@@ -54,20 +54,19 @@ class Stories(Stream):
     "task"
   ]
 
+  # send list of project ids
+  def get_project_ids(self):
+    for workspace in self.call_api("workspaces"):
+      for project in self.call_api("projects", workspace=workspace["gid"]):
+        yield project["gid"]
 
   def get_objects(self):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
     opt_fields = ",".join(self.fields)
 
-    # list of project ids
-    project_ids = []
-    for workspace in self.call_api("workspaces"):
-      for project in self.call_api("projects", workspace=workspace["gid"]):
-        project_ids.append(project["gid"])
-
     # iterate over all project ids and continue fetching
-    for project_id in project_ids:
+    for project_id in self.get_project_ids():
       for task in self.call_api("tasks", project=project_id):
         task_gid = task.get('gid')
         for story in Context.asana.client.stories.get_stories_for_task(task_gid=task_gid, opt_fields=opt_fields):
