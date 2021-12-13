@@ -89,7 +89,7 @@ class AsanaStartDateTest(AsanaBase):
                 primary_keys_sync_1 = set(primary_keys_list_1)
                 primary_keys_sync_2 = set(primary_keys_list_2)
 
-                if expected_metadata.get(self.OBEYS_START_DATE):
+                if expected_metadata[self.OBEYS_START_DATE]:
                     # Expected bookmark key is one element in set so directly access it
                     start_date_keys_list_1 = [message.get('data').get(next(iter(expected_replication_keys))) for message in synced_records_1.get(stream).get('messages')
                                               if message.get('action') == 'upsert']

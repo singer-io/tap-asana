@@ -39,9 +39,12 @@ class AsanaBookmarksTest(AsanaBase):
         # setting 'second_start_date' as bookmark for running 2nd sync
         new_state = {'bookmarks': dict()}
         replication_keys = self.expected_replication_keys()
-        for stream in expected_streams:
+        # add state for bookmark stored for streams in 1st sync
+        for stream in first_sync_bookmarks.get('bookmarks').keys():
             if self.is_incremental(stream):
                 new_state['bookmarks'][stream] = dict()
+                # this date is being re-used from the start date test because it is more recent than
+                # the default start date used by the connection and is acting as a simulated bookmark
                 new_state['bookmarks'][stream][next(iter(replication_keys[stream]))] = self.second_start_date
 
         # Set state for next sync
@@ -100,6 +103,8 @@ class AsanaBookmarksTest(AsanaBase):
                         )
 
                         # Verify the data of the second sync is greater-equal to the bookmark from the first sync
+                        # We have added 'second_start_date' as the bookmark, it is more recent than
+                        #   the default start date and it will work as a simulated bookmark
                         self.assertGreaterEqual(
                             replication_key_value_parsed, parse(self.second_start_date).strftime("%Y-%m-%dT%H:%M:%SZ"),
                             msg="Sync did not respect the bookmark, a record with a smaller replication-key value was synced."
