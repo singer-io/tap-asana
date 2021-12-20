@@ -29,8 +29,11 @@ class Sections(Stream):
     modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
     opt_fields = ",".join(self.fields)
 
+    # get project ids
+    project_ids = self.get_project_ids()
+
     # iterate on all project ids and execute rest of the sync
-    for project_id in self.get_project_ids():
+    for project_id in project_ids:
       for section in Context.asana.client.sections.get_sections_for_project(project_gid=project_id, owner="me", opt_fields=opt_fields):
         yield section
 
