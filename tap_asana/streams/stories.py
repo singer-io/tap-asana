@@ -54,7 +54,6 @@ class Stories(Stream):
     "task"
   ]
 
-
   def get_objects(self):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
