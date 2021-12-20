@@ -36,9 +36,9 @@ class Projects(Stream):
 
 
   def get_objects(self):
+    opt_fields = ",".join(self.fields)
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
-    opt_fields = ",".join(self.fields)
     for workspace in self.call_api("workspaces"):
       for project in self.call_api("projects", workspace=workspace["gid"], opt_fields=opt_fields):
         session_bookmark = self.get_updated_session_bookmark(session_bookmark, project[self.replication_key])
