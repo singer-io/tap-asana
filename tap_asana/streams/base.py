@@ -4,6 +4,9 @@ import sys
 import backoff
 import simplejson
 import singer
+from asana.error import NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
+from asana.page_iterator import CollectionPageIterator
+from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
 from asana.error import RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
 from tap_asana.context import Context
