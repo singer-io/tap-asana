@@ -1,17 +1,11 @@
 import math
 import functools
-import datetime
 import sys
 import backoff
 import simplejson
 import singer
-import time
-from singer.messages import StateMessage
-from tap_asana.asana import Asana
-from asana.error import AsanaError, NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
-from asana.page_iterator import CollectionPageIterator
-from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
+from asana.error import RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
 from tap_asana.context import Context
 
 
@@ -102,7 +96,6 @@ class Stream():
     replication_key = None
     key_properties = ['gid']
     # Controls which SDK object we use to call the API by default.
-    # 
 
     def get_bookmark(self):
         bookmark = (singer.get_bookmark(Context.state,
@@ -139,7 +132,8 @@ class Stream():
             singer.write_state(Context.state)
 
 
-    def get_updated_session_bookmark(self, session_bookmark, value):
+    @staticmethod
+    def get_updated_session_bookmark(session_bookmark, value):
         try:
             session_bookmark = utils.strptime_with_tz(session_bookmark)
         except TypeError:
@@ -156,11 +150,11 @@ class Stream():
 
 
     @asana_error_handling
-    def call_api(self, resource, **query_params):
-        fn = getattr(Context.asana.client, resource)
+    def call_api(self, resource, **query_params): # pylint: disable=no-self-use
+        api_function = getattr(Context.asana.client, resource)
         if query_params:
-            return fn.find_all(**query_params)
-        return fn.find_all()
+            return api_function.find_all(**query_params)
+        return api_function.find_all()
 
     def sync(self):
         """Yield's processed SDK object dicts to the caller.
