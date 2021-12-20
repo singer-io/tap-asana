@@ -17,20 +17,18 @@ class Sections(Stream):
     "projects"
   ]
 
-  # send list of project ids
-  def get_project_ids(self):
-    for workspace in self.call_api("workspaces"):
-      for project in self.call_api("projects", workspace=workspace["gid"]):
-        yield project["gid"]
-
   def get_objects(self):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
     modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
     opt_fields = ",".join(self.fields)
 
-    # get project ids
-    project_ids = self.get_project_ids()
+    # list of project ids
+    project_ids = []
+
+    for workspace in self.call_api("workspaces"):
+      for project in self.call_api("projects", workspace=workspace["gid"]):
+        project_ids.append(project["gid"])
 
     # iterate on all project ids and execute rest of the sync
     for project_id in project_ids:
