@@ -4,8 +4,9 @@ from tap_asana.streams.base import Stream
 
 
 class Teams(Stream):
-  name = 'teams'
   replication_method = 'FULL_TABLE'
+  name = 'teams'
+
   fields = [
     "gid",
     "resource_type",

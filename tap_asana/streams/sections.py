@@ -1,12 +1,11 @@
 
-from singer import utils
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
 class Sections(Stream):
-  name = 'sections'
   replication_method = 'FULL_TABLE'
+  name = 'sections'
 
   fields = [
     "gid",
@@ -19,9 +18,6 @@ class Sections(Stream):
 
 
   def get_objects(self):
-    bookmark = self.get_bookmark()
-    session_bookmark = bookmark
-    modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
     opt_fields = ",".join(self.fields)
     for workspace in self.call_api("workspaces"):
       for project in self.call_api("projects", workspace=workspace["gid"]):

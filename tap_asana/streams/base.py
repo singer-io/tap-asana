@@ -1,15 +1,12 @@
 import math
 import functools
-import datetime
 import sys
+
+import requests
 import backoff
 import simplejson
 import singer
-import time
-import requests
-from singer.messages import StateMessage
-from tap_asana.asana import Asana
-from asana.error import AsanaError, NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
+from asana.error import NoAuthorizationError, RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
 from asana.page_iterator import CollectionPageIterator
 from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
@@ -76,7 +73,7 @@ def asana_error_handling(fnc):
                           max_tries=MAX_RETRIES,
                           factor=FACTOR)
     @backoff.on_exception(backoff.expo,
-                          (InvalidTokenError, 
+                          (InvalidTokenError,
                           NoAuthorizationError,
                           TokenExpiredError),
                           on_backoff=invalid_token_handler,
@@ -113,7 +110,6 @@ class Stream():
     replication_key = None
     key_properties = ['gid']
     # Controls which SDK object we use to call the API by default.
-    # 
 
     def __init__(self):
         # Set request timeout to config param `request_timeout` value.
@@ -159,7 +155,8 @@ class Stream():
             singer.write_state(Context.state)
 
 
-    def get_updated_session_bookmark(self, session_bookmark, value):
+    @staticmethod
+    def get_updated_session_bookmark(session_bookmark, value):
         try:
             session_bookmark = utils.strptime_with_tz(session_bookmark)
         except TypeError:
