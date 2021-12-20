@@ -8,7 +8,6 @@ from asana.error import NoAuthorizationError, RetryableAsanaError, InvalidTokenE
 from asana.page_iterator import CollectionPageIterator
 from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
-from asana.error import RetryableAsanaError, InvalidTokenError, RateLimitEnforcedError
 from tap_asana.context import Context
 
 
@@ -62,7 +61,7 @@ def invalid_token_handler(details):
 
 def asana_error_handling(fnc):
     @backoff.on_exception(backoff.expo,
-                          (InvalidTokenError, 
+                          (InvalidTokenError,
                           NoAuthorizationError,
                           TokenExpiredError),
                           on_backoff=invalid_token_handler,
