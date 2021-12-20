@@ -31,9 +31,7 @@ class Projects(Stream):
     "permalink_url",
     "workspace",
     "team",
-    "resource_type"
-  ]
-
+    "resource_type"]
 
   def get_objects(self):
     opt_fields = ",".join(self.fields)

@@ -16,13 +16,11 @@ class Tags(Stream):
     "color",
     "notes",
     "permalink_url",
-    "workspace"
-  ]
-
+    "workspace"]
 
   def get_objects(self):
-    opt_fields = ",".join(self.fields)
     bookmark = self.get_bookmark()
+    opt_fields = ",".join(self.fields)
     session_bookmark = bookmark
     for workspace in self.call_api("workspaces"):
       for tag in self.call_api("tags", workspace=workspace["gid"], opt_fields=opt_fields):
