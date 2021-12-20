@@ -1,13 +1,13 @@
 
-from singer import utils
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
 class Stories(Stream):
   name = "stories"
-  replication_key = "created_at"
   replication_method = 'INCREMENTAL'
+  replication_key = "created_at"
+
   fields = [
     "gid",
     "resource_type",
@@ -61,7 +61,7 @@ class Stories(Stream):
     opt_fields = ",".join(self.fields)
     for workspace in self.call_api("workspaces"):
       for project in self.call_api("projects", workspace=workspace["gid"]):
-        for task in self.call_api("tasks", project=project["gid"]): 
+        for task in self.call_api("tasks", project=project["gid"]):
           task_gid = task.get('gid')
           for story in Context.asana.client.stories.get_stories_for_task(task_gid=task_gid, opt_fields=opt_fields):
             session_bookmark = self.get_updated_session_bookmark(session_bookmark, story[self.replication_key])

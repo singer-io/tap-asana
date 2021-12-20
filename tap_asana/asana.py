@@ -6,9 +6,9 @@ LOGGER = singer.get_logger()
 
 
 """ Simple wrapper for Asana. """
-class Asana(object):
+class Asana():
 
-  def __init__(self, client_id, client_secret, redirect_uri, refresh_token, start_date, access_token=None):
+  def __init__(self, client_id, client_secret, redirect_uri, refresh_token, access_token=None): # pylint: disable=too-many-arguments
     self.client_id = client_id
     self.client_secret = client_secret
     self.redirect_uri = redirect_uri
@@ -30,8 +30,6 @@ class Asana(object):
     return asana.Client.access_token(self.access_token)
 
   def refresh_access_token(self):
-    if self._client.session.authorized:
-      return
     return self._client.session.refresh_token(self._client.session.token_url, client_id=self.client_id, client_secret=self.client_secret, refresh_token=self.refresh_token)
 
   @property

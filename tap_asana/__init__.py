@@ -4,8 +4,8 @@ import datetime
 import json
 import time
 import math
-import asana
 import functools
+import asana
 import singer
 from singer import utils
 from singer import metadata
@@ -39,7 +39,7 @@ def load_schemas():
     for filename in os.listdir(get_abs_path('schemas')):
         path = get_abs_path('schemas') + '/' + filename
         schema_name = filename.replace('.json', '')
-        with open(path) as file:
+        with open(path) as file: # pylint: disable=unspecified-encoding
             try:
                 schemas[schema_name] = json.load(file)
             except ValueError:
@@ -160,14 +160,13 @@ def main():
 
     # Set context.
     creds = {
-        "start_date": args.config['start_date'],
         "client_id": args.config['client_id'],
         "client_secret": args.config['client_secret'],
         "redirect_uri": args.config['redirect_uri'],
         "refresh_token": args.config['refresh_token']
     }
 
-    Context.config = creds
+    Context.config = args.config
     Context.state = args.state
     Context.asana = Asana(**creds)
 

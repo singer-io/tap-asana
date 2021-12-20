@@ -1,5 +1,4 @@
 
-from singer import utils
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
@@ -28,8 +27,6 @@ class Portfolios(Stream):
 
 
   def get_objects(self):
-    bookmark = self.get_bookmark()
-    session_bookmark = bookmark
     opt_fields = ",".join(self.fields)
     for workspace in Context.asana.client.workspaces.find_all():
       # NOTE: Currently, API users can only get a list of portfolios that they themselves own; owner="me"

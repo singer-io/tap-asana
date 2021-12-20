@@ -1,6 +1,4 @@
 
-import time
-from singer import utils
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
@@ -19,7 +17,7 @@ class Tags(Stream):
     "notes",
     "permalink_url",
     "workspace"
-  ]  
+  ]
 
 
   def get_objects(self):
