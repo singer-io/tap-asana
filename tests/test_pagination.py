@@ -25,7 +25,7 @@ class AsanaPaginationTest(AsanaBase):
         self.select_found_catalogs(conn_id, found_catalogs, only_streams=expected_streams)
 
         # Run a sync job using orchestrator
-        record_count_by_stream = self.run_and_verify_sync(conn_id)
+        record_count_by_stream = self.run_and_verify_sync(conn_id, expected_streams)
         actual_fields_by_stream = runner.examine_target_output_for_fields()
         sync_records = runner.get_records_from_target_output()
 

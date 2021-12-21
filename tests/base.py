@@ -170,7 +170,7 @@ class AsanaBase(unittest.TestCase):
 
         return found_catalogs
 
-    def run_and_verify_sync(self, conn_id):
+    def run_and_verify_sync(self, conn_id, streams=None):
         sync_job_name = runner.run_sync_mode(self, conn_id)
 
         # verify tap and target exit codes
@@ -179,7 +179,7 @@ class AsanaBase(unittest.TestCase):
 
         sync_record_count = runner.examine_target_output_file(self,
                                                               conn_id,
-                                                              self.expected_streams(),
+                                                              streams if streams else self.expected_streams(),
                                                               self.expected_primary_keys())
 
         self.assertGreater(
