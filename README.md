@@ -39,7 +39,8 @@ $ pip install tap-asana
   "client_secret": "xxx",
   "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
   "refresh_token": "yyy",
-  "start_date" : "2018-02-22T02:06:58.147Z"
+  "start_date" : "2018-02-22T02:06:58.147Z",
+  "request_timeout": 300
 }
 ```
 
@@ -47,6 +48,8 @@ $ pip install tap-asana
    (for those resources that support this).
 
    The `client_id`, `client_secret`, `redirect_uri`, and `refresh_token` can be generated following these [Asana OAuth instructions](https://developers.asana.com/docs/oauth).
+
+   The `request_timeout` specifies the timeout for the requests. Default: 300
 
 4. Run the Tap in Discovery Mode
 
