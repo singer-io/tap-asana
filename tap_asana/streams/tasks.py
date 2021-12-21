@@ -47,13 +47,13 @@ class Tasks(Stream):
   ]
 
   def get_objects(self):
+    # list of project ids
+    project_ids = []
+
+    opt_fields = ",".join(self.fields)
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
     modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
-    opt_fields = ",".join(self.fields)
-
-    # list of project ids
-    project_ids = []
 
     for workspace in self.call_api("workspaces"):
       for project in self.call_api("projects", workspace=workspace["gid"]):

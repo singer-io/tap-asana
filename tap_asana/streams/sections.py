@@ -17,10 +17,10 @@ class Sections(Stream):
   ]
 
   def get_objects(self):
-    opt_fields = ",".join(self.fields)
-
     # list of project ids
     project_ids = []
+
+    opt_fields = ",".join(self.fields)
 
     for workspace in self.call_api("workspaces"):
       for project in self.call_api("projects", workspace=workspace["gid"]):
