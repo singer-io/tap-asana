@@ -70,7 +70,7 @@ class Stories(Stream):
     for project_id in project_ids:
       for task in self.call_api("tasks", project=project_id):
         task_gid = task.get('gid')
-        for story in Context.asana.client.stories.get_stories_for_task(task_gid=task_gid, opt_fields=opt_fields):
+        for story in Context.asana.client.stories.get_stories_for_task(task_gid=task_gid, opt_fields=opt_fields, timeout=self.request_timeout):
           session_bookmark = self.get_updated_session_bookmark(session_bookmark, story[self.replication_key])
           if self.is_bookmark_old(story[self.replication_key]):
             yield story

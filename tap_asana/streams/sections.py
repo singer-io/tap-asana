@@ -28,7 +28,7 @@ class Sections(Stream):
 
     # iterate on all project ids and execute rest of the sync
     for project_id in project_ids:
-      for section in Context.asana.client.sections.get_sections_for_project(project_gid=project_id, owner="me", opt_fields=opt_fields):
+      for section in Context.asana.client.sections.get_sections_for_project(project_gid=project_id, owner="me", opt_fields=opt_fields, timeout=self.request_timeout):
         yield section
 
 
