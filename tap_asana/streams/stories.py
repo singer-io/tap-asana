@@ -1,13 +1,13 @@
 
-from singer import utils
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
 class Stories(Stream):
   name = "stories"
-  replication_key = "created_at"
   replication_method = 'INCREMENTAL'
+  replication_key = "created_at"
+
   fields = [
     "gid",
     "resource_type",
