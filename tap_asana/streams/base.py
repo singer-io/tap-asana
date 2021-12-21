@@ -1,6 +1,8 @@
 import math
 import functools
 import sys
+
+import requests
 import backoff
 import simplejson
 import singer
@@ -12,6 +14,12 @@ from tap_asana.context import Context
 
 
 LOGGER = singer.get_logger()
+
+# Setting default timeout as 300 second
+REQUEST_TIMEOUT = 300
+
+# Retry the request in the factor of 2 ie. 2, 4, 8, ...
+FACTOR = 2
 
 RESULTS_PER_PAGE = 250
 
@@ -61,6 +69,10 @@ def invalid_token_handler(details):
 
 def asana_error_handling(fnc):
     @backoff.on_exception(backoff.expo,
+                          requests.Timeout,
+                          max_tries=MAX_RETRIES,
+                          factor=FACTOR)
+    @backoff.on_exception(backoff.expo,
                           (InvalidTokenError,
                           NoAuthorizationError,
                           TokenExpiredError),
@@ -98,6 +110,15 @@ class Stream():
     replication_key = None
     key_properties = ['gid']
     # Controls which SDK object we use to call the API by default.
+
+    def __init__(self):
+        # Set request timeout to config param `request_timeout` value.
+        config_request_timeout = Context.config.get('request_timeout')
+        # If value is 0, "0", "" or not passed then it sets default to 300 seconds.
+        if config_request_timeout and float(config_request_timeout):
+            self.request_timeout = float(config_request_timeout)
+        else:
+            self.request_timeout = REQUEST_TIMEOUT
 
     def get_bookmark(self):
         bookmark = (singer.get_bookmark(Context.state,
@@ -151,12 +172,14 @@ class Stream():
         return session_bookmark
 
 
+    # As we added timeout, we need to pass it in the query param
+    # hence removed the condition: 'if query_params', as
+    # there will be atleast 1 param: 'timeout'
     @asana_error_handling
-    def call_api(self, resource, **query_params): # pylint: disable=no-self-use
+    def call_api(self, resource, **query_params):
         api_function = getattr(Context.asana.client, resource)
-        if query_params:
-            return api_function.find_all(**query_params)
-        return api_function.find_all()
+        query_params['timeout'] = self.request_timeout
+        return api_function.find_all(**query_params)
 
     def sync(self):
         """Yield's processed SDK object dicts to the caller.
