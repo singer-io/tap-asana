@@ -16,7 +16,7 @@ class AsanaPaginationTest(AsanaBase):
         # the default page size is 50: https://github.com/Asana/python-asana/blob/master/asana/client.py#L41
         # we have more than 50 records for all the stream except 'workspace'
         # to get data from more than 1 'workspaces' we need to upgrade asana plan
-        expected_streams = self.expected_streams() - {'workspaces'}
+        expected_streams = self.expected_streams() - {'workspaces'} | {'stories'}
         conn_id = connections.ensure_connection(self)
 
         # Select all streams and all fields within streams

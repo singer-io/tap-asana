@@ -113,7 +113,7 @@ class AsanaBase(unittest.TestCase):
         }
 
     def expected_streams(self):
-        return set(self.expected_metadata().keys())
+        return set(self.expected_metadata().keys()) - {'stories'}
 
     def expected_replication_keys(self):
         return {table: properties.get(self.REPLICATION_KEYS, set()) for table, properties
@@ -165,7 +165,7 @@ class AsanaBase(unittest.TestCase):
 
         found_catalog_names = set(map(lambda c: c['stream_name'], found_catalogs))
         print(found_catalog_names)
-        self.assertSetEqual(self.expected_streams(), found_catalog_names, msg="discovered schemas do not match")
+        self.assertSetEqual(set(self.expected_metadata().keys()), found_catalog_names, msg="discovered schemas do not match")
         print("discovered schemas are OK")
 
         return found_catalogs
