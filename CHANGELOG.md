@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.2
+ * Request timeout Implementation [#42](https://github.com/singer-io/tap-asana/pull/42)
+ * Fix backoff logic [#41](https://github.com/singer-io/tap-asana/pull/41)
+ * Fix pagination for stores and tasks [#40] (https://github.com/singer-io/tap-asana/pull/40)
+ * Check Best Practices [#39] (https://github.com/singer-io/tap-asana/pull/39)
+
 ## 2.1.1
  * Fixed issue where stream selection wasn't applying [#29](https://github.com/singer-io/tap-asana/pull/29)
 
