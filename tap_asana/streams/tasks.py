@@ -1,8 +1,9 @@
 
-from singer import utils
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+LOGGER = singer.get_logger()
 
 class Tasks(Stream):
   name = 'tasks'
@@ -29,7 +30,8 @@ class Tasks(Stream):
     "is_rendered_as_seperator",
     "liked",
     "likes",
-    "memberships",
+    "memberships.section",
+    "memberships.project",
     "modified_at",
     "notes",
     "num_hearts",
@@ -55,6 +57,7 @@ class Tasks(Stream):
     opt_fields = ",".join(self.fields)
     for workspace in self.call_api("workspaces"):
       for project in self.call_api("projects", workspace=workspace["gid"]):
+        LOGGER.info("Task extraction - project {}".format(project["gid"]))
         for task in self.call_api("tasks", project=project["gid"], opt_fields=opt_fields,
                                   modified_since=modified_since):
           session_bookmark = self.get_updated_session_bookmark(session_bookmark, task[self.replication_key])
