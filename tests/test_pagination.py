@@ -52,7 +52,7 @@ class AsanaPaginationTest(AsanaBase):
                 # Verify that the automatic fields are sent to the target
                 self.assertTrue(
                     actual_fields_by_stream.get(stream, set()).issuperset(
-                        expected_pk.get(stream, set()) |
+                        expected_pk |
                         self.expected_replication_keys().get(stream, set())),
                     msg="The fields sent to the target don't include all automatic fields"
                 )
@@ -60,7 +60,7 @@ class AsanaPaginationTest(AsanaBase):
                 # Verify we have more fields sent to the target than just automatic fields
                 self.assertTrue(
                     actual_fields_by_stream.get(stream, set()).symmetric_difference(
-                        expected_pk.get(stream, set()) |
+                        expected_pk |
                         self.expected_replication_keys().get(stream, set())),
                     msg="The fields sent to the target don't include non-automatic fields"
                 )

@@ -17,7 +17,8 @@ class AsanaBase(unittest.TestCase):
     INCREMENTAL = "INCREMENTAL"
     OBEYS_START_DATE = "obey-start-date"
     START_DATE_FORMAT = "%Y-%m-%dT00:00:00Z"
-    BOOKMARK_FOMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+    REPLICATION_DATE_FOMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+    BOOKMARK_FOMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
     first_start_date = '2019-01-01T00:00:00Z'
     second_start_date = '2020-08-15T00:00:00Z'

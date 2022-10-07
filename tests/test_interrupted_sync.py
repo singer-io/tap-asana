@@ -122,7 +122,7 @@ class AsanaInterruptedSyncTest(AsanaBase):
                     interrupted_stream_datetime = start_date_datetime
 
                     for record in interrupted_records:
-                        record_time = self.dt_to_ts(record.get(list(replication_key)[0]), self.BOOKMARK_FOMAT)
+                        record_time = self.dt_to_ts(record.get(list(replication_key)[0]), self.REPLICATION_DATE_FOMAT)
 
                         # Verify resuming sync only replicates records with the replication key
                         # values greater or equal to the state for streams that were replicated
@@ -137,7 +137,7 @@ class AsanaInterruptedSyncTest(AsanaBase):
                     # Record count for all streams of interrupted sync match expectations
                     records_after_interrupted_bookmark = 0
                     for record in full_records:
-                        record_time = self.dt_to_ts(record.get(list(replication_key)[0]), self.BOOKMARK_FOMAT)
+                        record_time = self.dt_to_ts(record.get(list(replication_key)[0]), self.REPLICATION_DATE_FOMAT)
                         if record_time >= interrupted_stream_datetime:
                             records_after_interrupted_bookmark += 1
 
@@ -158,7 +158,7 @@ class AsanaInterruptedSyncTest(AsanaBase):
                     self.assertGreater(interrupted_record_count, 0)
 
                     for record in interrupted_records:
-                        record_time = self.dt_to_ts(record.get(list(replication_key)[0]), self.BOOKMARK_FOMAT)
+                        record_time = self.dt_to_ts(record.get(list(replication_key)[0]), self.REPLICATION_DATE_FOMAT)
 
                         # Verify resuming sync only replicates records with the replication key
                         # values greater or equal to the state for streams that were replicated

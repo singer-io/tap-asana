@@ -108,7 +108,7 @@ class AsanaBookmarksTest(AsanaBase):
                         # Verify the second sync bookmark value is the max replication key value for
                         # a given stream
                         replication_key_value = record.get(replication_key)
-                        replication_key_value_parsed = self.dt_to_ts(replication_key_value, self.BOOKMARK_FOMAT)
+                        replication_key_value_parsed = self.dt_to_ts(replication_key_value, self.REPLICATION_DATE_FOMAT)
                         self.assertLessEqual(
                             replication_key_value_parsed, second_bookmark_value_parsed,
                             msg="Second sync bookmark was set incorrectly, \
@@ -130,7 +130,7 @@ class AsanaBookmarksTest(AsanaBase):
                         # Verify the first sync bookmark value is the max replication key value for
                         # a given stream
                         replication_key_value = record.get(replication_key)
-                        replication_key_value_parsed = self.dt_to_ts(replication_key_value, self.BOOKMARK_FOMAT)
+                        replication_key_value_parsed = self.dt_to_ts(replication_key_value, self.REPLICATION_DATE_FOMAT)
                         self.assertLessEqual(
                             replication_key_value_parsed, first_bookmark_value_parsed,
                             msg="First sync bookmark was set incorrectly, \
