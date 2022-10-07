@@ -1,4 +1,4 @@
-import json
+import simplejson as json
 from tap_tester import runner, connections
 from base import AsanaBase
 
@@ -70,7 +70,7 @@ class AsanaPaginationTest(AsanaBase):
                            if message.get('action') == 'upsert']
                 # Remove duplicate records
                 records_pks_list = [tuple(message.get(pk) for pk in expected_pk)
-                                   for message in [json.loads(t) for t in {json.dumps(d) for d in records}]]
+                                    for message in [json.loads(t) for t in {json.dumps(d) for d in records}]]
                 records_pks_set = set(records_pks_list)
 
                 # Verify we did not duplicate any records across pages
