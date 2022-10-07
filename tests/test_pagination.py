@@ -66,7 +66,7 @@ class AsanaPaginationTest(AsanaBase):
                 )
 
                 # Get records
-                records = [message.get("data") for message in sync_messages.get('messages', [])
+                records = [message.get("data") for message in sync_messages
                            if message.get('action') == 'upsert']
                 # Remove duplicate records
                 records_pks_list = [tuple(message.get(pk) for pk in expected_pk)
