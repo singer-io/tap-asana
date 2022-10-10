@@ -8,6 +8,46 @@ class AsanaAllFieldsTest(AsanaBase):
     in the replication of all fields.
     """
 
+    # Removed below fields as data cannot be generated
+    fields_to_remove = {
+        'tasks': {
+            'external',
+            'is_rendered_as_seperator',
+            'assignee_section',
+            'start_at'
+        },
+        'stories': {
+            'old_approval_status',
+            'old_name',
+            'previews',
+            'task',
+            'new_number_value',
+            'old_number_value',
+            'new_name'
+        },
+        'sections': {
+            'projects'
+        },
+        'portfolios': {
+            'is_template',
+            'public',
+            'custom_fields',
+            'current_status_update'
+        },
+        'projects': {
+            'completed',
+            'completed_by',
+            'is_template',
+            'current_status_update',
+            'custom_field_settings',
+            'project_brief',
+            'completed_at',
+            'created_from_template'
+        },
+        'teams': {
+            'visibility'
+        }
+    }
     def name(self):
         return "tap_tester_asana_all_fields_test"
 
@@ -75,22 +115,7 @@ class AsanaAllFieldsTest(AsanaBase):
                                 msg=f'{expected_automatic_keys-expected_all_keys} is not in "expected_all_keys"')
 
                 # Removed below fields as data cannot be generated
-                if stream == 'tasks':
-                    expected_all_keys.remove('is_rendered_as_seperator')
-                    expected_all_keys.remove('external')
-                elif stream == 'stories':
-                    expected_all_keys.remove('old_approval_status')
-                    expected_all_keys.remove('old_name')
-                    expected_all_keys.remove('previews')
-                    expected_all_keys.remove('task')
-                    expected_all_keys.remove('new_number_value')
-                    expected_all_keys.remove('old_number_value')
-                    expected_all_keys.remove('new_name')
-                elif stream == 'sections':
-                    expected_all_keys.remove('projects')
-                elif stream == 'portfolios':
-                    expected_all_keys.remove('is_template')
-                elif stream == 'projects':
-                    expected_all_keys.remove('is_template')
+                for field in self.fields_to_remove.get(stream, set()):
+                    expected_all_keys.remove(field)
 
                 self.assertSetEqual(expected_all_keys, actual_all_keys)
