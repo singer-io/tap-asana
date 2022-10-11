@@ -81,5 +81,7 @@ class AsanaAllFieldsTest(AsanaBase):
                     expected_all_keys.remove('projects')
                 elif stream == 'portfolios':
                     expected_all_keys.remove('is_template')
-
+                elif stream == 'projects':
+                    expected_all_keys.remove('is_template')
+                    
                 self.assertSetEqual(expected_all_keys, actual_all_keys)
