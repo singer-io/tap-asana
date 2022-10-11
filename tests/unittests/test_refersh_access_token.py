@@ -30,7 +30,7 @@ class TestRefreshAccessToken(unittest.TestCase):
         # Set asana CollectionPageIterator object
         client = tap_asana.asana.asana.client.Client({})
         iterator_object = CollectionPageIterator(client, 'test', 'test', {})
-        mocked_get.side_effect = invalid_token_error_raiser # raise InvalidTokenError
+        mocked_get.side_effect = invalid_token_error_raiser # Raise InvalidTokenError
         
         try:
             iterator_object.get_initial()
@@ -47,7 +47,7 @@ class TestRefreshAccessToken(unittest.TestCase):
         # Set asana CollectionPageIterator object
         client = tap_asana.asana.asana.client.Client({})
         iterator_object = CollectionPageIterator(client, 'test', 'test', {})
-        mocked_get.side_effect = no_authorized_error_raiser # raise NoAuthorizationError
+        mocked_get.side_effect = no_authorized_error_raiser # Raise NoAuthorizationError
         
         try:
             iterator_object.get_initial()
@@ -64,7 +64,7 @@ class TestRefreshAccessToken(unittest.TestCase):
         # Set asana CollectionPageIterator object
         client = tap_asana.asana.asana.client.Client({})
         iterator_object = CollectionPageIterator(client, 'test', 'test', {})
-        mocked_get.side_effect = token_expired_error_raiser # raise TokenExpiredError
+        mocked_get.side_effect = token_expired_error_raiser # Raise TokenExpiredError
         
         try:
             iterator_object.get_initial()
@@ -100,7 +100,7 @@ class TestRefreshAccessToken(unittest.TestCase):
         client = tap_asana.asana.asana.client.Client({})
         iterator_object = CollectionPageIterator(client, 'test', 'test', {})
         iterator_object.continuation = {"offset": "test"}
-        mocked_get.side_effect = invalid_token_error_raiser # raise InvalidTokenError
+        mocked_get.side_effect = invalid_token_error_raiser # Raise InvalidTokenError
         
         try:
             iterator_object.get_next()
@@ -118,7 +118,7 @@ class TestRefreshAccessToken(unittest.TestCase):
         client = tap_asana.asana.asana.client.Client({})
         iterator_object = CollectionPageIterator(client, 'test', 'test', {})
         iterator_object.continuation = {"offset": "test"}
-        mocked_get.side_effect = no_authorized_error_raiser # raise NoAuthorizationError
+        mocked_get.side_effect = no_authorized_error_raiser # Raise NoAuthorizationError
         
         try:
             iterator_object.get_next()
@@ -136,7 +136,7 @@ class TestRefreshAccessToken(unittest.TestCase):
         client = tap_asana.asana.asana.client.Client({})
         iterator_object = CollectionPageIterator(client, 'test', 'test', {})
         iterator_object.continuation = {"offset": "test"}
-        mocked_get.side_effect = token_expired_error_raiser # raise TokenExpiredError
+        mocked_get.side_effect = token_expired_error_raiser # Raise TokenExpiredError
         
         try:
             iterator_object.get_next()
