@@ -341,7 +341,7 @@
     "new_approval_status": {
       "type": [
         "null",
-        "string"
+        "boolean"
       ]
     },
     "new_dates": {
