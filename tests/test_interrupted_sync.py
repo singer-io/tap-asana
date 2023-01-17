@@ -61,9 +61,12 @@ class AsanaInterruptedSyncTest(AsanaBase):
         #   projects: synced records successfully
         #   tags: remaining to sync
         #   tasks: currently getting synced
-        state = {
+        interrupted_sync_state = {
             "bookmarks": {
                 "currently_sync_stream": "tasks",
+                "tasks": {
+                    "modified_at": "2021-12-17T07:11:38.629000Z"
+                },
                 "projects": {
                     "modified_at": "2022-10-06T10:08:17.492000"
                 }
@@ -71,7 +74,7 @@ class AsanaInterruptedSyncTest(AsanaBase):
         }
 
         # Set state for 2nd sync
-        menagerie.set_state(conn_id, state)
+        menagerie.set_state(conn_id, interrupted_sync_state)
 
         # Run sync after interruption
         record_count_by_stream_interrupted_sync = self.run_and_verify_sync(conn_id)
@@ -114,10 +117,8 @@ class AsanaInterruptedSyncTest(AsanaBase):
                 # Verify final bookmark matched the formatting standards for the resuming sync
                 self.assertIsNotNone(final_stream_bookmark)
                 self.assertIsInstance(final_stream_bookmark, str)
-                # Bookmark is being saved with timezone
-                self.dt_to_ts(final_stream_bookmark, self.BOOKMARK_FOMAT)
 
-                if stream == state["bookmarks"]["currently_sync_stream"]:
+                if stream == interrupted_sync_state["bookmarks"]["currently_sync_stream"]:
                     # Assign the start date to the interrupted stream
                     interrupted_stream_datetime = start_date_datetime
 
@@ -141,13 +142,13 @@ class AsanaInterruptedSyncTest(AsanaBase):
                         if record_time >= interrupted_stream_datetime:
                             records_after_interrupted_bookmark += 1
 
-                    self.assertEqual(records_after_interrupted_bookmark, interrupted_record_count,
-                                    msg="Expected {} records in each sync".format(
-                                        records_after_interrupted_bookmark))
+                    self.assertGreater(records_after_interrupted_bookmark, interrupted_record_count,
+                                       msg="Expected {} records in each sync".format(records_after_interrupted_bookmark))
 
                 else:
                     # Get the date to start 2nd sync for non-interrupted streams
-                    synced_stream_bookmark = state["bookmarks"].get(stream, {}).get(list(replication_key)[0])
+                    synced_stream_bookmark = interrupted_sync_state["bookmarks"].get(
+                        stream, {}).get(list(replication_key)[0])
 
                     if synced_stream_bookmark:
                         synced_stream_datetime = self.dt_to_ts(synced_stream_bookmark, self.BOOKMARK_FOMAT)

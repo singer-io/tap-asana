@@ -37,7 +37,7 @@ class AsanaAutomaticFieldsTest(AsanaBase):
 
                 # Expected values
                 expected_primary_keys = self.expected_primary_keys()[stream]
-                expected_keys = expected_primary_keys | self.expected_replication_keys()[stream]
+                expected_automatic_keys = expected_primary_keys | self.expected_replication_keys()[stream]
 
                 # Collect actual values
                 messages = synced_records.get(stream)
@@ -49,16 +49,21 @@ class AsanaAutomaticFieldsTest(AsanaBase):
 
                 # Verify that only the automatic fields are sent to the target
                 for actual_keys in record_messages_keys:
-                    self.assertSetEqual(expected_keys, actual_keys)
+                    self.assertSetEqual(expected_automatic_keys, actual_keys)
 
                 # Get records
                 records = [message.get("data") for message in messages.get('messages', [])
                            if message.get('action') == 'upsert']
+
                 # Remove duplicate records
                 records_pks_list = [tuple(message.get(pk) for pk in expected_primary_keys)
                                    for message in [json.loads(t) for t in {json.dumps(d) for d in records}]]
+
+                # Remove duplicate primary keys
                 records_pks_set = set(records_pks_list)
 
-                # Verify we did not duplicate any records across pages
+                # Verify defined primary key is unique
+                # Note: In tap-asana streams can have duplicate records with exact same primary key and other field values
+                # Below assertion will check if we have records with same primary key but different field values
                 self.assertCountEqual(records_pks_set, records_pks_list,
-                                      msg="We have duplicate records for {}".format(stream))
+                                      msg=f"{expected_primary_keys} is not a unique primary key for {stream} stream.")
