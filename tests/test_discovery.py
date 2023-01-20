@@ -94,8 +94,8 @@ class AsanaDiscoveryTest(AsanaBase):
 
                 # Verify there is only 1 top level breadcrumb in metadata
                 self.assertTrue(len(stream_properties) == 1,
-                                msg="There is NOT only one top level breadcrumb for {}".format(stream) +
-                                "\nstream_properties | {}".format(stream_properties))
+                                msg=f"There is NOT only one top level breadcrumb for {stream}" +
+                                f"\nstream_properties | {stream_properties}")
 
                 # Verify primary key(s) match expectations
                 self.assertSetEqual(expected_primary_keys, actual_primary_keys,)

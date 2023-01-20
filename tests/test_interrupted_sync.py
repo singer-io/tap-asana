@@ -143,7 +143,7 @@ class AsanaInterruptedSyncTest(AsanaBase):
                             records_after_interrupted_bookmark += 1
 
                     self.assertGreater(records_after_interrupted_bookmark, interrupted_record_count,
-                                       msg="Expected {} records in each sync".format(records_after_interrupted_bookmark))
+                                       msg=f"Expected {records_after_interrupted_bookmark} records in each sync")
 
                 else:
                     # Get the date to start 2nd sync for non-interrupted streams

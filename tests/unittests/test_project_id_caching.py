@@ -6,14 +6,14 @@ from unittest import mock
 from tap_asana.context import Context
 from tap_asana.asana import Asana
 
-# dummy 'sections' data
+# Dummy 'sections' data
 def sections_data(*args, **kwargs):
     return [
         {"gid": 1, "name": "test_data_1"},
         {"gid": 2, "name": "test_data_2"},
         {"gid": 3, "name": "test_data_3"}]
 
-# dummy 'stories' data
+# Dummy 'stories' data
 def stories_data(*args, **kwargs):
     return [
         {"gid": 1, "name": "test_data_1", "created_at": "2021-01-01"},

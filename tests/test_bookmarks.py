@@ -8,6 +8,7 @@ class AsanaBookmarksTest(AsanaBase):
     """
 
     def name(self):
+        """ Returns the test name """
         return "tap_tester_asana_bookmarks_test"
 
     def test_run(self):
@@ -99,10 +100,13 @@ class AsanaBookmarksTest(AsanaBase):
                     # Verify the second sync bookmark is Equal to the first sync bookmark
                     self.assertEqual(second_bookmark_value, first_bookmark_value)  # assumes no changes to data during test
 
-                    # Verify that the 2nd sync respects the bookmark. The number of records in the
+                    # Verify that you get some records for each stream
+                    self.assertGreater(second_sync_count, 0)
+
                     # second sync is less than the first
                     self.assertLess(second_sync_count, first_sync_count)
 
+                    # Verify that the 2nd sync respects the bookmark. The number of records in the
                     for record in second_sync_messages:
 
                         # Verify the second sync bookmark value is the max replication key value for

@@ -1,4 +1,4 @@
-from tap_tester import connections, menagerie, runner
+from tap_tester import connections, menagerie, runner, LOGGER
 import os
 import unittest
 from datetime import datetime as dt
@@ -38,6 +38,7 @@ class AsanaBase(unittest.TestCase):
             raise Exception("set " + ", ".join(missing_envs))
 
     def get_type(self):
+        """ Return the integration type """
         return "platform.asana"
 
     def get_credentials(self):
@@ -186,13 +187,13 @@ class AsanaBase(unittest.TestCase):
 
         found_catalogs = menagerie.get_catalogs(conn_id)
         self.assertGreater(len(found_catalogs), 0,
-                           msg="unable to locate schemas for connection {}".format(conn_id))
+                           msg=f"unable to locate schemas for connection {conn_id}")
 
         found_catalog_names = set(map(lambda c: c['stream_name'], found_catalogs))
-        print(found_catalog_names)
+        LOGGER.info(found_catalog_names)
         self.assertSetEqual(set(self.expected_metadata().keys()), found_catalog_names,
                             msg="discovered schemas do not match")
-        print("discovered schemas are OK")
+        LOGGER.info("discovered schemas are OK")
 
         return found_catalogs
 
@@ -213,17 +214,17 @@ class AsanaBase(unittest.TestCase):
 
         self.assertGreater(
             sum(sync_record_count.values()), 0,
-            msg="failed to replicate any data: {}".format(sync_record_count)
+            msg=f"failed to replicate any data: {sync_record_count}"
         )
-        print("total replicated row count: {}".format(sum(sync_record_count.values())))
+        LOGGER.info(f"total replicated row count: {sum(sync_record_count.values())}")
 
         return sync_record_count
 
-    def dt_to_ts(self, dtime, format):
+    def dt_to_ts(self, dtime, dt_format):
         """
         Converts datetime to timestamp format.
         """
-        date_stripped = int(time.mktime(dt.strptime(dtime, format).timetuple()))
+        date_stripped = int(time.mktime(dt.strptime(dtime, dt_format).timetuple()))
         return date_stripped
 
     def is_incremental(self, stream):
