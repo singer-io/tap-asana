@@ -164,7 +164,7 @@ def main():
     # If discover flag was passed, run discovery mode and dump output to stdout
     if args.discover:
         catalog = discover()
-        LOGGER.info(json.dumps(catalog, indent=2))
+        print(json.dumps(catalog, indent=2))  # noqa
     # Otherwise run in sync mode
     else:
         Context.tap_start = utils.now()
