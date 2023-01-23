@@ -5,6 +5,8 @@ import os
 import singer
 from singer import Transformer, metadata, utils
 
+# Load stream objects into Context
+import tap_asana.streams  # noqa
 from tap_asana.asana import Asana
 from tap_asana.context import Context
 
