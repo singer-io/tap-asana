@@ -194,11 +194,17 @@
         {
           "type": "array",
           "items": {
-            "type": ["null", "object"],
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": false,
             "properties": {
               "gid": {
-                "type": ["null", "string"]
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "user": {
                 "type": [
@@ -258,11 +264,17 @@
         {
           "type": "array",
           "items": {
-            "type": ["null", "object"],
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": false,
             "properties": {
               "gid": {
-                "type": ["null", "string"]
+                "type": [
+                  "null",
+                  "string"
+                ]
               },
               "user": {
                 "type": [
@@ -304,7 +316,10 @@
         {
           "type": "array",
           "items": {
-            "type": ["null", "object"],
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": false,
             "properties": {
               "project": {

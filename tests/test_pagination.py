@@ -1,14 +1,15 @@
-from tap_tester import menagerie, runner, connections
 from base import AsanaBase
+from tap_tester import connections, runner
+
 
 class AsanaPaginationTest(AsanaBase):
-
     def name(self):
         return "tap_tester_asana_pagination_test"
 
     def test_run(self):
-        """
-        Testing that the pagination works when there are records greater than the page size
+        """Testing that the pagination works when there are records greater
+        than the page size.
+
         - Verify for each stream you can get multiple pages of data
         - Verify by pks that the data replicated matches the data we expect.
         """
@@ -16,7 +17,7 @@ class AsanaPaginationTest(AsanaBase):
         # the default page size is 50: https://github.com/Asana/python-asana/blob/master/asana/client.py#L41
         # we have more than 50 records for all the stream except 'workspace'
         # to get data from more than 1 'workspaces' we need to upgrade asana plan
-        expected_streams = self.expected_streams() - {'workspaces'} | {'stories'}
+        expected_streams = self.expected_streams() - {"workspaces"} | {"stories"}
         conn_id = connections.ensure_connection(self)
 
         # Select all streams and all fields within streams
@@ -35,32 +36,42 @@ class AsanaPaginationTest(AsanaBase):
                 # verify that we can paginate with all fields selected
                 minimum_record_count = 50
 
-                self.assertGreater(record_count_by_stream.get(stream, -1), minimum_record_count,
-                    msg="The number of records is not over the stream max limit")
+                self.assertGreater(
+                    record_count_by_stream.get(stream, -1),
+                    minimum_record_count,
+                    msg="The number of records is not over the stream max limit",
+                )
 
                 expected_pk = self.expected_primary_keys()
-                sync_messages = sync_records.get(stream, {'messages': []}).get('messages')
+                sync_messages = sync_records.get(stream, {"messages": []}).get("messages")
 
                 # verify that the automatic fields are sent to the target
                 self.assertTrue(
                     actual_fields_by_stream.get(stream, set()).issuperset(
-                        expected_pk.get(stream, set()) |
-                        self.expected_replication_keys().get(stream, set())),
-                    msg="The fields sent to the target don't include all automatic fields"
+                        expected_pk.get(stream, set()) | self.expected_replication_keys().get(stream, set())
+                    ),
+                    msg="The fields sent to the target don't include all automatic fields",
                 )
 
                 # verify we have more fields sent to the target than just automatic fields
                 self.assertTrue(
                     actual_fields_by_stream.get(stream, set()).symmetric_difference(
-                        expected_pk.get(stream, set()) |
-                        self.expected_replication_keys().get(stream, set())),
-                    msg="The fields sent to the target don't include non-automatic fields"
+                        expected_pk.get(stream, set()) | self.expected_replication_keys().get(stream, set())
+                    ),
+                    msg="The fields sent to the target don't include non-automatic fields",
                 )
 
                 # Verify we did not duplicate any records across pages
-                records_pks_set = {tuple([message.get('data').get(primary_key) for primary_key in expected_pk.get(stream, set())])
-                                   for message in sync_messages}
-                records_pks_list = [tuple([message.get('data').get(primary_key) for primary_key in expected_pk.get(stream, set())])
-                                    for message in sync_messages]
-                self.assertCountEqual(records_pks_set, records_pks_list,
-                                      msg=f"We have duplicate records for {stream}")
+                records_pks_set = {
+                    tuple(message.get("data").get(primary_key) for primary_key in expected_pk.get(stream, set()))
+                    for message in sync_messages
+                }
+                records_pks_list = [
+                    tuple(message.get("data").get(primary_key) for primary_key in expected_pk.get(stream, set()))
+                    for message in sync_messages
+                ]
+                self.assertCountEqual(
+                    records_pks_set,
+                    records_pks_list,
+                    msg=f"We have duplicate records for {stream}",
+                )
