@@ -30,7 +30,15 @@ class Projects(Stream):
     "permalink_url",
     "workspace",
     "team",
-    "resource_type"]
+    "resource_type",
+    "current_status_update",
+    "custom_field_settings",
+    "completed",
+    "completed_at",
+    "completed_by",
+    "created_from_template",
+    "project_brief"
+  ]
 
   def get_objects(self):
     """Get stream object"""

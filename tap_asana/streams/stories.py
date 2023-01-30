@@ -29,6 +29,10 @@ class Stories(Stream):
         "new_approval_status",
         "new_dates",
         "new_enum_value",
+        "old_date_value",
+        "new_date_value",
+        "old_people_value",
+        "new_people_value",
         "new_name",
         "new_number_value",
         "new_resource_subtype",
@@ -51,6 +55,12 @@ class Stories(Stream):
         "tag",
         "target",
         "task",
+        "sticker_name",
+        "custom_field",
+        "is_editable",
+        "new_multi_enum_values",
+        "old_multi_enum_values",
+        "type"
     ]
 
     def get_objects(self):

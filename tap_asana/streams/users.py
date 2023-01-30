@@ -6,7 +6,14 @@ class Users(Stream):
     replication_method = "FULL_TABLE"
     name = "users"
 
-    fields = ["gid", "resource_type", "name", "email", "photo", "workspaces"]
+    fields = [
+        "gid",
+        "resource_type",
+        "name",
+        "email",
+        "photo",
+        "workspaces"
+    ]
 
     def get_objects(self):
         """Get stream object"""

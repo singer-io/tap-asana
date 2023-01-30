@@ -22,6 +22,9 @@ class Portfolios(Stream):
         "start_on",
         "workspace",
         "portfolio_items",
+        "current_status_update",
+        "custom_fields",
+        "public"
     ]
 
     def get_objects(self):

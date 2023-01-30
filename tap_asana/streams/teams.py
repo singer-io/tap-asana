@@ -14,6 +14,7 @@ class Teams(Stream):
         "html_description",
         "organization",
         "permalink_url",
+        "visibility"
     ]
 
     def get_objects(self):

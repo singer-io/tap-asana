@@ -43,6 +43,8 @@ class Tasks(Stream):
         "projects",
         "tags",
         "workspace",
+        "start_at",
+        "assignee_section"
     ]
 
     def get_objects(self):
