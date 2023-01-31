@@ -12,9 +12,7 @@ class AsanaAllFieldsTest(AsanaBase):
     fields_to_remove = {
         'tasks': {
             'external',
-            'is_rendered_as_seperator',
-            'assignee_section',
-            'start_at'
+            'is_rendered_as_seperator'
         },
         'stories': {
             'old_approval_status',
@@ -29,26 +27,15 @@ class AsanaAllFieldsTest(AsanaBase):
             'projects'
         },
         'portfolios': {
-            'is_template',
-            'public',
-            'custom_fields',
-            'current_status_update'
+            'is_template'
         },
         'projects': {
-            'completed',
-            'completed_by',
             'is_template',
-            'current_status_update',
-            'custom_field_settings',
-            'project_brief',
-            'completed_at',
-            'created_from_template'
-        },
-        'teams': {
-            'visibility'
+            'project_brief'
         }
     }
     def name(self):
+        """ Returns the test name """
         return "tap_tester_asana_all_fields_test"
 
     def test_run(self):
