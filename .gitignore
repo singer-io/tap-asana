@@ -154,5 +154,3 @@ singer-check-tap-data
 node_modules
 generate-schema.js
 package-lock.json
-
-

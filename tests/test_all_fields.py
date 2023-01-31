@@ -1,19 +1,20 @@
-from tap_tester import runner, connections, menagerie
 from base import AsanaBase
+from tap_tester import connections, menagerie, runner
+
 
 class AsanaAllFieldsTest(AsanaBase):
-
     def name(self):
         return "tap_tester_asana_all_fields_test"
 
     def test_run(self):
-        """
-        Testing that all fields mentioned in the catalog are synced from the tap
+        """Testing that all fields mentioned in the catalog are synced from the
+        tap.
+
         - Verify no unexpected streams were replicated
         - Verify that more than just the automatic fields are replicated for each stream
         """
         expected_streams = self.expected_streams()
-        
+
         # instantiate connection
         conn_id = connections.ensure_connection(self)
 
@@ -24,12 +25,13 @@ class AsanaAllFieldsTest(AsanaBase):
         self.select_found_catalogs(conn_id, found_catalogs, only_streams=expected_streams)
 
         # grab metadata after performing table-and-field selection to set expectations
-        stream_to_all_catalog_fields = dict() # used for asserting all fields are replicated
+        stream_to_all_catalog_fields = dict()  # used for asserting all fields are replicated
         for catalog in found_catalogs:
-            stream_id, stream_name = catalog['stream_id'], catalog['stream_name']
+            stream_id, stream_name = catalog["stream_id"], catalog["stream_name"]
             catalog_entry = menagerie.get_annotated_schema(conn_id, stream_id)
-            fields_from_field_level_md = [md_entry['breadcrumb'][1] for md_entry in catalog_entry['metadata']
-                                          if md_entry['breadcrumb'] != []]
+            fields_from_field_level_md = [
+                md_entry["breadcrumb"][1] for md_entry in catalog_entry["metadata"] if md_entry["breadcrumb"] != []
+            ]
             stream_to_all_catalog_fields[stream_name] = set(fields_from_field_level_md)
 
         # run initial sync
@@ -44,7 +46,9 @@ class AsanaAllFieldsTest(AsanaBase):
             with self.subTest(stream=stream):
 
                 # expected values
-                expected_automatic_keys = self.expected_primary_keys()[stream] | self.expected_replication_keys()[stream]
+                expected_automatic_keys = (
+                    self.expected_primary_keys()[stream] | self.expected_replication_keys()[stream]
+                )
 
                 # get all expected keys
                 expected_all_keys = stream_to_all_catalog_fields[stream]
@@ -54,32 +58,35 @@ class AsanaAllFieldsTest(AsanaBase):
 
                 actual_all_keys = set()
                 # collect actual values
-                for message in messages['messages']:
-                    if message['action'] == 'upsert':
-                        actual_all_keys.update(message['data'].keys())
+                for message in messages["messages"]:
+                    if message["action"] == "upsert":
+                        actual_all_keys.update(message["data"].keys())
 
                 # Verify that you get some records for each stream
                 self.assertGreater(record_count_by_stream.get(stream, -1), 0)
 
                 # verify all fields for a stream were replicated
                 self.assertGreater(len(expected_all_keys), len(expected_automatic_keys))
-                self.assertTrue(expected_automatic_keys.issubset(expected_all_keys), msg=f'{expected_automatic_keys-expected_all_keys} is not in "expected_all_keys"')
+                self.assertTrue(
+                    expected_automatic_keys.issubset(expected_all_keys),
+                    msg=f'{expected_automatic_keys-expected_all_keys} is not in "expected_all_keys"',
+                )
 
                 # removd below fields as data cannot be generated
-                if stream == 'tasks':
-                    expected_all_keys.remove('is_rendered_as_seperator')
-                    expected_all_keys.remove('external')
-                elif stream == 'stories':
-                    expected_all_keys.remove('old_approval_status')
-                    expected_all_keys.remove('old_name')
-                    expected_all_keys.remove('previews')
-                    expected_all_keys.remove('task')
-                    expected_all_keys.remove('new_number_value')
-                    expected_all_keys.remove('old_number_value')
-                    expected_all_keys.remove('new_name')
-                elif stream == 'sections':
-                    expected_all_keys.remove('projects')
-                elif stream == 'portfolios':
-                    expected_all_keys.remove('is_template')
+                if stream == "tasks":
+                    expected_all_keys.remove("is_rendered_as_seperator")
+                    expected_all_keys.remove("external")
+                elif stream == "stories":
+                    expected_all_keys.remove("old_approval_status")
+                    expected_all_keys.remove("old_name")
+                    expected_all_keys.remove("previews")
+                    expected_all_keys.remove("task")
+                    expected_all_keys.remove("new_number_value")
+                    expected_all_keys.remove("old_number_value")
+                    expected_all_keys.remove("new_name")
+                elif stream == "sections":
+                    expected_all_keys.remove("projects")
+                elif stream == "portfolios":
+                    expected_all_keys.remove("is_template")
 
                 self.assertSetEqual(expected_all_keys, actual_all_keys)

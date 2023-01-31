@@ -1,18 +1,19 @@
+import os
+import time
+import unittest
+from datetime import datetime as dt
+
+import singer
 import tap_tester.connections as connections
 import tap_tester.menagerie as menagerie
 import tap_tester.runner as runner
-import os
-import unittest
-from datetime import datetime as dt
-import time
+
+LOGGER = singer.get_logger()
+
 
 class AsanaBase(unittest.TestCase):
     START_DATE = ""
-    DATETIME_FMT = {
-        "%Y-%m-%dT%H:%M:%SZ",
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S.%fZ"
-    }
+    DATETIME_FMT = {"%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S.%fZ"}
     PRIMARY_KEYS = "table-key-properties"
     REPLICATION_METHOD = "forced-replication-method"
     REPLICATION_KEYS = "valid-replication-keys"
@@ -20,8 +21,8 @@ class AsanaBase(unittest.TestCase):
     INCREMENTAL = "INCREMENTAL"
     OBEYS_START_DATE = "obey-start-date"
 
-    first_start_date = '2019-01-01T00:00:00Z'
-    second_start_date = '2020-08-15T00:00:00Z'
+    first_start_date = "2019-01-01T00:00:00Z"
+    second_start_date = "2020-08-15T00:00:00Z"
 
     def tap_name(self):
         return "tap-asana"
@@ -31,7 +32,7 @@ class AsanaBase(unittest.TestCase):
             "TAP_ASANA_CLIENT_ID",
             "TAP_ASANA_CLIENT_SECRET",
             "TAP_ASANA_REDIRECT_URI",
-            "TAP_ASANA_REFRESH_TOKEN"
+            "TAP_ASANA_REFRESH_TOKEN",
         }
         missing_envs = [v for v in required_env if not os.getenv(v)]
         if missing_envs:
@@ -43,14 +44,14 @@ class AsanaBase(unittest.TestCase):
     def get_credentials(self):
         return {
             "client_secret": os.getenv("TAP_ASANA_CLIENT_SECRET"),
-            "refresh_token": os.getenv("TAP_ASANA_REFRESH_TOKEN")
+            "refresh_token": os.getenv("TAP_ASANA_REFRESH_TOKEN"),
         }
 
     def get_properties(self, original: bool = True):
         return_value = {
             "start_date": "2018-04-11T00:00:00Z",
             "client_id": os.getenv("TAP_ASANA_CLIENT_ID"),
-            "redirect_uri": os.getenv("TAP_ASANA_REDIRECT_URI")
+            "redirect_uri": os.getenv("TAP_ASANA_REDIRECT_URI"),
         }
         if original:
             return return_value
@@ -64,71 +65,83 @@ class AsanaBase(unittest.TestCase):
             "portfolios": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.FULL_TABLE,
-                self.OBEYS_START_DATE: False
+                self.OBEYS_START_DATE: False,
             },
             "projects": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
                 self.REPLICATION_KEYS: {"modified_at"},
-                self.OBEYS_START_DATE: True
+                self.OBEYS_START_DATE: True,
             },
             "sections": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.FULL_TABLE,
-                self.OBEYS_START_DATE: False
+                self.OBEYS_START_DATE: False,
             },
             "stories": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
                 self.REPLICATION_KEYS: {"created_at"},
-                self.OBEYS_START_DATE: True
+                self.OBEYS_START_DATE: True,
             },
             "tags": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
                 self.REPLICATION_KEYS: {"created_at"},
-                self.OBEYS_START_DATE: True
+                self.OBEYS_START_DATE: True,
             },
             "tasks": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
                 self.REPLICATION_KEYS: {"modified_at"},
-                self.OBEYS_START_DATE: True
+                self.OBEYS_START_DATE: True,
             },
             "teams": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.FULL_TABLE,
-                self.OBEYS_START_DATE: False
+                self.OBEYS_START_DATE: False,
             },
             "users": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.FULL_TABLE,
-                self.OBEYS_START_DATE: False
+                self.OBEYS_START_DATE: False,
             },
             "workspaces": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.FULL_TABLE,
-                self.OBEYS_START_DATE: False
-            }
+                self.OBEYS_START_DATE: False,
+            },
         }
 
     def expected_streams(self):
-        return set(self.expected_metadata().keys()) - {'stories'}
+        return set(self.expected_metadata().keys()) - {"stories"}
 
     def expected_replication_keys(self):
-        return {table: properties.get(self.REPLICATION_KEYS, set()) for table, properties
-                in self.expected_metadata().items()}
+        return {
+            table: properties.get(self.REPLICATION_KEYS, set())
+            for table, properties in self.expected_metadata().items()
+        }
 
     def expected_primary_keys(self):
-        return {table: properties.get(self.PRIMARY_KEYS, set()) for table, properties
-                in self.expected_metadata().items()}
+        return {
+            table: properties.get(self.PRIMARY_KEYS, set()) for table, properties in self.expected_metadata().items()
+        }
 
     def expected_replication_method(self):
-        return {table: properties.get(self.REPLICATION_METHOD, set()) for table, properties
-                in self.expected_metadata().items()}
+        return {
+            table: properties.get(self.REPLICATION_METHOD, set())
+            for table, properties in self.expected_metadata().items()
+        }
 
-    def select_found_catalogs(self, conn_id, catalogs, only_streams=None, deselect_all_fields: bool = False, non_selected_props=[]):
-        """Select all streams and all fields within streams"""
+    def select_found_catalogs(
+        self,
+        conn_id,
+        catalogs,
+        only_streams=None,
+        deselect_all_fields: bool = False,
+        non_selected_props=[],
+    ):
+        """Select all streams and all fields within streams."""
         for catalog in catalogs:
             if only_streams and catalog["stream_name"] not in only_streams:
                 continue
@@ -141,15 +154,17 @@ class AsanaBase(unittest.TestCase):
                 non_selected_properties = non_selected_properties.keys()
             additional_md = []
 
-            connections.select_catalog_and_fields_via_metadata(conn_id,
-                                                               catalog,
-                                                               schema,
-                                                               additional_md=additional_md,
-                                                               non_selected_fields=non_selected_properties)
+            connections.select_catalog_and_fields_via_metadata(
+                conn_id,
+                catalog,
+                schema,
+                additional_md=additional_md,
+                non_selected_fields=non_selected_properties,
+            )
 
     def run_and_verify_check_mode(self, conn_id):
-        """
-        Run the tap in check mode and verify it succeeds.
+        """Run the tap in check mode and verify it succeeds.
+
         This should be ran prior to field selection and initial sync.
         Return the connection id and found catalogs from menagerie.
         """
@@ -161,12 +176,20 @@ class AsanaBase(unittest.TestCase):
         menagerie.verify_check_exit_status(self, exit_status, check_job_name)
 
         found_catalogs = menagerie.get_catalogs(conn_id)
-        self.assertGreater(len(found_catalogs), 0, msg="unable to locate schemas for connection {}".format(conn_id))
+        self.assertGreater(
+            len(found_catalogs),
+            0,
+            msg=f"unable to locate schemas for connection {conn_id}",
+        )
 
-        found_catalog_names = set(map(lambda c: c['stream_name'], found_catalogs))
-        print(found_catalog_names)
-        self.assertSetEqual(set(self.expected_metadata().keys()), found_catalog_names, msg="discovered schemas do not match")
-        print("discovered schemas are OK")
+        found_catalog_names = set(map(lambda c: c["stream_name"], found_catalogs))
+        LOGGER.info(found_catalog_names)
+        self.assertSetEqual(
+            set(self.expected_metadata().keys()),
+            found_catalog_names,
+            msg="discovered schemas do not match",
+        )
+        LOGGER.info("discovered schemas are OK")
 
         return found_catalogs
 
@@ -177,16 +200,19 @@ class AsanaBase(unittest.TestCase):
         exit_status = menagerie.get_exit_status(conn_id, sync_job_name)
         menagerie.verify_sync_exit_status(self, exit_status, sync_job_name)
 
-        sync_record_count = runner.examine_target_output_file(self,
-                                                              conn_id,
-                                                              streams if streams else self.expected_streams(),
-                                                              self.expected_primary_keys())
+        sync_record_count = runner.examine_target_output_file(
+            self,
+            conn_id,
+            streams if streams else self.expected_streams(),
+            self.expected_primary_keys(),
+        )
 
         self.assertGreater(
-            sum(sync_record_count.values()), 0,
-            msg="failed to replicate any data: {}".format(sync_record_count)
+            sum(sync_record_count.values()),
+            0,
+            msg=f"failed to replicate any data: {sync_record_count}",
         )
-        print("total replicated row count: {}".format(sum(sync_record_count.values())))
+        LOGGER.info(f"total replicated row count: {sum(sync_record_count.values())}")
 
         return sync_record_count
 

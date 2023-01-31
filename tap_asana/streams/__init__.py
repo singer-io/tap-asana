@@ -6,4 +6,4 @@ import tap_asana.streams.tags
 import tap_asana.streams.tasks
 import tap_asana.streams.teams
 import tap_asana.streams.users
-import tap_asana.streams.workspaces
+import tap_asana.streams.workspaces  # noqa
