@@ -6,7 +6,13 @@ class Workspaces(Stream):
     name = "workspaces"
     replication_method = "FULL_TABLE"
 
-    fields = ["gid", "name", "is_organization", "resource_type", "email_domains"]
+    fields = [
+        "gid",
+        "name",
+        "is_organization",
+        "resource_type",
+        "email_domains"
+    ]
 
     def get_objects(self):
         """Get stream object"""

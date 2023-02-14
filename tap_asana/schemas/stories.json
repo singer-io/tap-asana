@@ -392,6 +392,104 @@
         }
       }
     },
+    "old_date_value": {
+      "type": ["null", "object"],
+      "additionalProperties": false,
+      "properties": {
+        "start_on": {
+          "type": ["null", "string"]
+        },
+        "due_at": {
+          "type": ["null", "string"],
+          "format": "date-time"
+        },
+        "due_on": {
+          "type": ["null", "string"]
+        }
+      }
+    },
+    "new_date_value": {
+      "type": ["null", "object"],
+      "additionalProperties": false,
+      "properties": {
+        "start_on": {
+          "type": ["null", "string"]
+        },
+        "due_at": {
+          "type": ["null", "string"],
+          "format": "date-time"
+        },
+        "due_on": {
+          "type": ["null", "string"]
+        }
+      }
+    },
+    "old_people_value": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
+    "new_people_value": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
+    },
     "new_name": {
       "type": [
         "null",

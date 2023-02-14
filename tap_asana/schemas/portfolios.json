@@ -479,7 +479,8 @@
       "type": [
         "null",
         "string"
-      ]
+      ],
+      "format": "date-time"
     },
     "members": {
       "type": [
