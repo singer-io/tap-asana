@@ -669,7 +669,8 @@
                 "type": [
                   "null",
                   "string"
-                ]
+                ],
+                "format": "date-time"
               }
             }
           },
@@ -935,7 +936,8 @@
       "type": [
         "null",
         "string"
-      ]
+      ],
+      "format": "date-time"
     },
     "assignee_section": {
       "type": [
