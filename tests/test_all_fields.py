@@ -1,9 +1,41 @@
 from tap_tester import runner, connections, menagerie
 from base import AsanaBase
 
-class AsanaAllFieldsTest(AsanaBase):
 
+class AsanaAllFieldsTest(AsanaBase):
+    """
+    Test to verify that running the tap run with all streams and fields selected results
+    in the replication of all fields.
+    """
+
+    # Removed below fields as data cannot be generated
+    fields_to_remove = {
+        'tasks': {
+            'external',
+            'is_rendered_as_seperator'
+        },
+        'stories': {
+            'old_approval_status',
+            'old_name',
+            'previews',
+            'task',
+            'new_number_value',
+            'old_number_value',
+            'new_name'
+        },
+        'sections': {
+            'projects'
+        },
+        'portfolios': {
+            'is_template'
+        },
+        'projects': {
+            'is_template',
+            'project_brief'
+        }
+    }
     def name(self):
+        """ Returns the test name """
         return "tap_tester_asana_all_fields_test"
 
     def test_run(self):
@@ -13,18 +45,20 @@ class AsanaAllFieldsTest(AsanaBase):
         - Verify that more than just the automatic fields are replicated for each stream
         """
         expected_streams = self.expected_streams()
-        
-        # instantiate connection
+
+        # Instantiate connection
         conn_id = connections.ensure_connection(self)
 
-        # run check mode
+        # Run check mode
         found_catalogs = self.run_and_verify_check_mode(conn_id)
 
-        # table and field selection
-        self.select_found_catalogs(conn_id, found_catalogs, only_streams=expected_streams)
+        # Table and field selection
+        self.select_found_catalogs(
+            conn_id, found_catalogs, only_streams=expected_streams)
 
-        # grab metadata after performing table-and-field selection to set expectations
-        stream_to_all_catalog_fields = dict() # used for asserting all fields are replicated
+        # Grab metadata after performing table-and-field selection to set expectations
+        # Used for asserting all fields are replicated
+        stream_to_all_catalog_fields = dict()
         for catalog in found_catalogs:
             stream_id, stream_name = catalog['stream_id'], catalog['stream_name']
             catalog_entry = menagerie.get_annotated_schema(conn_id, stream_id)
@@ -32,7 +66,7 @@ class AsanaAllFieldsTest(AsanaBase):
                                           if md_entry['breadcrumb'] != []]
             stream_to_all_catalog_fields[stream_name] = set(fields_from_field_level_md)
 
-        # run initial sync
+        # Run initial sync
         record_count_by_stream = self.run_and_verify_sync(conn_id)
         synced_records = runner.get_records_from_target_output()
 
@@ -43,17 +77,18 @@ class AsanaAllFieldsTest(AsanaBase):
         for stream in expected_streams:
             with self.subTest(stream=stream):
 
-                # expected values
-                expected_automatic_keys = self.expected_primary_keys()[stream] | self.expected_replication_keys()[stream]
+                # Expected values
+                expected_automatic_keys = self.expected_primary_keys()[stream] | \
+                    self.expected_replication_keys()[stream]
 
-                # get all expected keys
+                # Get all expected keys
                 expected_all_keys = stream_to_all_catalog_fields[stream]
 
-                # collect actual values
+                # Collect actual values
                 messages = synced_records.get(stream)
 
                 actual_all_keys = set()
-                # collect actual values
+                # Collect actual values
                 for message in messages['messages']:
                     if message['action'] == 'upsert':
                         actual_all_keys.update(message['data'].keys())
@@ -61,25 +96,13 @@ class AsanaAllFieldsTest(AsanaBase):
                 # Verify that you get some records for each stream
                 self.assertGreater(record_count_by_stream.get(stream, -1), 0)
 
-                # verify all fields for a stream were replicated
+                # Verify all fields for a stream were replicated
                 self.assertGreater(len(expected_all_keys), len(expected_automatic_keys))
-                self.assertTrue(expected_automatic_keys.issubset(expected_all_keys), msg=f'{expected_automatic_keys-expected_all_keys} is not in "expected_all_keys"')
+                self.assertTrue(expected_automatic_keys.issubset(expected_all_keys),
+                                msg=f'{expected_automatic_keys-expected_all_keys} is not in "expected_all_keys"')
 
-                # removd below fields as data cannot be generated
-                if stream == 'tasks':
-                    expected_all_keys.remove('is_rendered_as_seperator')
-                    expected_all_keys.remove('external')
-                elif stream == 'stories':
-                    expected_all_keys.remove('old_approval_status')
-                    expected_all_keys.remove('old_name')
-                    expected_all_keys.remove('previews')
-                    expected_all_keys.remove('task')
-                    expected_all_keys.remove('new_number_value')
-                    expected_all_keys.remove('old_number_value')
-                    expected_all_keys.remove('new_name')
-                elif stream == 'sections':
-                    expected_all_keys.remove('projects')
-                elif stream == 'portfolios':
-                    expected_all_keys.remove('is_template')
+                # Removed below fields as data cannot be generated
+                for field in self.fields_to_remove.get(stream, set()):
+                    expected_all_keys.remove(field)
 
                 self.assertSetEqual(expected_all_keys, actual_all_keys)
