@@ -308,15 +308,13 @@
       "type": [
         "null",
         "string"
-      ],
-      "format": "date-time"
+      ]
     },
     "due_on": {
       "type": [
         "null",
         "string"
-      ],
-      "format": "date-time"
+      ]
     },
     "html_notes": {
       "type": [
@@ -643,7 +641,8 @@
                     "type": [
                       "null",
                       "string"
-                    ]
+                    ],
+                    "format": "date-time"
                   }
                 }
               },
