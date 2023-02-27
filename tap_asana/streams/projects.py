@@ -1,4 +1,3 @@
-
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
@@ -31,9 +30,18 @@ class Projects(Stream):
     "permalink_url",
     "workspace",
     "team",
-    "resource_type"]
+    "resource_type",
+    "current_status_update",
+    "custom_field_settings",
+    "completed",
+    "completed_at",
+    "completed_by",
+    "created_from_template",
+    "project_brief"
+  ]
 
   def get_objects(self):
+    """Get stream object"""
     opt_fields = ",".join(self.fields)
     bookmark = self.get_bookmark()
     session_bookmark = bookmark

@@ -1,10 +1,11 @@
-from dateutil.parser import parse
-import tap_tester.connections as connections
-import tap_tester.menagerie as menagerie
-import tap_tester.runner as runner
+from tap_tester import connections, runner
 from base import AsanaBase
 
+
 class AsanaStartDateTest(AsanaBase):
+    """
+        Verify that that the tap respects the start date.
+    """
 
     def name(self):
         return "tap_tester_asana_start_date_test"
@@ -13,25 +14,29 @@ class AsanaStartDateTest(AsanaBase):
         """
         Testing that the tap respects the start date
         - INCREMENTAL
-            - Verify 1st sync (start date=today-N days) record count > 2nd sync (start date=today) record count.
-            - Verify minimum bookmark sent to the target for incremental streams >= start date for both syncs.
-            - Verify by primary key values, that all records in the 2nd sync are included in the 1st sync since 2nd sync has a later start date.
+            - Verify 1st sync (start date=today-N days) record count > 2nd sync
+                (start date=today) record count.
+            - Verify minimum bookmark sent to the target for incremental streams >= start date
+                for both syncs.
+            - Verify by primary key values, that all records in the 2nd sync are included in
+                the 1st sync since 2nd sync has a later start date.
         - FULL TABLE
             - Verify that the 2nd sync includes the same number of records as the 1st sync.
-            - Verify by primary key values, that the 2nd sync and 1st sync replicated the same records.
+            - Verify by primary key values, that the 2nd sync and 1st sync replicated the same
+                records.
         """
 
-        start_date_1_epoch = self.dt_to_ts(self.first_start_date)
-        start_date_2_epoch = self.dt_to_ts(self.second_start_date)
+        start_date_1_epoch = self.dt_to_ts(self.first_start_date, self.START_DATE_FORMAT)
+        start_date_2_epoch = self.dt_to_ts(self.second_start_date, self.START_DATE_FORMAT)
 
         ##########################################################################
-        ### Update Start Date for 1st sync
+        # Update Start Date for 1st sync
         ##########################################################################
 
         self.START_DATE = self.first_start_date
 
         ##########################################################################
-        ### Frist Sync
+        # First Sync
         ##########################################################################
 
         expected_streams = self.expected_streams()
@@ -40,27 +45,29 @@ class AsanaStartDateTest(AsanaBase):
         runner.run_check_mode(self, conn_id_1)
 
         found_catalogs_1 = self.run_and_verify_check_mode(conn_id_1)
-        self.select_found_catalogs(conn_id_1, found_catalogs_1, only_streams=expected_streams)
+        self.select_found_catalogs(conn_id_1, found_catalogs_1,
+                                   only_streams=expected_streams)
 
         sync_record_count_1 = self.run_and_verify_sync(conn_id_1)
 
         synced_records_1 = runner.get_records_from_target_output()
 
         ##########################################################################
-        ### Update Start Date for 2nd sync
+        # Update Start Date for 2nd sync
         ##########################################################################
 
         self.START_DATE = self.second_start_date
 
         ##########################################################################
-        ### Second Sync
+        # Second Sync
         ##########################################################################
 
         conn_id_2 = connections.ensure_connection(self, original_properties=False)
         runner.run_check_mode(self, conn_id_2)
 
         found_catalogs_2 = self.run_and_verify_check_mode(conn_id_2)
-        self.select_found_catalogs(conn_id_2, found_catalogs_2, only_streams=expected_streams)
+        self.select_found_catalogs(conn_id_2, found_catalogs_2,
+                                   only_streams=expected_streams)
 
         sync_record_count_2 = self.run_and_verify_sync(conn_id_2)
 
@@ -79,11 +86,13 @@ class AsanaStartDateTest(AsanaBase):
                 # collect information for assertions from syncs 1 & 2 base on expected values
                 record_count_sync_1 = sync_record_count_1.get(stream, 0)
                 record_count_sync_2 = sync_record_count_2.get(stream, 0)
-                primary_keys_list_1 = [tuple(message.get('data').get(expected_pk) for expected_pk in expected_primary_keys)
-                                       for message in synced_records_1.get(stream, {}).get('messages')
+                primary_keys_list_1 = [tuple(message.get('data').get(expected_pk)
+                                       for expected_pk in expected_primary_keys)
+                                       for message in synced_records_1.get(stream,{}).get('messages')
                                        if message.get('action') == 'upsert']
-                primary_keys_list_2 = [tuple(message.get('data').get(expected_pk) for expected_pk in expected_primary_keys)
-                                       for message in synced_records_2.get(stream, {}).get('messages')
+                primary_keys_list_2 = [tuple(message.get('data').get(expected_pk)
+                                       for expected_pk in expected_primary_keys)
+                                       for message in synced_records_2.get(stream,{}).get('messages')
                                        if message.get('action') == 'upsert']
 
                 primary_keys_sync_1 = set(primary_keys_list_1)
@@ -91,23 +100,23 @@ class AsanaStartDateTest(AsanaBase):
 
                 if expected_metadata[self.OBEYS_START_DATE]:
                     # Expected bookmark key is one element in set so directly access it
-                    start_date_keys_list_1 = [message.get('data').get(next(iter(expected_replication_keys))) for message in synced_records_1.get(stream).get('messages')
-                                              if message.get('action') == 'upsert']
-                    start_date_keys_list_2 = [message.get('data').get(next(iter(expected_replication_keys))) for message in synced_records_2.get(stream).get('messages')
-                                              if message.get('action') == 'upsert']
+                    start_date_keys_list_1 = [message.get('data').get(list(expected_replication_keys)[0])
+                        for message in synced_records_1.get(stream).get('messages')
+                        if message.get('action') == 'upsert']
+                    start_date_keys_list_2 = [message.get('data').get(list(expected_replication_keys)[0])
+                        for message in synced_records_2.get(stream).get('messages')
+                        if message.get('action') == 'upsert']
 
                     start_date_key_sync_1 = set(start_date_keys_list_1)
                     start_date_key_sync_2 = set(start_date_keys_list_2)
 
                     # Verify bookmark key values are greater than or equal to start date of sync 1
                     for start_date_key_value in start_date_key_sync_1:
-                        start_date_key_value_parsed = parse(start_date_key_value).strftime("%Y-%m-%dT%H:%M:%SZ")
-                        self.assertGreaterEqual(self.dt_to_ts(start_date_key_value_parsed), start_date_1_epoch)
+                        self.assertGreaterEqual(self.dt_to_ts(start_date_key_value, self.REPLICATION_DATE_FOMAT), start_date_1_epoch)
 
                     # Verify bookmark key values are greater than or equal to start date of sync 2
                     for start_date_key_value in start_date_key_sync_2:
-                        start_date_key_value_parsed = parse(start_date_key_value).strftime("%Y-%m-%dT%H:%M:%SZ")
-                        self.assertGreaterEqual(self.dt_to_ts(start_date_key_value_parsed), start_date_2_epoch)
+                        self.assertGreaterEqual(self.dt_to_ts(start_date_key_value, self.REPLICATION_DATE_FOMAT), start_date_2_epoch)
 
                     # Verify the number of records replicated in sync 1 is greater than the number
                     # of records replicated in sync 2 for stream
