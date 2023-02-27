@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0
+ * Below are the changes [#48](https://github.com/singer-io/tap-asana/pull/48)
+   * Upgraded the asana-python SDK
+   * Added parameterized in config.yml file
+   * Schema fields addition
+ * Updated code as per PEP8 standards [#49](https://github.com/singer-io/tap-asana/pull/49)
+ * Updated missing tap-tester tests and assertions [#47](https://github.com/singer-io/tap-asana/pull/47)
+
 ## 2.1.2
  * Request timeout Implementation [#42](https://github.com/singer-io/tap-asana/pull/42)
  * Fix backoff logic [#41](https://github.com/singer-io/tap-asana/pull/41)
