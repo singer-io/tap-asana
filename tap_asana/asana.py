@@ -11,7 +11,7 @@ class Asana():
     """Base class for tap-asana"""
 
     def __init__(
-        self, client_id, client_secret, redirect_uri, refresh_token, access_token=None
+        self, client_id, client_secret, redirect_uri, refresh_token, access_token=None, options=None
     ):  # pylint: disable=too-many-arguments
         self.client_id = client_id
         self.client_secret = client_secret
@@ -20,6 +20,9 @@ class Asana():
         self.access_token = access_token
         self._client = self._oauth_auth() or self._access_token_auth()
         self.refresh_access_token()
+
+        if options is not None:
+            self.update_options(options)
 
     def _oauth_auth(self):
         """Oauth authentication for tap"""
@@ -34,7 +37,7 @@ class Asana():
         return asana.Client.oauth(
             client_id=self.client_id,
             client_secret=self.client_secret,
-            redirect_uri=self.redirect_uri,
+            redirect_uri=self.redirect_uri
         )
 
     def _access_token_auth(self):
@@ -51,6 +54,9 @@ class Asana():
             client_secret=self.client_secret,
             refresh_token=self.refresh_token,
         )
+
+    def update_options(self, options):
+        self._client.options.update(options)
 
     @property
     def client(self):
