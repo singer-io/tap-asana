@@ -1,3 +1,4 @@
+# pylint:disable=duplicate-code
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 import singer
