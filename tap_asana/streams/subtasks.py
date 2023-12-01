@@ -1,8 +1,8 @@
 # pylint:disable=duplicate-code
-from tap_asana.context import Context
-from tap_asana.streams.base import Stream
 import singer
 import logging
+from tap_asana.context import Context
+from tap_asana.streams.base import Stream
 
 LOGGER = singer.get_logger()
 LOGGER.setLevel(logging.DEBUG)
