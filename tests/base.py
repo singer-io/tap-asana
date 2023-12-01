@@ -105,6 +105,11 @@ class AsanaBase(unittest.TestCase):
                 self.REPLICATION_KEYS: {"modified_at"},
                 self.OBEYS_START_DATE: True
             },
+            "subtasks": {
+                self.PRIMARY_KEYS: {"gid"},
+                self.REPLICATION_METHOD: self.FULL_TABLE,
+                self.OBEYS_START_DATE: True
+            },
             "teams": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.FULL_TABLE,
