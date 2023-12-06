@@ -21,7 +21,7 @@ class AsanaBase(unittest.TestCase):
     BOOKMARK_FOMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
     first_start_date = '2019-01-01T00:00:00Z'
-    second_start_date = '2020-08-15T00:00:00Z'
+    second_start_date = '2021-08-15T00:00:00Z'
 
     def tap_name(self):
         return "tap-asana"

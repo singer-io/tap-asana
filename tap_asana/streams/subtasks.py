@@ -3,13 +3,15 @@ import logging
 import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
+from singer import utils
 
 LOGGER = singer.get_logger()
 LOGGER.setLevel(logging.DEBUG)
 
 class SubTasks(Stream):
     name = "subtasks"
-    replication_method = "FULL_TABLE"
+    replication_key = "modified_at"
+    replication_method = "INCREMENTAL"
     fields = [
         "gid",
         "resource_type",
@@ -56,6 +58,9 @@ class SubTasks(Stream):
         # list of project ids
         project_ids = []
         opt_fields = ",".join(self.fields)
+        bookmark = self.get_bookmark()
+        session_bookmark = bookmark
+        
         for workspace in self.call_api("workspaces"):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                     project_ids.append(project["gid"])
@@ -64,7 +69,15 @@ class SubTasks(Stream):
             LOGGER.info("Fetching Subtasks for project: %s/%s",indx, len(project_ids))
             tasks_list = self.call_api("tasks",project=project_id,opt_fields=opt_fields)
             for task in tasks_list:
-                yield from self.fetch_children(task, opt_fields)
+                for subt in self.fetch_children(task, opt_fields):
+                    session_bookmark = self.get_updated_session_bookmark(
+                        session_bookmark, subt[self.replication_key]
+                    )
+                    if self.is_bookmark_old(subt[self.replication_key]):
+                        yield subt
+                    else:
+                        continue
+        self.update_bookmark(session_bookmark)
 
     def fetch_children(self, p_task, opt_fields):
         subtasks_children = []
