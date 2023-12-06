@@ -3,7 +3,6 @@ import logging
 import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
-from singer import utils
 
 LOGGER = singer.get_logger()
 LOGGER.setLevel(logging.DEBUG)
