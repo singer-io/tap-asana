@@ -59,7 +59,6 @@ class SubTasks(Stream):
         opt_fields = ",".join(self.fields)
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
-        
         for workspace in self.call_api("workspaces"):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                     project_ids.append(project["gid"])
