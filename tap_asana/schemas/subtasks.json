@@ -23,12 +23,6 @@
         "string"
       ]
     },
-    "approval_status": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
     "assignee_status": {
       "type": [
         "null",
@@ -162,27 +156,6 @@
       ],
       "format": "date-time"
     },
-    "external": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "gid": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "data": {
-          "type": [
-            "null",
-            "string"
-          ]
-        }
-      }
-    },
     "hearted": {
       "type": [
         "null",
@@ -239,12 +212,6 @@
       "type": [
         "null",
         "string"
-      ]
-    },
-    "is_rendered_as_seperator": {
-      "type": [
-        "null",
-        "boolean"
       ]
     },
     "liked": {
@@ -938,33 +905,6 @@
         "string"
       ],
       "format": "date-time"
-    },
-    "assignee_section": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "gid": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "resource_type": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "name": {
-          "type": [
-            "null",
-            "string"
-          ]
-        }
-      }
     }
   }
 }
