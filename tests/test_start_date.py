@@ -11,6 +11,12 @@ class AsanaStartDateTest(AsanaBase):
         return "tap_tester_asana_start_date_test"
 
     def test_run(self):
+        # running sync with multiple date timestamps accross different streams due to differences in bookmark values
+        self.run_test("2021-11-09T00:00:00Z", "2021-11-09T08:38:00Z", {"projects",})
+        self.run_test("2023-11-28T00:00:00Z", "2023-11-30T00:00:00Z", {"subtasks",})
+        self.run_test("2023-11-28T00:00:00Z", "2023-11-30T00:00:00Z", self.expected_streams - {"subtasks","projects"})
+        
+    def run_test(self, start_date_1, start_date_2, streams):
         """
         Testing that the tap respects the start date
         - INCREMENTAL
@@ -26,6 +32,12 @@ class AsanaStartDateTest(AsanaBase):
                 records.
         """
 
+        self.first_start_date = start_date_1
+        self.second_start_date = start_date_2
+        self.streams = streams
+        expected_streams = streams
+
+
         start_date_1_epoch = self.dt_to_ts(self.first_start_date, self.START_DATE_FORMAT)
         start_date_2_epoch = self.dt_to_ts(self.second_start_date, self.START_DATE_FORMAT)
 
@@ -38,8 +50,6 @@ class AsanaStartDateTest(AsanaBase):
         ##########################################################################
         # First Sync
         ##########################################################################
-
-        expected_streams = self.expected_streams()
 
         conn_id_1 = connections.ensure_connection(self, original_properties=False)
         runner.run_check_mode(self, conn_id_1)
