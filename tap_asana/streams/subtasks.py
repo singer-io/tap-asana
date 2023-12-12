@@ -5,7 +5,8 @@ from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 LOGGER = singer.get_logger()
-LOGGER.setLevel(logging.DEBUG)
+
+
 
 class SubTasks(Stream):
     name = "subtasks"
@@ -61,11 +62,11 @@ class SubTasks(Stream):
         session_bookmark = bookmark
         for workspace in self.call_api("workspaces"):
             for project in self.call_api("projects", workspace=workspace["gid"]):
-                    project_ids.append(project["gid"])
+                project_ids.append(project["gid"])
 
         for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info("Fetching Subtasks for project: %s/%s",indx, len(project_ids))
-            tasks_list = self.call_api("tasks",project=project_id,opt_fields=opt_fields)
+            LOGGER.info("Fetching Subtasks for project: %s/%s", indx, len(project_ids))
+            tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
             for task in tasks_list:
                 for subt in self.fetch_children(task, opt_fields):
                     session_bookmark = self.get_updated_session_bookmark(
@@ -80,7 +81,7 @@ class SubTasks(Stream):
     def fetch_children(self, p_task, opt_fields):
         subtasks_children = []
         resource = getattr(Context.asana.client, "tasks")
-        subtasks  = list(resource.get_subtasks_for_task(p_task.get("gid"), opt_fields=opt_fields))
+        subtasks = list(resource.get_subtasks_for_task(p_task.get("gid"), opt_fields=opt_fields))
         for s_task in subtasks:
             subtasks_children.extend(self.fetch_children(s_task, opt_fields))
         return subtasks + subtasks_children
