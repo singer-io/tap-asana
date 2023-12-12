@@ -1,5 +1,4 @@
 # pylint:disable=duplicate-code
-import logging
 import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
@@ -74,8 +73,6 @@ class SubTasks(Stream):
                     )
                     if self.is_bookmark_old(subt[self.replication_key]):
                         yield subt
-                    else:
-                        continue
         self.update_bookmark(session_bookmark)
 
     def fetch_children(self, p_task, opt_fields):
