@@ -13,6 +13,7 @@ This tap:
   - [Projects](https://developers.asana.com/docs/projects)
   - [Sections](https://developers.asana.com/docs/sections)
   - [Stories](https://developers.asana.com/docs/stories)
+  - [Subtasks](https://developers.asana.com/reference/getsubtasksfortask)
   - [Tags](https://developers.asana.com/docs/tags)
   - [Tasks](https://developers.asana.com/docs/tasks)
   - [Teams](https://developers.asana.com/docs/teams)

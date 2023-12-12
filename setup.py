@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="tap-asana",
-    version="2.2.0",
+    version="2.3.0",
     description="Singer.io tap for extracting Asana data",
     author="Stitch",
     url="http://github.com/singer-io/tap-asana",
@@ -28,7 +28,7 @@ setup(
     tap-asana=tap_asana:main
     """,
     packages=["tap_asana"],
-    package_data = {
+    package_data={
         "schemas": ["tap_asana/schemas/*.json"]
     },
     include_package_data=True,

@@ -29,7 +29,7 @@ class SubTasks(Stream):
         "hearted",
         "hearts",
         "html_notes",
-        "is_rendered_as_seperator",
+        "is_rendered_as_separator",
         "liked",
         "likes",
         "memberships",

@@ -208,6 +208,12 @@
         }
       ]
     },
+    "is_rendered_as_separator": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
     "html_notes": {
       "type": [
         "null",
