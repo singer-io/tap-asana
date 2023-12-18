@@ -12,6 +12,13 @@ class AsanaBookmarksTest(AsanaBase):
         return "tap_tester_asana_bookmarks_test"
 
     def test_run(self):
+        # running sync with multiple date timestamps accross different streams due to differences in bookmark values
+        self.run_test("2021-11-09T00:00:00Z", "2023-11-10T00:00:00Z", {"projects",})
+        self.run_test("2023-11-28T00:00:00Z", "2023-11-30T00:00:00Z", {"subtasks",})
+        self.run_test("2019-01-28T00:00:00Z", "2023-11-30T00:00:00Z", self.expected_streams() - {"subtasks","projects"})
+
+
+    def run_test(self, start_date_1, start_date_2, streams):
         """
         Testing that the bookmarking for the tap works as expected
         - Verify for each incremental stream you can do a sync which records bookmarks
@@ -24,7 +31,10 @@ class AsanaBookmarksTest(AsanaBase):
         conn_id = connections.ensure_connection(self)
         runner.run_check_mode(self, conn_id)
 
-        expected_streams = self.expected_streams()
+        self.first_start_date = start_date_1
+        self.second_start_date = start_date_2
+        self.streams = streams
+        expected_streams = streams
 
         found_catalogs = self.run_and_verify_check_mode(conn_id)
         self.select_found_catalogs(conn_id, found_catalogs,

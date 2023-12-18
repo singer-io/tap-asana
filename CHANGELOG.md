@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.3.0
+ * New Stream Inclusion: Subtasks [#56](https://github.com/singer-io/tap-asana/pull/56)
+ 
 ## 2.2.0
  * Below are the changes [#48](https://github.com/singer-io/tap-asana/pull/48)
    * Upgraded the asana-python SDK

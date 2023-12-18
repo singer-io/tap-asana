@@ -21,7 +21,7 @@ class AsanaBase(unittest.TestCase):
     BOOKMARK_FOMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
     first_start_date = '2019-01-01T00:00:00Z'
-    second_start_date = '2020-08-15T00:00:00Z'
+    second_start_date = '2023-08-15T00:00:00Z'
 
     def tap_name(self):
         return "tap-asana"
@@ -100,6 +100,12 @@ class AsanaBase(unittest.TestCase):
                 self.OBEYS_START_DATE: True
             },
             "tasks": {
+                self.PRIMARY_KEYS: {"gid"},
+                self.REPLICATION_METHOD: self.INCREMENTAL,
+                self.REPLICATION_KEYS: {"modified_at"},
+                self.OBEYS_START_DATE: True
+            },
+            "subtasks": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
                 self.REPLICATION_KEYS: {"modified_at"},

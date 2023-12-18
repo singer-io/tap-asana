@@ -2,6 +2,7 @@ import tap_asana.streams.portfolios
 import tap_asana.streams.projects
 import tap_asana.streams.sections
 import tap_asana.streams.stories
+import tap_asana.streams.subtasks
 import tap_asana.streams.tags
 import tap_asana.streams.tasks
 import tap_asana.streams.teams
