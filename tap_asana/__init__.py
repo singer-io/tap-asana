@@ -181,7 +181,6 @@ def main():
         else:
             raise Exception from exc
 
-    # Set context.
     if "access_token" in args.config:
         creds = {
             "access_token": args.config["access_token"],
@@ -193,16 +192,8 @@ def main():
             "redirect_uri": args.config["redirect_uri"],
             "refresh_token": args.config["refresh_token"],
         }
-    # args = utils.parse_args(REQUIRED_CONFIG_KEYS)
 
     # Set context.
-    # creds = {
-    #     "client_id": args.config["client_id"],
-    #     "client_secret": args.config["client_secret"],
-    #     "redirect_uri": args.config["redirect_uri"],
-    #     "refresh_token": args.config["refresh_token"],
-    # }
-
     # As we passed 'request_timeout', we need to add a whole 'args.config' rather than adding 'creds'
     Context.config = args.config
     Context.state = args.state
