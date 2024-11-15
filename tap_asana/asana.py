@@ -51,15 +51,12 @@ class Asana():
         return asana.Client.access_token(self.access_token)
 
     def refresh_access_token(self):
-        if self.refresh_token:
-            return self._client.session.refresh_token(
-                self._client.session.token_url,
-                client_id=self.client_id,
-                client_secret=self.client_secret,
-                refresh_token=self.refresh_token,
-            )
-        self._client = self._access_token_auth()
-        return
+        return self._client.session.refresh_token(
+            self._client.session.token_url,
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            refresh_token=self.refresh_token,
+        )
 
     @property
     def client(self):
