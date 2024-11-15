@@ -58,7 +58,8 @@ class Asana():
                 client_secret=self.client_secret,
                 refresh_token=self.refresh_token,
             )
-        return self._access_token_auth()
+        self._client = self._access_token_auth()
+        return
 
     @property
     def client(self):
