@@ -3,9 +3,8 @@ import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
 LOGGER = singer.get_logger()
-
-
 
 class SubTasks(Stream):
     name = "subtasks"
@@ -67,9 +66,12 @@ class SubTasks(Stream):
 
         # iterate over all project ids and continue fetching
         for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info(f"Fetching Subtasks for {project_id} project: {indx}/{num_projects}")
+            LOGGER.info(f"Fetching tasks in {project_id} project: {indx}/{num_projects}")
             tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
-            for task in tasks_list:
+
+            num_tasks_list = len(tasks_list)
+            for index, task in enumerate(tasks_list, 1):
+                LOGGER.info(f"Fetching subtasks of {task} task: {index}/{num_tasks_list}")
                 for subt in self.fetch_children(task, opt_fields):
                     session_bookmark = self.get_updated_session_bookmark(
                         session_bookmark, subt[self.replication_key]

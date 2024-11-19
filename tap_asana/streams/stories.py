@@ -2,6 +2,7 @@ import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
 LOGGER = singer.get_logger()
 
 class Stories(Stream):
@@ -82,9 +83,10 @@ class Stories(Stream):
 
         # iterate over all project ids and continue fetching
         for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info(f"Fetching stories for tasks in {project_id} project ({indx}/{num_projects})")
+            LOGGER.info(f"Fetching tasks in {project_id} project ({indx}/{num_projects})")
             for task in self.call_api("tasks", project=project_id):
                 task_gid = task.get("gid")
+                LOGGER.info(f"Fetching stories for {task} task)")
                 for story in Context.asana.client.stories.get_stories_for_task(
                     task_gid=task_gid,
                     opt_fields=opt_fields,

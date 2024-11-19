@@ -1,6 +1,9 @@
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
+LOGGER = singer.get_logger()
 
 class Portfolios(Stream):
     name = "portfolios"
@@ -32,6 +35,7 @@ class Portfolios(Stream):
         opt_fields = ",".join(self.fields)
         for workspace in self.call_api("workspaces"):
             # NOTE: Currently, API users can only get a list of portfolios that they themselves own; owner="me"
+            LOGGER.info(f"Fetching portfolios in workspace {workspace}")
             for portfolio in Context.asana.client.portfolios.get_portfolios(
                 workspace=workspace["gid"],
                 owner="me",
@@ -39,6 +43,7 @@ class Portfolios(Stream):
                 timeout=self.request_timeout,
             ):
                 # portfolio_items are typically the projects in a portfolio
+                LOGGER.info(f"Fetching portfolio_items of portfolio {portfolio}")
                 portfolio_items = []
                 for (
                     portfolio_item

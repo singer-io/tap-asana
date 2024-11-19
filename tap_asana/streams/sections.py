@@ -1,6 +1,9 @@
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
+LOGGER = singer.get_logger()
 
 class Sections(Stream):
     replication_method = "FULL_TABLE"
@@ -26,8 +29,11 @@ class Sections(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
+        num_projects = len(project_ids)
+
         # iterate on all project ids and execute rest of the sync
-        for project_id in project_ids:
+        for indx, project_id in enumerate(project_ids, 1):
+            LOGGER.info(f"Fetching sections in {project_id} project ({indx}/{num_projects})")
             for section in Context.asana.client.sections.get_sections_for_project(
                 project_gid=project_id,
                 owner="me",

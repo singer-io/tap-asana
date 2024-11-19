@@ -1,6 +1,9 @@
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
+LOGGER = singer.get_logger()
 
 class Projects(Stream):
   name = "projects"
@@ -46,6 +49,7 @@ class Projects(Stream):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
     for workspace in self.call_api("workspaces"):
+      LOGGER.info(f"Fetching projects in workspace {workspace}")
       for project in self.call_api("projects", workspace=workspace["gid"], opt_fields=opt_fields):
         session_bookmark = self.get_updated_session_bookmark(session_bookmark, project[self.replication_key])
         if self.is_bookmark_old(project[self.replication_key]):

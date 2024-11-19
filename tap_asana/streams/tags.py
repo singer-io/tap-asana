@@ -1,6 +1,9 @@
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
+LOGGER = singer.get_logger()
 
 class Tags(Stream):
     name = "tags"
@@ -24,6 +27,7 @@ class Tags(Stream):
         opt_fields = ",".join(self.fields)
         session_bookmark = bookmark
         for workspace in self.call_api("workspaces"):
+            LOGGER.info(f"Fetching tags in {workspace} workspace)")
             for tag in self.call_api(
                 "tags", workspace=workspace["gid"], opt_fields=opt_fields
             ):
