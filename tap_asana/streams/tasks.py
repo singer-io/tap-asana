@@ -1,6 +1,8 @@
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+LOGGER = singer.get_logger()
 
 class Tasks(Stream):
     name = "tasks"
@@ -61,8 +63,11 @@ class Tasks(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
+        num_projects = len(project_ids)
+
         # iterate over all project ids and continue fetching
-        for project_id in project_ids:
+        for indx, project_id in enumerate(project_ids, 1):
+            LOGGER.info(f"Fetching tasks for {project_id} project ({indx}/{num_projects})")
             for task in self.call_api(
                 "tasks",
                 project=project_id,

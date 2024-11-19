@@ -63,8 +63,11 @@ class SubTasks(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
+        num_projects = len(project_ids)
+
+        # iterate over all project ids and continue fetching
         for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info("Fetching Subtasks for project: %s/%s", indx, len(project_ids))
+            LOGGER.info(f"Fetching Subtasks for {project_id} project: {indx}/{num_projects}")
             tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
             for task in tasks_list:
                 for subt in self.fetch_children(task, opt_fields):
