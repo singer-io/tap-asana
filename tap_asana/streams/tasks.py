@@ -2,6 +2,7 @@ import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
 LOGGER = singer.get_logger()
 
 class Tasks(Stream):
@@ -63,11 +64,14 @@ class Tasks(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
-        num_projects = len(project_ids)
+        num_projects = len(project_ids) // 100 # near 1% of total projects
+        koef = 1
 
         # iterate over all project ids and continue fetching
         for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info(f"Fetching tasks for {project_id} project ({indx}/{num_projects})")
+            if (indx == koef * num_projects):
+                LOGGER.info(f"Fetching tasks progress near: {koef}%)")
+                koef += 1
             for task in self.call_api(
                 "tasks",
                 project=project_id,

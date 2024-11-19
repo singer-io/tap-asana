@@ -62,16 +62,17 @@ class SubTasks(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
-        num_projects = len(project_ids)
+        num_projects = len(project_ids) // 100 # near 1% of total projects
+        koef = 1
 
         # iterate over all project ids and continue fetching
         for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info(f"Fetching tasks in {project_id} project: {indx}/{num_projects}")
+            if (indx == koef * num_projects):
+                LOGGER.info(f"Fetching subtasks progress near: {koef}%)")
+                koef += 1
             tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
 
-            num_tasks_list = len(tasks_list)
-            for index, task in enumerate(tasks_list, 1):
-                LOGGER.info(f"Fetching subtasks of {task} task: {index}/{num_tasks_list}")
+            for task in tasks_list:
                 for subt in self.fetch_children(task, opt_fields):
                     session_bookmark = self.get_updated_session_bookmark(
                         session_bookmark, subt[self.replication_key]

@@ -79,14 +79,16 @@ class Stories(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
-        num_projects = len(project_ids)
+        num_projects = len(project_ids) // 100 # near 1% of total projects
+        koef = 1
 
         # iterate over all project ids and continue fetching
         for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info(f"Fetching tasks in {project_id} project ({indx}/{num_projects})")
+            if (indx == koef * num_projects):
+                LOGGER.info(f"Fetching stories for tasks in projects progress near: {koef}%)")
+                koef += 1
             for task in self.call_api("tasks", project=project_id):
                 task_gid = task.get("gid")
-                LOGGER.info(f"Fetching stories for {task} task)")
                 for story in Context.asana.client.stories.get_stories_for_task(
                     task_gid=task_gid,
                     opt_fields=opt_fields,
