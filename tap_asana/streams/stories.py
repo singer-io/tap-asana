@@ -5,7 +5,6 @@ from tap_asana.streams.base import Stream
 
 
 LOGGER = singer.get_logger()
-CONST_DATE = datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
 
 class Stories(Stream):
     name = "stories"
@@ -72,7 +71,7 @@ class Stories(Stream):
         """Get stream object"""
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
-        modified_since = CONST_DATE.strftime("%Y-%m-%dT%H:%M:%S.%f")
+        modified_since = Context.config["start_date"]
         opt_fields = ",".join(self.fields)
 
         # list of project ids
