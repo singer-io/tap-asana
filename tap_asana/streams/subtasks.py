@@ -70,11 +70,10 @@ class SubTasks(Stream):
             if (indx % projects_fraction == 0):
                 LOGGER.info(f"Progress near: {indx / projects_fraction}%)")
             tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
-            len_tasks_list = len(tasks_list)
 
             i = 0
             for task in tasks_list:
-                LOGGER.info(f"subtasks: {i}/{len_tasks_list}%)")
+                LOGGER.info(f"tasks: {i}%)")
                 i += 1
                 for subt in self.fetch_children(task, opt_fields):
                     session_bookmark = self.get_updated_session_bookmark(

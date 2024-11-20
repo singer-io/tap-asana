@@ -86,10 +86,9 @@ class Stories(Stream):
         for indx, project_id in enumerate(project_ids, 1):
             if (indx % projects_fraction == 0):
                 LOGGER.info(f"Progress near: {indx / projects_fraction}%)")
-            i = 0
             for task in self.call_api("tasks", project=project_id):
                 task_gid = task.get("gid")
-                LOGGER.info(f"story : {i}%)")
+                LOGGER.info(f"stories for task: {task_gid})")
                 for story in Context.asana.client.stories.get_stories_for_task(
                     task_gid=task_gid,
                     opt_fields=opt_fields,
