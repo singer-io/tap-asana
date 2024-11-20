@@ -1,9 +1,11 @@
 import singer
+from datetime import datetime
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
 LOGGER = singer.get_logger()
+CONST_DATE = datetime.strptime("2023-01-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ")
 
 class Stories(Stream):
     name = "stories"
@@ -70,6 +72,7 @@ class Stories(Stream):
         """Get stream object"""
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
+        modified_since = CONST_DATE.strftime("%Y-%m-%dT%H:%M:%S.%f")
         opt_fields = ",".join(self.fields)
 
         # list of project ids
@@ -86,7 +89,11 @@ class Stories(Stream):
         for indx, project_id in enumerate(project_ids, 1):
             if (indx % projects_fraction == 0):
                 LOGGER.info(f"Progress near: {indx / projects_fraction}%)")
-            for task in self.call_api("tasks", project=project_id):
+            for task in self.call_api(
+                "tasks",
+                project=project_id,
+                modified_since=modified_since,
+                ):
                 task_gid = task.get("gid")
                 LOGGER.info(f"stories for task: {task_gid})")
                 for story in Context.asana.client.stories.get_stories_for_task(

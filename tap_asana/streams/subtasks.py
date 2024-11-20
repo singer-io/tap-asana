@@ -58,6 +58,7 @@ class SubTasks(Stream):
         opt_fields = ",".join(self.fields)
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
+        modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
         for workspace in self.call_api("workspaces"):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
@@ -69,12 +70,15 @@ class SubTasks(Stream):
         for indx, project_id in enumerate(project_ids, 1):
             if (indx % projects_fraction == 0):
                 LOGGER.info(f"Progress near: {indx / projects_fraction}%)")
-            tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
+            tasks_list = self.call_api(
+                "tasks",
+                project=project_id,
+                opt_fields=opt_fields,
+                modified_since=modified_since,
+                )
 
-            i = 0
             for task in tasks_list:
-                LOGGER.info(f"tasks: {i}%)")
-                i += 1
+                LOGGER.info(f'task: {task.get("gid")}')
                 for subt in self.fetch_children(task, opt_fields):
                     session_bookmark = self.get_updated_session_bookmark(
                         session_bookmark, subt[self.replication_key]
