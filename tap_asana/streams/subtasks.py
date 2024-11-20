@@ -72,9 +72,11 @@ class SubTasks(Stream):
             tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
             len_tasks_list = len(tasks_list)
 
+            i = 0
             for task in tasks_list:
+                LOGGER.info(f"subtasks: {i}/{len_tasks_list}%)")
+                i += 1
                 for subt in self.fetch_children(task, opt_fields):
-                    LOGGER.info(f"subtasks for task: {task}, tasks_list_len: {len_tasks_list}%)")
                     session_bookmark = self.get_updated_session_bookmark(
                         session_bookmark, subt[self.replication_key]
                     )
