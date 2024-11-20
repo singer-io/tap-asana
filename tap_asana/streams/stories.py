@@ -93,6 +93,7 @@ class Stories(Stream):
                     opt_fields=opt_fields,
                     timeout=self.request_timeout,
                 ):
+                    LOGGER.info(f"story : {story}%)")
                     session_bookmark = self.get_updated_session_bookmark(
                         session_bookmark, story[self.replication_key]
                     )

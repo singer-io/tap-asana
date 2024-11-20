@@ -65,14 +65,16 @@ class SubTasks(Stream):
         projects_fraction = len(project_ids) // 100 # near 1% of total projects
 
         # iterate over all project ids and continue fetching
-        LOGGER.info("Fetching subtasks...)")
+        LOGGER.info("Fetching subtasks...")
         for indx, project_id in enumerate(project_ids, 1):
             if (indx % projects_fraction == 0):
                 LOGGER.info(f"Progress near: {indx / projects_fraction}%)")
             tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
+            len_tasks_list = len(tasks_list)
 
             for task in tasks_list:
                 for subt in self.fetch_children(task, opt_fields):
+                    LOGGER.info(f"subtasks for task: {task}, tasks_list_len: {len_tasks_list}%)")
                     session_bookmark = self.get_updated_session_bookmark(
                         session_bookmark, subt[self.replication_key]
                     )
