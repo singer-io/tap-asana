@@ -27,7 +27,7 @@ class Tags(Stream):
         opt_fields = ",".join(self.fields)
         session_bookmark = bookmark
         for workspace in self.call_api("workspaces"):
-            LOGGER.info(f"Fetching tags in {workspace} workspace)")
+            LOGGER.info("Fetching tags...")
             for tag in self.call_api(
                 "tags", workspace=workspace["gid"], opt_fields=opt_fields
             ):

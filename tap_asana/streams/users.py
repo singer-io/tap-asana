@@ -22,7 +22,7 @@ class Users(Stream):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
         for workspace in self.call_api("workspaces"):
-            LOGGER.info(f"Fetching users in {workspace} workspace)")
+            LOGGER.info("Fetching users...")
             for user in self.call_api(
                 "users", workspace=workspace["gid"], opt_fields=opt_fields
             ):

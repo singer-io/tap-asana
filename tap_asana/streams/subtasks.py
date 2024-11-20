@@ -62,14 +62,13 @@ class SubTasks(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
-        num_projects = len(project_ids) // 100 # near 1% of total projects
-        koef = 1
+        projects_fraction = len(project_ids) // 100 # near 1% of total projects
 
         # iterate over all project ids and continue fetching
+        LOGGER.info("Fetching subtasks...)")
         for indx, project_id in enumerate(project_ids, 1):
-            if (indx == koef * num_projects):
-                LOGGER.info(f"Fetching subtasks progress near: {koef}%)")
-                koef += 1
+            if (indx % projects_fraction == 0):
+                LOGGER.info(f"Progress near: {indx / projects_fraction}%)")
             tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
 
             for task in tasks_list:

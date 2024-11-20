@@ -29,14 +29,13 @@ class Sections(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
-        num_projects = len(project_ids) // 100 # near 1% of total projects
-        koef = 1
+        projects_fraction = len(project_ids) // 100 # near 1% of total projects
 
         # iterate on all project ids and execute rest of the sync
+        LOGGER.info("Fetching sections...")
         for indx, project_id in enumerate(project_ids, 1):
-            if (indx == koef * num_projects):
-                LOGGER.info(f"Fetching sections progress near: {koef}%)")
-                koef += 1
+            if (indx % projects_fraction == 0):
+                LOGGER.info(f"Progress near: {indx / projects_fraction}%)")
             for section in Context.asana.client.sections.get_sections_for_project(
                 project_gid=project_id,
                 owner="me",

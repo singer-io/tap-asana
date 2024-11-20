@@ -25,7 +25,7 @@ class Teams(Stream):
         opt_fields = ",".join(self.fields)
         for workspace in self.call_api("workspaces", opt_fields="gid,is_organization"):
             if workspace.get("is_organization", False):
-                LOGGER.info(f"Fetching teams in {workspace} workspace)")
+                LOGGER.info("Fetching teams...")
                 for team in Context.asana.client.teams.find_by_organization(
                     organization=workspace["gid"],
                     opt_fields=opt_fields,

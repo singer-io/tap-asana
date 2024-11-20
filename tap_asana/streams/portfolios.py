@@ -35,7 +35,7 @@ class Portfolios(Stream):
         opt_fields = ",".join(self.fields)
         for workspace in self.call_api("workspaces"):
             # NOTE: Currently, API users can only get a list of portfolios that they themselves own; owner="me"
-            LOGGER.info(f"Fetching portfolios in workspace {workspace}")
+            LOGGER.info("Fetching portfolios...")
             for portfolio in Context.asana.client.portfolios.get_portfolios(
                 workspace=workspace["gid"],
                 owner="me",
