@@ -30,7 +30,6 @@ class Tasks(Stream):
         "is_rendered_as_seperator",
         "liked",
         "likes",
-        "memberships",
         "memberships.section",
         "memberships.project",
         "modified_at",

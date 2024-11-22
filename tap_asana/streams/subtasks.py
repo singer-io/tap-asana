@@ -31,7 +31,6 @@ class SubTasks(Stream):
         "is_rendered_as_separator",
         "liked",
         "likes",
-        "memberships",
         "memberships.section",
         "memberships.project",
         "modified_at",
