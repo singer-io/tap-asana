@@ -31,6 +31,8 @@ class Tasks(Stream):
         "liked",
         "likes",
         "memberships",
+        "memberships.section",
+        "memberships.project",
         "modified_at",
         "notes",
         "num_hearts",
@@ -76,6 +78,7 @@ class Tasks(Stream):
                 "tasks",
                 project=project_id,
                 opt_fields=opt_fields,
+                opt_expand="memberships",
                 modified_since=modified_since,
             ):
                 session_bookmark = self.get_updated_session_bookmark(

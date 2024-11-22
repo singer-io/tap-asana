@@ -342,6 +342,60 @@
         }
       ]
     },
+    "memberships.project": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gid": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "memberships.section": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "gid": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "resource_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
     "modified_at": {
       "type": [
         "null",

@@ -32,6 +32,8 @@ class SubTasks(Stream):
         "liked",
         "likes",
         "memberships",
+        "memberships.section",
+        "memberships.project",
         "modified_at",
         "notes",
         "num_hearts",

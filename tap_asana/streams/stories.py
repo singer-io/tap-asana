@@ -70,7 +70,7 @@ class Stories(Stream):
         """Get stream object"""
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
-        modified_since = Context.config["start_date"]
+        modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
         opt_fields = ",".join(self.fields)
 
         # list of project ids
