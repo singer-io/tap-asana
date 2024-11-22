@@ -43,7 +43,6 @@ class Portfolios(Stream):
                 timeout=self.request_timeout,
             ):
                 # portfolio_items are typically the projects in a portfolio
-                LOGGER.info(f"Fetching portfolio_items of portfolio {portfolio}")
                 portfolio_items = []
                 for (
                     portfolio_item
