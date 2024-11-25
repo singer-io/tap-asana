@@ -1,6 +1,9 @@
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
+LOGGER = singer.get_logger()
 
 class Teams(Stream):
     replication_method = "FULL_TABLE"
@@ -22,6 +25,7 @@ class Teams(Stream):
         opt_fields = ",".join(self.fields)
         for workspace in self.call_api("workspaces", opt_fields="gid,is_organization"):
             if workspace.get("is_organization", False):
+                LOGGER.info("Fetching teams...")
                 for team in Context.asana.client.teams.find_by_organization(
                     organization=workspace["gid"],
                     opt_fields=opt_fields,

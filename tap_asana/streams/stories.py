@@ -1,6 +1,9 @@
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
+LOGGER = singer.get_logger()
 
 class Stories(Stream):
     name = "stories"
@@ -67,6 +70,7 @@ class Stories(Stream):
         """Get stream object"""
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
+        modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
         opt_fields = ",".join(self.fields)
 
         # list of project ids
@@ -76,9 +80,19 @@ class Stories(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
+        projects_total = len(project_ids)
+        projects_fraction = projects_total // 100 # near 1% of total projects
+
         # iterate over all project ids and continue fetching
-        for project_id in project_ids:
-            for task in self.call_api("tasks", project=project_id):
+        LOGGER.info("Fetching stories...")
+        for indx, project_id in enumerate(project_ids, 1):
+            if (indx % projects_fraction == 0):
+                LOGGER.info(f"Fetching done for projects: {indx - 1}/{projects_total}")
+            for task in self.call_api(
+                "tasks",
+                project=project_id,
+                modified_since=modified_since,
+                ):
                 task_gid = task.get("gid")
                 for story in Context.asana.client.stories.get_stories_for_task(
                     task_gid=task_gid,

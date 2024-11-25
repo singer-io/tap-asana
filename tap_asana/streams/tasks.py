@@ -1,6 +1,9 @@
+import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
+LOGGER = singer.get_logger()
 
 class Tasks(Stream):
     name = "tasks"
@@ -27,7 +30,8 @@ class Tasks(Stream):
         "is_rendered_as_seperator",
         "liked",
         "likes",
-        "memberships",
+        "memberships.section",
+        "memberships.project",
         "modified_at",
         "notes",
         "num_hearts",
@@ -61,12 +65,19 @@ class Tasks(Stream):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
+        projects_total = len(project_ids)
+        projects_fraction = projects_total // 100 # near 1% of total projects
+
         # iterate over all project ids and continue fetching
-        for project_id in project_ids:
+        LOGGER.info("Fetching tasks...")
+        for indx, project_id in enumerate(project_ids, 1):
+            if (indx % projects_fraction == 0):
+                LOGGER.info(f"Fetching done for projects: {indx - 1}/{projects_total}")
             for task in self.call_api(
                 "tasks",
                 project=project_id,
                 opt_fields=opt_fields,
+                opt_expand="memberships",
                 modified_since=modified_since,
             ):
                 session_bookmark = self.get_updated_session_bookmark(

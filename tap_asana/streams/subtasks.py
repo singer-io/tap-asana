@@ -3,9 +3,8 @@ import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
+
 LOGGER = singer.get_logger()
-
-
 
 class SubTasks(Stream):
     name = "subtasks"
@@ -32,7 +31,8 @@ class SubTasks(Stream):
         "is_rendered_as_separator",
         "liked",
         "likes",
-        "memberships",
+        "memberships.section",
+        "memberships.project",
         "modified_at",
         "notes",
         "num_hearts",
@@ -59,13 +59,26 @@ class SubTasks(Stream):
         opt_fields = ",".join(self.fields)
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
+        modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
         for workspace in self.call_api("workspaces"):
             for project in self.call_api("projects", workspace=workspace["gid"]):
                 project_ids.append(project["gid"])
 
+        projects_total = len(project_ids)
+        projects_fraction = projects_total // 100 # near 1% of total projects
+
+        # iterate over all project ids and continue fetching
+        LOGGER.info("Fetching subtasks...")
         for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info("Fetching Subtasks for project: %s/%s", indx, len(project_ids))
-            tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
+            if (indx % projects_fraction == 0):
+                LOGGER.info(f"Fetching done for projects: {indx - 1}/{projects_total}")
+            tasks_list = self.call_api(
+                "tasks",
+                project=project_id,
+                opt_fields=opt_fields,
+                modified_since=modified_since,
+                )
+
             for task in tasks_list:
                 for subt in self.fetch_children(task, opt_fields):
                     session_bookmark = self.get_updated_session_bookmark(
