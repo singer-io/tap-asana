@@ -10,8 +10,8 @@ setup(
     classifiers=["Programming Language :: Python :: 3 :: Only"],
     py_modules=["tap_asana"],
     install_requires=[
-        "asana==3.1.0",
-        "singer-python==5.13.0"
+        "asana==5.1.0",
+        "singer-python==6.1.1"
     ],
     extras_require={
         "test": [
