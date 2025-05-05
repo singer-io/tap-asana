@@ -11,16 +11,16 @@ setup(
     py_modules=["tap_asana"],
     install_requires=[
         "asana==3.1.0",
-        'singer-python==5.13.0'
+        "singer-python==5.13.0"
     ],
     extras_require={
-        'test': [
-            'pylint',
-            'requests==2.20.0',
+        "test": [
+            "pylint",
+            "requests==2.20.0",
             'nose'
         ],
-        'dev': [
-            'ipdb'
+        "dev": [
+            "ipdb"
         ]
     },
     entry_points="""
