@@ -16,7 +16,7 @@ setup(
     extras_require={
         "test": [
             "pylint",
-            "requests==2.20.0",
+            "requests==2.32.3",
             'nose'
         ],
         "dev": [
