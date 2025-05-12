@@ -6,14 +6,6 @@ import requests
 import backoff
 import simplejson
 import singer
-from asana.error import (
-    NoAuthorizationError,
-    RetryableAsanaError,
-    InvalidTokenError,
-    RateLimitEnforcedError,
-)
-from asana.page_iterator import CollectionPageIterator
-from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
 from tap_asana.context import Context
 
@@ -85,23 +77,22 @@ def asana_error_handling(fnc):
     )
     @backoff.on_exception(
         backoff.expo,
-        (InvalidTokenError, NoAuthorizationError, TokenExpiredError),
+        (requests.exceptions.RequestException,),
         on_backoff=invalid_token_handler,
         max_tries=MAX_RETRIES,
     )
     @backoff.on_exception(
         backoff.expo,
-        (simplejson.scanner.JSONDecodeError, RetryableAsanaError),
+        (simplejson.scanner.JSONDecodeError, requests.exceptions.HTTPError),
         giveup=is_not_status_code_fn(range(500, 599)),
         on_backoff=retry_handler,
         max_tries=MAX_RETRIES,
     )
     @backoff.on_exception(
         retry_after_wait_gen,
-        RateLimitEnforcedError,
+        requests.exceptions.HTTPError,
         giveup=is_not_status_code_fn([429]),
         on_backoff=leaky_bucket_handler,
-        # No jitter as we want a constant value
         jitter=None,
     )
     @functools.wraps(fnc)
@@ -113,10 +104,10 @@ def asana_error_handling(fnc):
 # tap is yielding data from that function so backoff is not working over tap functions.
 # Decorator can be put above get_objects() functions of every stream file but
 # it has multiple for loops so it's expensive to backoff everything.
-CollectionPageIterator.get_initial = asana_error_handling(
-    CollectionPageIterator.get_initial
-)
-CollectionPageIterator.get_next = asana_error_handling(CollectionPageIterator.get_next)
+# CollectionPageIterator.get_initial = asana_error_handling(
+#     CollectionPageIterator.get_initial
+# )
+# CollectionPageIterator.get_next = asana_error_handling(CollectionPageIterator.get_next)
 
 class Stream():
     # Used for bookmarking and stream identification. Is overridden by
