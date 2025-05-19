@@ -1,5 +1,6 @@
 import asana
 import singer
+import requests
 
 LOGGER = singer.get_logger()
 
@@ -18,39 +19,48 @@ class Asana():
         self.redirect_uri = redirect_uri
         self.refresh_token = refresh_token
         self.access_token = access_token
-        self._client = self._oauth_auth() or self._access_token_auth()
-        self.refresh_access_token()
-
-    def _oauth_auth(self):
-        """Oauth authentication for tap"""
-        if (
-            self.client_id is None
-            or self.client_secret is None
-            or self.redirect_uri is None
-            or self.refresh_token is None
-        ):
-            LOGGER.debug("OAuth authentication unavailable.")
-            return None
-        return asana.Client.oauth(
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            redirect_uri=self.redirect_uri,
-        )
+        self._client = self._access_token_auth()
+        # self.refresh_access_token()
 
     def _access_token_auth(self):
         """Check for access token"""
         if self.access_token is None:
-            LOGGER.debug("OAuth authentication unavailable.")
-            return None
-        return asana.Client.access_token(self.access_token)
+            self.access_token = self.refresh_access_token()
+
+        if self.access_token:
+            try:
+                configuration = asana.Configuration()
+
+                return asana.ApiClient(configuration)
+            except Exception as e:
+                LOGGER.error(f"Error creating Asana client: {e}")
+                return None
 
     def refresh_access_token(self):
-        return self._client.session.refresh_token(
-            self._client.session.token_url,
-            client_id=self.client_id,
-            client_secret=self.client_secret,
-            refresh_token=self.refresh_token,
-        )
+        """Get the access token using the refresh token"""
+        url = "https://app.asana.com/-/oauth_token"
+        payload = {
+            "grant_type": "refresh_token",
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "redirect_uri": self.redirect_uri,
+            "refresh_token": self.refresh_token,
+        }
+
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+        try:
+            response = requests.post(url, data=payload, headers=headers)
+
+            if response.status_code == 200:
+                LOGGER.debug("Access token refreshed successfully.")
+                if "access_token" in response.json():
+                    self.access_token = response.json()["access_token"]
+                    return response.json()["access_token"]
+            return None
+        except Exception as e:
+            LOGGER.error(f"Failed to refresh access token: {e}")
+            return None
 
     @property
     def client(self):

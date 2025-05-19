@@ -6,14 +6,6 @@ import requests
 import backoff
 import simplejson
 import singer
-from asana.error import (
-    NoAuthorizationError,
-    RetryableAsanaError,
-    InvalidTokenError,
-    RateLimitEnforcedError,
-)
-from asana.page_iterator import CollectionPageIterator
-from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
 from tap_asana.context import Context
 
@@ -85,23 +77,22 @@ def asana_error_handling(fnc):
     )
     @backoff.on_exception(
         backoff.expo,
-        (InvalidTokenError, NoAuthorizationError, TokenExpiredError),
+        (requests.exceptions.RequestException,),
         on_backoff=invalid_token_handler,
         max_tries=MAX_RETRIES,
     )
     @backoff.on_exception(
         backoff.expo,
-        (simplejson.scanner.JSONDecodeError, RetryableAsanaError),
+        (simplejson.scanner.JSONDecodeError, requests.exceptions.HTTPError),
         giveup=is_not_status_code_fn(range(500, 599)),
         on_backoff=retry_handler,
         max_tries=MAX_RETRIES,
     )
     @backoff.on_exception(
         retry_after_wait_gen,
-        RateLimitEnforcedError,
+        requests.exceptions.HTTPError,
         giveup=is_not_status_code_fn([429]),
         on_backoff=leaky_bucket_handler,
-        # No jitter as we want a constant value
         jitter=None,
     )
     @functools.wraps(fnc)
@@ -113,10 +104,10 @@ def asana_error_handling(fnc):
 # tap is yielding data from that function so backoff is not working over tap functions.
 # Decorator can be put above get_objects() functions of every stream file but
 # it has multiple for loops so it's expensive to backoff everything.
-CollectionPageIterator.get_initial = asana_error_handling(
-    CollectionPageIterator.get_initial
-)
-CollectionPageIterator.get_next = asana_error_handling(CollectionPageIterator.get_next)
+# CollectionPageIterator.get_initial = asana_error_handling(
+#     CollectionPageIterator.get_initial
+# )
+# CollectionPageIterator.get_next = asana_error_handling(CollectionPageIterator.get_next)
 
 class Stream():
     # Used for bookmarking and stream identification. Is overridden by
@@ -195,12 +186,60 @@ class Stream():
     # As we added timeout, we need to pass it in the query param
     # hence removed the condition: 'if query_params', as
     # there will be atleast 1 param: 'timeout'
+    
     @asana_error_handling
-    def call_api(self, resource, **query_params):
-        """Function to make API call"""
-        api_function = getattr(Context.asana.client, resource)
-        query_params["timeout"] = self.request_timeout
-        return api_function.find_all(**query_params)
+    def call_api(self, api_instance, method_name, **query_params):
+        """Function to make API call with error handling"""
+        # Get the API method from the API instance
+        api_method = getattr(api_instance, method_name, None)
+        if not api_method:
+            raise AttributeError(f"Method '{method_name}' not found in {api_instance.__class__.__name__}.")
+
+        # Ensure the 'opts' parameter is included
+        if "opts" not in query_params:
+            query_params["opts"] = {}
+
+        # Check if the method supports pagination
+        supports_pagination = "offset" in api_method.__code__.co_varnames
+
+        # Handle pagination manually if supported
+        results = {"data": []}
+        if supports_pagination:
+            offset = None
+            while True:
+                query_params["offset"] = offset
+                query_params["limit"] = RESULTS_PER_PAGE
+
+                try:
+                    # Call the API method
+                    response = api_method(**query_params)
+                    
+                    # Handle generator responses
+                    if isinstance(response, (list, tuple)):
+                        results["data"].extend(response)
+                    else:
+                        results["data"].extend(list(response))  # Convert generator to list
+
+                    offset = getattr(response, "offset", None)
+                    if not offset:
+                        break
+                except Exception as e:
+                    LOGGER.error(f"Error during API call: {e}")
+                    break
+        else:
+            # Call the API method without pagination
+            try:
+                response = api_method(**query_params)
+
+                # Handle generator responses
+                if isinstance(response, (list, tuple)):
+                    results["data"] = response
+                else:
+                    results["data"] = list(response)  # Convert generator to list
+            except Exception as e:
+                LOGGER.error(f"Error during API call: {e}")
+
+        return results
 
     def sync(self):
         """Yield's processed SDK object dicts to the caller."""
