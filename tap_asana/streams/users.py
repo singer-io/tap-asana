@@ -1,5 +1,6 @@
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
+import asana
 
 
 class Users(Stream):
@@ -15,13 +16,31 @@ class Users(Stream):
         "workspaces"
     ]
 
+    
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
-        for workspace in self.call_api("workspaces"):
-            for user in self.call_api(
-                "users", workspace=workspace["gid"], opt_fields=opt_fields
-            ):
+
+        # Use WorkspacesApi and UsersApi
+        workspaces_api = asana.WorkspacesApi(Context.asana.client)
+        users_api = asana.UsersApi(Context.asana.client)
+
+        # Fetch workspaces using call_api
+        workspaces = self.call_api(
+            workspaces_api,
+            "get_workspaces",
+            opts={"opt_fields": "gid"},
+        )["data"]
+
+        # Iterate over all workspaces
+        for workspace in workspaces:
+            # Fetch users for the current workspace
+            users_response = self.call_api(
+                users_api,
+                "get_users",
+                opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
+            )
+            for user in users_response["data"]:
                 yield user
 
 
