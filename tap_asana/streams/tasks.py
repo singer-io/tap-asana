@@ -1,5 +1,6 @@
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
+import asana
 
 
 class Tasks(Stream):
@@ -49,32 +50,48 @@ class Tasks(Stream):
 
     def get_objects(self):
         """Get stream object"""
-        # list of project ids
-        project_ids = []
-
         opt_fields = ",".join(self.fields)
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
         modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
 
-        for workspace in self.call_api("workspaces"):
-            for project in self.call_api("projects", workspace=workspace["gid"]):
-                project_ids.append(project["gid"])
+        # Use WorkspacesApi, ProjectsApi, and TasksApi
+        workspaces_api = asana.WorkspacesApi(Context.asana.client)
+        projects_api = asana.ProjectsApi(Context.asana.client)
+        tasks_api = asana.TasksApi(Context.asana.client)
 
-        # iterate over all project ids and continue fetching
-        for project_id in project_ids:
-            for task in self.call_api(
-                "tasks",
-                project=project_id,
-                opt_fields=opt_fields,
-                modified_since=modified_since,
-            ):
-                session_bookmark = self.get_updated_session_bookmark(
-                    session_bookmark, task[self.replication_key]
+        # Fetch workspaces using call_api
+        workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
+
+        # Iterate over all workspaces
+        for workspace in workspaces:
+            # Fetch projects for the current workspace
+            response = self.call_api(
+                projects_api,
+                "get_projects",
+                opts={"workspace": workspace["gid"], "opt_fields": "gid"},
+            )
+            project_ids = [project["gid"] for project in response["data"]]
+
+            # Iterate over all project IDs and fetch tasks
+            for project_id in project_ids:
+                task_response = self.call_api(
+                    tasks_api,
+                    "get_tasks",
+                    opts={
+                        "project": project_id,
+                        "opt_fields": opt_fields,
+                        "modified_since": modified_since,
+                    },
                 )
-                if self.is_bookmark_old(task[self.replication_key]):
-                    yield task
+                for task in task_response["data"]:
+                    session_bookmark = self.get_updated_session_bookmark(
+                        session_bookmark, task[self.replication_key]
+                    )
+                    if self.is_bookmark_old(task[self.replication_key]):
+                        yield task
 
+        # Update the bookmark after processing all tasks
         self.update_bookmark(session_bookmark)
 
 
