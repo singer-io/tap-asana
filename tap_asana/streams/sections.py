@@ -1,5 +1,6 @@
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
+import asana
 
 
 class Sections(Stream):
@@ -17,24 +18,36 @@ class Sections(Stream):
 
     def get_objects(self):
         """Get stream object"""
-        # list of project ids
-        project_ids = []
-
         opt_fields = ",".join(self.fields)
 
-        for workspace in self.call_api("workspaces"):
-            for project in self.call_api("projects", workspace=workspace["gid"]):
-                project_ids.append(project["gid"])
+        # Use WorkspacesApi, ProjectsApi, and SectionsApi
+        workspaces_api = asana.WorkspacesApi(Context.asana.client)
+        projects_api = asana.ProjectsApi(Context.asana.client)
+        sections_api = asana.SectionsApi(Context.asana.client)
 
-        # iterate on all project ids and execute rest of the sync
-        for project_id in project_ids:
-            for section in Context.asana.client.sections.get_sections_for_project(
-                project_gid=project_id,
-                owner="me",
-                opt_fields=opt_fields,
-                timeout=self.request_timeout,
-            ):
-                yield section
+        # Fetch workspaces using call_api
+        workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
+
+        # Iterate over all workspaces
+        for workspace in workspaces:
+            # Fetch projects for the current workspace
+            response = self.call_api(
+                projects_api,
+                "get_projects",
+                opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
+            )
+            project_ids = [project["gid"] for project in response["data"]]
+
+            # Iterate over all project IDs and fetch sections
+            for project_id in project_ids:
+                section_response = self.call_api(
+                    sections_api,
+                    "get_sections_for_project",
+                    project_gid=project_id,
+                    opts={"opt_fields": opt_fields},
+                )
+                for section in section_response["data"]:
+                    yield section
 
 
 Context.stream_objects["sections"] = Sections
