@@ -1,6 +1,6 @@
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
-
+import asana
 
 class Stories(Stream):
     name = "stories"
@@ -69,28 +69,50 @@ class Stories(Stream):
         session_bookmark = bookmark
         opt_fields = ",".join(self.fields)
 
-        # list of project ids
-        project_ids = []
+        # Use WorkspacesApi, ProjectsApi, TasksApi, and StoriesApi
+        workspaces_api = asana.WorkspacesApi(Context.asana.client)
+        projects_api = asana.ProjectsApi(Context.asana.client)
+        tasks_api = asana.TasksApi(Context.asana.client)
+        stories_api = asana.StoriesApi(Context.asana.client)
 
-        for workspace in self.call_api("workspaces"):
-            for project in self.call_api("projects", workspace=workspace["gid"]):
-                project_ids.append(project["gid"])
+        # Fetch workspaces using call_api
+        workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
 
-        # iterate over all project ids and continue fetching
-        for project_id in project_ids:
-            for task in self.call_api("tasks", project=project_id):
-                task_gid = task.get("gid")
-                for story in Context.asana.client.stories.get_stories_for_task(
-                    task_gid=task_gid,
-                    opt_fields=opt_fields,
-                    timeout=self.request_timeout,
-                ):
-                    session_bookmark = self.get_updated_session_bookmark(
-                        session_bookmark, story[self.replication_key]
+        # Iterate over all workspaces
+        for workspace in workspaces:
+            # Fetch projects for the current workspace
+            response = self.call_api(
+                projects_api,
+                "get_projects",
+                opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
+            )
+            project_ids = [project["gid"] for project in response["data"]]
+
+            # Iterate over all project IDs and fetch tasks
+            for project_id in project_ids:
+                task_response = self.call_api(
+                    tasks_api,
+                    "get_tasks",
+                    opts={"project": project_id},
+                )
+                for task in task_response["data"]:
+                    task_gid = task.get("gid")
+
+                    # Fetch stories for the current task
+                    story_response = self.call_api(
+                        stories_api,
+                        "get_stories_for_task",
+                        task_gid=task_gid,
+                        opts={"opt_fields": opt_fields},
                     )
-                    if self.is_bookmark_old(story[self.replication_key]):
-                        yield story
+                    for story in story_response["data"]:
+                        session_bookmark = self.get_updated_session_bookmark(
+                            session_bookmark, story[self.replication_key]
+                        )
+                        if self.is_bookmark_old(story[self.replication_key]):
+                            yield story
 
+        # Update the bookmark after processing all stories
         self.update_bookmark(session_bookmark)
 
 
