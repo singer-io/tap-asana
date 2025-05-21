@@ -21,22 +21,31 @@ def stories_data(*args, **kwargs):
         {"gid": 3, "name": "test_data_3", "created_at": "2021-01-01"}]
 
 # Mock 'call_api' function
+# Mock 'call_api' function
 def mock_call_api(*args, **kwargs):
     # Dummy 'workspaces' data
-    if args[0] == "workspaces":
-        return [{"gid": 1, "name": "test_workspace"}]
+    if args[1] == "get_workspaces":
+        return {"data": [{"gid": 1, "name": "test_workspace"}]}
     # Dummy 'projects' data
-    elif args[0] == "projects":
-        return [
+    elif args[1] == "get_projects":
+        return {"data": [
             {"gid": 1, "name": "test_project_1"},
             {"gid": 2, "name": "test_project_2"}
-        ]
+        ]}
+    # Dummy 'sections' data
+    elif args[1] == "get_sections_for_project":
+        return {"data": sections_data()}
     # Dummy 'tasks' data
-    elif args[0] == "tasks":
-        return [
-            {"gid": 1, "name": "test_task_1", "modified_at": "2021-01-01"},
-            {"gid": 2, "name": "test_task_2", "modified_at": "2021-01-01"}
-        ]
+    elif args[1] == "get_tasks":
+        return {"data": [
+            {"gid": 1, "name": "test_task_1", "modified_at": "2021-01-01T00:00:00Z"},
+            {"gid": 2, "name": "test_task_2", "modified_at": "2021-01-02T00:00:00Z"}
+        ]}
+    # Dummy 'stories' data
+    elif args[1] == "get_stories_for_task":
+        return {"data": stories_data()}
+    # Default case
+    return {"data": []}
 
 @mock.patch("tap_asana.asana.Asana.refresh_access_token")
 @mock.patch("time.sleep")
@@ -52,7 +61,7 @@ class TestProjectIdCaching(unittest.TestCase):
         # Mock 'call_api' function
         mocked_call_api.side_effect = mock_call_api
         # Mock and return 'sections' data
-        Context.asana.client.sections.get_sections_for_project = sections_data
+        mocked_call_api.return_value = {"data": sections_data()}
 
         # Call function
         section = sections.Sections().get_objects()
@@ -96,7 +105,7 @@ class TestProjectIdCaching(unittest.TestCase):
         # As we have created dummy responses: 1 workspace, 2 projects, 2 tasks
         # Hence we will get total 4 tasks (2 for each project)
         for i in range(2):
-            for d in mock_call_api("tasks"):
+            for d in mock_call_api(None, "get_tasks")["data"]:
                 expected_data.append(d)
 
         # Verify the data we expected is returned
@@ -113,7 +122,6 @@ class TestProjectIdCaching(unittest.TestCase):
         # Mock 'call_api' function
         mocked_call_api.side_effect = mock_call_api
         # Mock and return 'stories' data
-        Context.asana.client.stories.get_stories_for_task = stories_data
         mocked_is_bookmark_old.return_value = True
 
         # Call function
