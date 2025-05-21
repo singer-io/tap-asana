@@ -186,7 +186,7 @@ class Stream():
     # As we added timeout, we need to pass it in the query param
     # hence removed the condition: 'if query_params', as
     # there will be atleast 1 param: 'timeout'
-    @asana_error_handling
+    # @asana_error_handling
     def call_api(self, api_instance, method_name, **query_params):
         """Function to make API call with error handling"""
         api_method = getattr(api_instance, method_name, None)
