@@ -170,7 +170,7 @@ class Stream():
     def get_updated_session_bookmark(session_bookmark, value):
         """Returns the updated session bookmark"""
         try:
-            session_bookmark = utils.strptime_with_tz(session_bookmark)
+            session_bookmark = utils.strptime_with_tz(str(session_bookmark))
         except TypeError:
             pass
 
