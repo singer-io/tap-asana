@@ -186,15 +186,9 @@ class Stream():
     # As we added timeout, we need to pass it in the query param
     # hence removed the condition: 'if query_params', as
     # there will be atleast 1 param: 'timeout'
-        """Function to make API call"""
-        api_function = getattr(Context.asana.client, resource)
-        query_params["timeout"] = self.request_timeout
-        return api_function.find_all(**query_params)
-    
     @asana_error_handling
     def call_api(self, api_instance, method_name, **query_params):
         """Function to make API call with error handling"""
-        # Get the API method from the API instance
         api_method = getattr(api_instance, method_name, None)
         if not api_method:
             raise AttributeError(f"Method '{method_name}' not found in {api_instance.__class__.__name__}.")
@@ -203,45 +197,18 @@ class Stream():
         if "opts" not in query_params:
             query_params["opts"] = {}
 
-        # Check if the method supports pagination
-        supports_pagination = "offset" in api_method.__code__.co_varnames
-
-        # Handle pagination manually if supported
+        # Call the API method without pagination
         results = {"data": []}
-        if supports_pagination:
-            offset = None
-            while True:
-                query_params["offset"] = offset
-                query_params["limit"] = RESULTS_PER_PAGE
+        try:
+            response = api_method(**query_params)
 
-                try:
-                    # Call the API method
-                    response = api_method(**query_params)
-                    
-                    # Handle generator responses
-                    if isinstance(response, (list, tuple)):
-                        results["data"].extend(response)
-                    else:
-                        results["data"].extend(list(response))  # Convert generator to list
-
-                    offset = getattr(response, "offset", None)
-                    if not offset:
-                        break
-                except Exception as e:
-                    LOGGER.error(f"Error during API call: {e}")
-                    break
-        else:
-            # Call the API method without pagination
-            try:
-                response = api_method(**query_params)
-
-                # Handle generator responses
-                if isinstance(response, (list, tuple)):
-                    results["data"] = response
-                else:
-                    results["data"] = list(response)  # Convert generator to list
-            except Exception as e:
-                LOGGER.error(f"Error during API call: {e}")
+            # Handle generator responses
+            if isinstance(response, (list, tuple)):
+                results["data"] = response
+            else:
+                results["data"] = list(response)  # Convert generator to list
+        except Exception as e:
+            LOGGER.error(f"Error during API call: {e}")
 
         return results
 
