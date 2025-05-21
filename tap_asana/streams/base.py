@@ -53,14 +53,19 @@ def retry_handler(details):
 
 # pylint: disable=unused-argument
 def retry_after_wait_gen(**kwargs):
+    """Generator to handle Retry-After logic for HTTP 429 errors."""
     # This is called in an except block so we can retrieve the exception
     # and check it.
     exc_info = sys.exc_info()
-    resp = exc_info[1].response
-    # Retry-After is an undocumented header. But honoring
-    # it was proven to work in our spikes.
-    sleep_time_str = resp.headers.get("Retry-After")
-    yield math.floor(float(sleep_time_str))
+    if exc_info[1] is not None and hasattr(exc_info[1], "response"):
+        resp = exc_info[1].response
+        # Retry-After is an undocumented header. But honoring
+        # it was proven to work in our spikes.
+        sleep_time_str = resp.headers.get("Retry-After", "1")  
+        yield math.floor(float(sleep_time_str))
+    else:
+        # LOGGER.error("retry_after_wait_gen called without a valid exception.")
+        yield 1
 
 
 def invalid_token_handler(details):
@@ -186,7 +191,7 @@ class Stream():
     # As we added timeout, we need to pass it in the query param
     # hence removed the condition: 'if query_params', as
     # there will be atleast 1 param: 'timeout'
-    # @asana_error_handling
+    @asana_error_handling
     def call_api(self, api_instance, method_name, **query_params):
         """Function to make API call with error handling"""
         api_method = getattr(api_instance, method_name, None)
