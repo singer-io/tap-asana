@@ -39,6 +39,7 @@ class Users(Stream):
                 users_api,
                 "get_users",
                 opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
+                _request_timeout=self.request_timeout,
             )
             for user in users_response["data"]:
                 yield user

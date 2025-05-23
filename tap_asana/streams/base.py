@@ -59,13 +59,14 @@ def retry_after_wait_gen(**kwargs):
     exc_info = sys.exc_info()
     if exc_info[1] is not None and hasattr(exc_info[1], "response"):
         resp = exc_info[1].response
-        # Retry-After is an undocumented header. But honoring
-        # it was proven to work in our spikes.
-        sleep_time_str = resp.headers.get("Retry-After", "1")  
-        yield math.floor(float(sleep_time_str))
+        if resp.status_code == 429:
+            # Retry-After is an undocumented header. But honoring
+            # it was proven to work in our spikes.
+            sleep_time_str = resp.headers.get("Retry-After", "1")
+            yield math.floor(float(sleep_time_str))
     else:
         # LOGGER.error("retry_after_wait_gen called without a valid exception.")
-        yield 1
+        yield 0
 
 
 def invalid_token_handler(details):
@@ -95,7 +96,7 @@ def asana_error_handling(fnc):
     )
     @backoff.on_exception(
         retry_after_wait_gen,
-        requests.exceptions.HTTPError,
+        (requests.exceptions.HTTPError,requests.exceptions.ConnectionError),
         giveup=is_not_status_code_fn([429]),
         on_backoff=leaky_bucket_handler,
         jitter=None,

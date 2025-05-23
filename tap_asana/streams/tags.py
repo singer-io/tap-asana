@@ -39,6 +39,7 @@ class Tags(Stream):
                 tags_api,
                 "get_tags",
                 opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
+                _request_timeout=self.request_timeout,
             )
             for tag in tag_response["data"]:
                 session_bookmark = self.get_updated_session_bookmark(

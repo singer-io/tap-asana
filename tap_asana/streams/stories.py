@@ -85,6 +85,7 @@ class Stories(Stream):
                 projects_api,
                 "get_projects",
                 opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
+                _request_timeout=self.request_timeout,
             )
             project_ids = [project["gid"] for project in response["data"]]
 
@@ -94,6 +95,7 @@ class Stories(Stream):
                     tasks_api,
                     "get_tasks",
                     opts={"project": project_id},
+                    _request_timeout=self.request_timeout,
                 )
                 for task in task_response["data"]:
                     task_gid = task.get("gid")
@@ -104,6 +106,7 @@ class Stories(Stream):
                         "get_stories_for_task",
                         task_gid=task_gid,
                         opts={"opt_fields": opt_fields},
+                        _request_timeout=self.request_timeout,
                     )
                     for story in story_response["data"]:
                         session_bookmark = self.get_updated_session_bookmark(

@@ -35,6 +35,7 @@ class Sections(Stream):
                 projects_api,
                 "get_projects",
                 opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
+                _request_timeout=self.request_timeout,
             )
             project_ids = [project["gid"] for project in response["data"]]
 
@@ -45,6 +46,7 @@ class Sections(Stream):
                     "get_sections_for_project",
                     project_gid=project_id,
                     opts={"opt_fields": opt_fields},
+                    _request_timeout=self.request_timeout,
                 )
                 for section in section_response["data"]:
                     yield section

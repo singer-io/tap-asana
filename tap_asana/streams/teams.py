@@ -43,6 +43,7 @@ class Teams(Stream):
                     "get_teams_for_workspace",
                     workspace_gid=workspace["gid"],
                     opts={"opt_fields": opt_fields},
+                    _request_timeout=self.request_timeout,
                 )
                 for team in teams_response["data"]:
                     # Fetch users for the current team using get_users_for_team
@@ -51,6 +52,7 @@ class Teams(Stream):
                         "get_users_for_team",
                         team_gid=team["gid"],
                         opts={"opt_fields": "gid,name,email"},
+                        _request_timeout=self.request_timeout,
                     )
                     team["users"] = users_response["data"]
                     yield team

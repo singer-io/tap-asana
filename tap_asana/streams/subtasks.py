@@ -74,6 +74,7 @@ class SubTasks(Stream):
                 projects_api,
                 "get_projects",
                 opts={"workspace": workspace["gid"], "opt_fields": "gid"},
+                _request_timeout=self.request_timeout,
             )
             project_ids = [project["gid"] for project in projects_response["data"]]
 
@@ -84,6 +85,7 @@ class SubTasks(Stream):
                     tasks_api,
                     "get_tasks",
                     opts={"project": project_id, "opt_fields": opt_fields},
+                    _request_timeout=self.request_timeout,
                 )
                 for task in tasks_response["data"]:
                     # Fetch subtasks recursively

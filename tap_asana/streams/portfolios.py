@@ -49,6 +49,7 @@ class Portfolios(Stream):
                     "get_portfolios",
                     workspace=workspace["gid"],  # Workspace ID
                     opts={"owner": "me", "opt_fields": opt_fields},
+                    _request_timeout=self.request_timeout,
                 )
 
 
@@ -59,6 +60,7 @@ class Portfolios(Stream):
                         "get_portfolio",
                         portfolio_gid=portfolio["gid"],
                         opts={"opt_fields": opt_fields},
+                        _request_timeout=self.request_timeout,
                     )
 
                     # Add detailed portfolio information to the portfolio object

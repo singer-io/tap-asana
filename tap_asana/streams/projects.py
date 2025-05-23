@@ -61,7 +61,8 @@ class Projects(Stream):
             response = self.call_api(
                 projects_api,
                 "get_projects",
-                opts={"workspace" : workspace["gid"],  "opt_fields":opt_fields }    
+                opts={"workspace" : workspace["gid"],  "opt_fields":opt_fields },
+                _request_timeout=self.request_timeout,
             )
 
             for project in response["data"]:

@@ -70,6 +70,7 @@ class Tasks(Stream):
                 projects_api,
                 "get_projects",
                 opts={"workspace": workspace["gid"], "opt_fields": "gid"},
+                _request_timeout=self.request_timeout,
             )
             project_ids = [project["gid"] for project in response["data"]]
 
@@ -83,6 +84,7 @@ class Tasks(Stream):
                         "opt_fields": opt_fields,
                         "modified_since": modified_since,
                     },
+                    _request_timeout=self.request_timeout,
                 )
                 for task in task_response["data"]:
                     session_bookmark = self.get_updated_session_bookmark(
