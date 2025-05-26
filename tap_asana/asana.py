@@ -32,9 +32,9 @@ class Asana():
                 configuration = asana.Configuration()
                 configuration.access_token = self.access_token
                 return asana.ApiClient(configuration)
-            except Exception as e:
-                LOGGER.error(f"Error creating Asana client: {e}")
-                return None
+            except asana.rest.ApiException as e:
+                LOGGER.error("Error creating Asana client: %s", e)
+        return None
 
     def refresh_access_token(self):
         """Get the access token using the refresh token"""
@@ -50,7 +50,7 @@ class Asana():
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
         try:
-            response = requests.post(url, data=payload, headers=headers)
+            response = requests.post(url, data=payload, headers=headers, timeout=30)
 
             if response.status_code == 200:
                 LOGGER.debug("Access token refreshed successfully.")
@@ -58,8 +58,8 @@ class Asana():
                     self.access_token = response.json()["access_token"]
                     return response.json()["access_token"]
             return None
-        except Exception as e:
-            LOGGER.error(f"Failed to refresh access token: {e}")
+        except requests.exceptions.RequestException as e:
+            LOGGER.error("Failed to refresh access token: %s", e)
             return None
 
     @property

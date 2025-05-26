@@ -52,26 +52,21 @@ class SubTasks(Stream):
         "start_at",
         "assignee_section"
     ]
-    
+
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
 
-        # Use WorkspacesApi, ProjectsApi, and TasksApi
-        workspaces_api = asana.WorkspacesApi(Context.asana.client)
-        projects_api = asana.ProjectsApi(Context.asana.client)
-        tasks_api = asana.TasksApi(Context.asana.client)
-
         # Fetch workspaces using call_api
-        workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
+        workspaces = self.call_api(asana.WorkspacesApi(Context.asana.client), "get_workspaces")["data"]
 
         # Iterate over all workspaces
         for workspace in workspaces:
             # Fetch projects for the current workspace
             projects_response = self.call_api(
-                projects_api,
+                asana.ProjectsApi(Context.asana.client),
                 "get_projects",
                 opts={"workspace": workspace["gid"], "opt_fields": "gid"},
                 _request_timeout=self.request_timeout,
@@ -82,7 +77,7 @@ class SubTasks(Stream):
             for indx, project_id in enumerate(project_ids, 1):
                 LOGGER.info("Fetching Subtasks for project: %s/%s", indx, len(project_ids))
                 tasks_response = self.call_api(
-                    tasks_api,
+                    asana.TasksApi(Context.asana.client),
                     "get_tasks",
                     opts={"project": project_id, "opt_fields": opt_fields},
                     _request_timeout=self.request_timeout,
@@ -101,7 +96,7 @@ class SubTasks(Stream):
 
     def fetch_children(self, p_task, opt_fields):
         subtasks_children = []
-        resource = asana.TasksApi(Context.asana.client) 
+        resource = asana.TasksApi(Context.asana.client)
         subtasks = list(resource.get_subtasks_for_task(task_gid=p_task.get("gid"), opts={"opt_fields": opt_fields}))
         for s_task in subtasks:
             subtasks_children.extend(self.fetch_children(s_task, opt_fields))

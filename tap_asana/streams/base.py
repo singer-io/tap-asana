@@ -213,8 +213,8 @@ class Stream():
                 results["data"] = response
             else:
                 results["data"] = list(response)  # Convert generator to list
-        except Exception as e:
-            LOGGER.error(f"Error during API call: {e}")
+        except requests.exceptions.RequestException as e:
+            LOGGER.error("Error during API call: %s", e)
 
         return results
 
