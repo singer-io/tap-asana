@@ -1031,33 +1031,6 @@
           ]
         }
       }
-    },
-    "next_page": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "offset": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "path": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "uri": {
-          "type": [
-            "null",
-            "string"
-          ]
-        }
-      }
     }
   }
 }

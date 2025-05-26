@@ -62,7 +62,7 @@ def retry_after_wait_gen(**kwargs):
         if resp.status_code == 429:
             # Retry-After is an undocumented header. But honoring
             # it was proven to work in our spikes.
-            sleep_time_str = resp.headers.get("Retry-After", "1")
+            sleep_time_str = resp.headers.get("Retry-After", "5")
             yield math.floor(float(sleep_time_str))
     else:
         yield 0
