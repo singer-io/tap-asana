@@ -69,20 +69,14 @@ class Stories(Stream):
         session_bookmark = bookmark
         opt_fields = ",".join(self.fields)
 
-        # Use WorkspacesApi, ProjectsApi, TasksApi, and StoriesApi
-        workspaces_api = asana.WorkspacesApi(Context.asana.client)
-        projects_api = asana.ProjectsApi(Context.asana.client)
-        tasks_api = asana.TasksApi(Context.asana.client)
-        stories_api = asana.StoriesApi(Context.asana.client)
-
         # Fetch workspaces using call_api
-        workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
+        workspaces = self.call_api(asana.WorkspacesApi(Context.asana.client), "get_workspaces")["data"]
 
         # Iterate over all workspaces
         for workspace in workspaces:
             # Fetch projects for the current workspace
             response = self.call_api(
-                projects_api,
+                asana.ProjectsApi(Context.asana.client),
                 "get_projects",
                 opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
                 _request_timeout=self.request_timeout,
@@ -92,7 +86,7 @@ class Stories(Stream):
             # Iterate over all project IDs and fetch tasks
             for project_id in project_ids:
                 task_response = self.call_api(
-                    tasks_api,
+                    asana.TasksApi(Context.asana.client),
                     "get_tasks",
                     opts={"project": project_id},
                     _request_timeout=self.request_timeout,
@@ -102,7 +96,7 @@ class Stories(Stream):
 
                     # Fetch stories for the current task
                     story_response = self.call_api(
-                        stories_api,
+                        asana.StoriesApi(Context.asana.client),
                         "get_stories_for_task",
                         task_gid=task_gid,
                         opts={"opt_fields": opt_fields},
