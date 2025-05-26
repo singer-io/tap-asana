@@ -1,8 +1,8 @@
 # pylint:disable=duplicate-code
+import asana
 import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
-import asana
 
 LOGGER = singer.get_logger()
 

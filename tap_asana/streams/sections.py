@@ -1,6 +1,6 @@
+import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
-import asana
 
 
 class Sections(Stream):
