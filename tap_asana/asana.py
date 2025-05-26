@@ -21,7 +21,6 @@ class Asana():
         self.refresh_token = refresh_token
         self.access_token = access_token
         self._client = self._access_token_auth()
-        # self.refresh_access_token()
 
     def _access_token_auth(self):
         """Check for access token"""

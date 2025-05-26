@@ -83,7 +83,7 @@ def asana_error_handling(fnc):
     @backoff.on_exception(
         backoff.expo,
         (requests.exceptions.RequestException,),
-        giveup=is_not_status_code_fn(range(412,401)),
+        giveup=is_not_status_code_fn([412, 401]),
         on_backoff=invalid_token_handler,
         max_tries=MAX_RETRIES,
     )
@@ -105,15 +105,6 @@ def asana_error_handling(fnc):
     def wrapper(*args, **kwargs):
         return fnc(*args, **kwargs)
     return wrapper
-
-# Added decorator over functions of asana SDK as functions from SDK returns generator and
-# tap is yielding data from that function so backoff is not working over tap functions.
-# Decorator can be put above get_objects() functions of every stream file but
-# it has multiple for loops so it's expensive to backoff everything.
-# CollectionPageIterator.get_initial = asana_error_handling(
-#     CollectionPageIterator.get_initial
-# )
-# CollectionPageIterator.get_next = asana_error_handling(CollectionPageIterator.get_next)
 
 class Stream():
     # Used for bookmarking and stream identification. Is overridden by
