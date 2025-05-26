@@ -83,6 +83,7 @@ def asana_error_handling(fnc):
     @backoff.on_exception(
         backoff.expo,
         (requests.exceptions.RequestException,),
+        giveup=is_not_status_code_fn(range(412,401)),
         on_backoff=invalid_token_handler,
         max_tries=MAX_RETRIES,
     )
