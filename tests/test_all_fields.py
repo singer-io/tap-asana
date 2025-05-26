@@ -25,7 +25,6 @@ class AsanaAllFieldsTest(AsanaBase):
         },
         'sections': {
             'projects',
-            'next_page'
         },
         'portfolios': {
             'is_template',
@@ -37,13 +36,11 @@ class AsanaAllFieldsTest(AsanaBase):
         },
         'projects': {
             'is_template',
-            'project_brief',
-            'next_page'
+            'project_brief'
         },
         'tags': {
             'offset',
             'uri',
-            'next_page',
             'path'
         },
         'teams': {
