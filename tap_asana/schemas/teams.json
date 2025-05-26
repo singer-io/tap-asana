@@ -107,8 +107,6 @@
         "string"
       ]
     },
-
-    // Appended missing fields from doc:
     "edit_team_name_or_description_access_level": {
       "type": ["null", "string"]
     },

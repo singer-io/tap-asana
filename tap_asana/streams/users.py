@@ -16,7 +16,7 @@ class Users(Stream):
         "workspaces"
     ]
 
-    
+
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
