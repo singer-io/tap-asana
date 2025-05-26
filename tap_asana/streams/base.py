@@ -217,6 +217,7 @@ class Stream():
 
         return results
 
+# pylint: disable=use-yield-from
     def sync(self):
         """Yield's processed SDK object dicts to the caller."""
         for obj in self.get_objects():

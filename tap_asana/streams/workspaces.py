@@ -3,6 +3,7 @@ from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
+# pylint: disable=use-yield-from
 class Workspaces(Stream):
     name = "workspaces"
     replication_method = "FULL_TABLE"

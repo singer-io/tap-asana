@@ -8,6 +8,7 @@ LOGGER = singer.get_logger()
 """ Simple wrapper for Asana. """
 
 
+# pylint: disable=too-many-positional-arguments
 class Asana():
     """Base class for tap-asana"""
 
