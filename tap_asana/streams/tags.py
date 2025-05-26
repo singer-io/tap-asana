@@ -3,7 +3,6 @@ from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
-
 class Tags(Stream):
     name = "tags"
     replication_key = "created_at"
