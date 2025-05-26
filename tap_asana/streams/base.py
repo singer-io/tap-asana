@@ -96,7 +96,7 @@ def asana_error_handling(fnc):
     )
     @backoff.on_exception(
         retry_after_wait_gen,
-        (requests.exceptions.HTTPError,requests.exceptions.ConnectionError),
+        (requests.exceptions.HTTPError, requests.exceptions.ConnectionError),
         giveup=is_not_status_code_fn([429]),
         on_backoff=leaky_bucket_handler,
         jitter=None,
