@@ -65,7 +65,6 @@ def retry_after_wait_gen(**kwargs):
             sleep_time_str = resp.headers.get("Retry-After", "1")
             yield math.floor(float(sleep_time_str))
     else:
-        # LOGGER.error("retry_after_wait_gen called without a valid exception.")
         yield 0
 
 
