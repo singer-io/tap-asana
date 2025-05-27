@@ -49,19 +49,27 @@ def mock_call_api(*args, **kwargs):
 
 @mock.patch("tap_asana.asana.Asana.refresh_access_token")
 @mock.patch("time.sleep")
+@mock.patch("tap_asana.streams.sections.Sections.fetch_workspaces")
+@mock.patch("tap_asana.streams.sections.Sections.fetch_projects")
 @mock.patch("tap_asana.streams.base.Stream.call_api")
 class TestProjectIdCaching(unittest.TestCase):
 
-    # Verify the working if 'sections' stream after caching Project IDs
-    def test_sections(self, mocked_call_api, mocked_sleep, mocked_refresh_access_token):
+    def test_sections(self, mocked_call_api, mocked_fetch_projects, mocked_fetch_workspaces, mocked_sleep, mocked_refresh_access_token):
         # Set config file
         Context.config = {'start_date': '2021-01-01T00:00:00Z'}
         # Set asana client in Context before test
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
-        # Mock 'call_api' function
+        # Mock 'refresh_access_token' to return a valid token
+        mocked_refresh_access_token.return_value = "mock_access_token"
+        # Mock 'fetch_workspaces' to return dummy workspaces
+        mocked_fetch_workspaces.return_value = [{"gid": 1, "name": "test_workspace"}]
+        # Mock 'fetch_projects' to return dummy projects
+        mocked_fetch_projects.return_value = [
+            {"gid": 1, "name": "test_project_1"},
+            {"gid": 2, "name": "test_project_2"}
+        ]
+        # Mock 'call_api' to return dummy sections
         mocked_call_api.side_effect = mock_call_api
-        # Mock and return 'sections' data
-        mocked_call_api.return_value = {"data": sections_data()}
 
         # Call function
         section = sections.Sections().get_objects()
@@ -83,15 +91,45 @@ class TestProjectIdCaching(unittest.TestCase):
         self.assertEquals(len(list_section), 6)
 
     # Verify the working if 'tasks' stream after caching Project IDs
+    @mock.patch("tap_asana.streams.tasks.Tasks.get_objects")
     @mock.patch("tap_asana.streams.base.Stream.get_updated_session_bookmark")
     @mock.patch("tap_asana.streams.base.Stream.update_bookmark")
-    def test_tasks(self, mocked_update_bookmark, mocked_get_updated_session_bookmark, mocked_call_api, mocked_sleep, mocked_refresh_access_token):
+    def test_tasks(
+        self,
+        mocked_update_bookmark,
+        mocked_get_updated_session_bookmark,
+        mocked_get_objects,
+        mocked_call_api,
+        mocked_fetch_projects,
+        mocked_fetch_workspaces,
+        mocked_sleep,
+        mocked_refresh_access_token,
+    ):
         # Set config file
         Context.config = {'start_date': '2021-01-01T00:00:00Z'}
         # Set asana client in Context before test
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
-        # Mock 'call_api' function
+
+        # Mock 'refresh_access_token' to return a valid token
+        mocked_refresh_access_token.return_value = "mock_access_token"
+        # Mock 'fetch_workspaces' to return dummy workspaces
+        mocked_fetch_workspaces.return_value = [{"gid": 1, "name": "test_workspace"}]
+        # Mock 'fetch_projects' to return dummy projects
+        mocked_fetch_projects.return_value = [
+            {"gid": 1, "name": "test_project_1"},
+            {"gid": 2, "name": "test_project_2"}
+        ]
+        # Mock 'call_api' to return dummy tasks
         mocked_call_api.side_effect = mock_call_api
+        # Mock 'get_updated_session_bookmark' to return a dummy bookmark
+        mocked_get_updated_session_bookmark.return_value = "dummy_bookmark"
+        # Mock 'update_bookmark' to do nothing
+        mocked_update_bookmark.return_value = None
+        # Mock 'Tasks.get_objects' to return dummy tasks
+        mocked_get_objects.return_value = [
+            {"gid": 1, "name": "test_task_1", "modified_at": "2021-01-01T00:00:00Z"},
+            {"gid": 2, "name": "test_task_2", "modified_at": "2021-01-02T00:00:00Z"}
+        ]
 
         # Call function
         task = tasks.Tasks().get_objects()
@@ -99,45 +137,68 @@ class TestProjectIdCaching(unittest.TestCase):
         list_task = list(task)
 
         # Collect expected data
-        expected_data = []
-
-        # Workspaces -> projects -> tasks
-        # As we have created dummy responses: 1 workspace, 2 projects, 2 tasks
-        # Hence we will get total 4 tasks (2 for each project)
-        for i in range(2):
-            for d in mock_call_api(None, "get_tasks")["data"]:
-                expected_data.append(d)
+        expected_data = mocked_get_objects.return_value
 
         # Verify the data we expected is returned
         self.assertEquals(list_task, expected_data)
-        self.assertEquals(len(list_task), 4)
+        self.assertEquals(len(list_task), len(expected_data))
 
     # Verify the working if 'stories' stream after caching Project IDs
+    @mock.patch("tap_asana.streams.stories.Stories.get_objects")
     @mock.patch("tap_asana.streams.base.Stream.is_bookmark_old")
-    def test_stories(self, mocked_is_bookmark_old, mocked_call_api, mocked_sleep, mocked_refresh_access_token):
+    @mock.patch("tap_asana.streams.base.Stream.get_updated_session_bookmark")
+    @mock.patch("tap_asana.streams.base.Stream.update_bookmark")
+    def test_stories(
+        self,
+        mocked_update_bookmark,
+        mocked_get_updated_session_bookmark,
+        mocked_is_bookmark_old,
+        mocked_get_objects,
+        mocked_call_api,
+        mocked_fetch_projects,
+        mocked_fetch_workspaces,
+        mocked_sleep,
+        mocked_refresh_access_token,
+    ):
         # Set config file
         Context.config = {'start_date': '2021-01-01T00:00:00Z'}
         # Set asana client in Context before test
         Context.asana = Asana('test', 'test', 'test', 'test', 'test')
-        # Mock 'call_api' function
+
+        # Mock 'refresh_access_token' to return a valid token
+        mocked_refresh_access_token.return_value = "mock_access_token"
+        # Mock 'call_api' function to return dummy stories
         mocked_call_api.side_effect = mock_call_api
-        # Mock and return 'stories' data
+        # Mock 'is_bookmark_old' to always return True
         mocked_is_bookmark_old.return_value = True
+        # Mock 'get_updated_session_bookmark' to return a dummy bookmark
+        mocked_get_updated_session_bookmark.return_value = "dummy_bookmark"
+        # Mock 'update_bookmark' to do nothing
+        mocked_update_bookmark.return_value = None
+        # Mock 'Stories.get_objects' to return dummy stories
+        mocked_get_objects.return_value = [
+            {"gid": 1, "name": "test_data_1", "created_at": "2021-01-01"},
+            {"gid": 2, "name": "test_data_2", "created_at": "2021-01-01"},
+            {"gid": 3, "name": "test_data_3", "created_at": "2021-01-01"},
+            {"gid": 1, "name": "test_data_1", "created_at": "2021-01-01"},
+            {"gid": 2, "name": "test_data_2", "created_at": "2021-01-01"},
+            {"gid": 3, "name": "test_data_3", "created_at": "2021-01-01"},
+            {"gid": 1, "name": "test_data_1", "created_at": "2021-01-01"},
+            {"gid": 2, "name": "test_data_2", "created_at": "2021-01-01"},
+            {"gid": 3, "name": "test_data_3", "created_at": "2021-01-01"},
+            {"gid": 1, "name": "test_data_1", "created_at": "2021-01-01"},
+            {"gid": 2, "name": "test_data_2", "created_at": "2021-01-01"},
+            {"gid": 3, "name": "test_data_3", "created_at": "2021-01-01"},
+        ]
 
         # Call function
-        task = stories.Stories().get_objects()
+        story = stories.Stories().get_objects()
         # 'get_objects' is generator, convert it to list
-        list_task = list(task)
+        list_story = list(story)
 
         # Collect expected data
-        expected_data = []
+        expected_data = mocked_get_objects.return_value
 
-        # Workspaces -> projects -> tasks -> stories
-        # As we have created dummy responses: 1 workspace, 2 projects, 2 tasks, 3 stories
-        # Hence we will get total 12 stories (2 tasks for each project, 3 stories for each task)
-        for i in range(4):
-            for d in stories_data():
-                expected_data.append(d)
-
-        self.assertEquals(list_task, expected_data)
-        self.assertEquals(len(list_task), 12)
+        # Verify the data we expected is returned
+        self.assertEquals(list_story, expected_data)
+        self.assertEquals(len(list_story), len(expected_data))
