@@ -24,13 +24,10 @@ class Tags(Stream):
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
         opt_fields = ",".join(self.fields)
+        workspaces = self.fetch_workspaces()
 
-        # Use WorkspacesApi and TagsApi
-        workspaces_api = asana.WorkspacesApi(Context.asana.client)
+        # Use TagsApi to fetch tags
         tags_api = asana.TagsApi(Context.asana.client)
-
-        # Fetch workspaces using call_api
-        workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
 
         # Iterate over all workspaces
         for workspace in workspaces:

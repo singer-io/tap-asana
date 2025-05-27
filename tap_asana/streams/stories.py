@@ -1,4 +1,3 @@
-# pylint:disable=duplicate-code
 import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
@@ -69,20 +68,11 @@ class Stories(Stream):
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
         opt_fields = ",".join(self.fields)
+        workspaces = self.fetch_workspaces()
 
-        # Fetch workspaces using call_api
-        workspaces = self.call_api(asana.WorkspacesApi(Context.asana.client), "get_workspaces")["data"]
-
-        # Iterate over all workspaces
         for workspace in workspaces:
-            # Fetch projects for the current workspace
-            response = self.call_api(
-                asana.ProjectsApi(Context.asana.client),
-                "get_projects",
-                opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
-                _request_timeout=self.request_timeout,
-            )
-            project_ids = [project["gid"] for project in response["data"]]
+            response = self.fetch_projects(workspace_gid=workspace["gid"], opt_fields=opt_fields, request_timeout=self.request_timeout)
+            project_ids = [project["gid"] for project in response]
 
             # Iterate over all project IDs and fetch tasks
             for project_id in project_ids:

@@ -2,6 +2,7 @@ import math
 import functools
 import sys
 
+import asana
 import requests
 import backoff
 import simplejson
@@ -214,3 +215,26 @@ class Stream():
         """Yield's processed SDK object dicts to the caller."""
         for obj in self.get_objects():
             yield obj
+
+    @asana_error_handling
+    def fetch_workspaces(self):
+        """Fetch all workspaces using the Asana API."""
+        try:
+            workspaces_api = asana.WorkspacesApi(Context.asana.client)
+            response = list(workspaces_api.get_workspaces(opts={}))
+            return response
+        except asana.rest.ApiException as e:
+            LOGGER.error("Failed to fetch workspaces: %s", e)
+            return []
+
+    @asana_error_handling
+    def fetch_projects(self,workspace_gid, opt_fields, request_timeout):
+        """Fetch all projects using the Asana API."""
+        try:
+            projects_api = asana.ProjectsApi(Context.asana.client)
+            response = projects_api.get_projects(opts={"workspace": workspace_gid, "opt_fields": opt_fields},
+                _request_timeout=request_timeout)
+            return list(response)
+        except asana.rest.ApiException as e:
+            LOGGER.error("Failed to fetch projects: %s", e)
+            return []

@@ -3,6 +3,7 @@ from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
+# pylint:disable=duplicate-code
 class Tasks(Stream):
     name = "tasks"
     replication_key = "modified_at"
@@ -54,25 +55,15 @@ class Tasks(Stream):
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
         modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
+        workspaces = self.fetch_workspaces()
 
-        # Use WorkspacesApi, ProjectsApi, and TasksApi
-        workspaces_api = asana.WorkspacesApi(Context.asana.client)
-        projects_api = asana.ProjectsApi(Context.asana.client)
+        # Use TasksApi to fetch tasks
         tasks_api = asana.TasksApi(Context.asana.client)
 
-        # Fetch workspaces using call_api
-        workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
-
-        # Iterate over all workspaces
         for workspace in workspaces:
-            # Fetch projects for the current workspace
-            response = self.call_api(
-                projects_api,
-                "get_projects",
-                opts={"workspace": workspace["gid"], "opt_fields": "gid"},
-                _request_timeout=self.request_timeout,
-            )
-            project_ids = [project["gid"] for project in response["data"]]
+            response = self.fetch_projects(workspace_gid=workspace["gid"], opt_fields="gid",
+                                           request_timeout=self.request_timeout)
+            project_ids = [project["gid"] for project in response]
 
             # Iterate over all project IDs and fetch tasks
             for project_id in project_ids:

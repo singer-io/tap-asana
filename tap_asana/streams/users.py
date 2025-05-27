@@ -3,7 +3,6 @@ from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
-# pylint: disable=use-yield-from
 class Users(Stream):
     replication_method = "FULL_TABLE"
     name = "users"
@@ -17,23 +16,15 @@ class Users(Stream):
         "workspaces"
     ]
 
-
+    # pylint: disable=use-yield-from
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
+        workspaces = self.fetch_workspaces()
 
-        # Use WorkspacesApi and UsersApi
-        workspaces_api = asana.WorkspacesApi(Context.asana.client)
+        # Use UsersApi to fetch users
         users_api = asana.UsersApi(Context.asana.client)
 
-        # Fetch workspaces using call_api
-        workspaces = self.call_api(
-            workspaces_api,
-            "get_workspaces",
-            opts={"opt_fields": "gid"},
-        )["data"]
-
-        # Iterate over all workspaces
         for workspace in workspaces:
             # Fetch users for the current workspace
             users_response = self.call_api(

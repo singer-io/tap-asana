@@ -1,4 +1,3 @@
-# pylint:disable=duplicate-code
 import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
@@ -32,13 +31,10 @@ class Portfolios(Stream):
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
+        workspaces = self.fetch_workspaces()
 
         # Use WorkspacesApi to fetch workspaces
-        workspaces_api = asana.WorkspacesApi(Context.asana.client)
         portfolios_api = asana.PortfoliosApi(Context.asana.client)
-
-        # Fetch workspaces using call_api
-        workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
 
         for workspace in workspaces:
             # Paginate through portfolios for each workspace
@@ -52,7 +48,6 @@ class Portfolios(Stream):
                     opts={"owner": "me", "opt_fields": opt_fields},
                     _request_timeout=self.request_timeout,
                 )
-
 
                 for portfolio in response["data"]:
                     # Fetch detailed portfolio information using get_portfolio

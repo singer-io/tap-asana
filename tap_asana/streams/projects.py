@@ -47,12 +47,10 @@ class Projects(Stream):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
 
-    # Use WorkspacesApi to fetch workspaces
-    workspaces_api = asana.WorkspacesApi(Context.asana.client)
-    projects_api = asana.ProjectsApi(Context.asana.client)
+    workspaces = self.fetch_workspaces()
 
-    # Fetch workspaces using call_api
-    workspaces = self.call_api(workspaces_api, "get_workspaces")["data"]
+    # Use ProjectsApi to fetch projects
+    projects_api = asana.ProjectsApi(Context.asana.client)
 
     for workspace in workspaces:
         # Paginate through projects for each workspace

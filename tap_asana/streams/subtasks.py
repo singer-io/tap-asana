@@ -1,4 +1,3 @@
-# pylint:disable=duplicate-code
 import asana
 import singer
 from tap_asana.context import Context
@@ -58,20 +57,12 @@ class SubTasks(Stream):
         opt_fields = ",".join(self.fields)
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
+        workspaces = self.fetch_workspaces()
 
-        # Fetch workspaces using call_api
-        workspaces = self.call_api(asana.WorkspacesApi(Context.asana.client), "get_workspaces")["data"]
-
-        # Iterate over all workspaces
         for workspace in workspaces:
-            # Fetch projects for the current workspace
-            projects_response = self.call_api(
-                asana.ProjectsApi(Context.asana.client),
-                "get_projects",
-                opts={"workspace": workspace["gid"], "opt_fields": "gid"},
-                _request_timeout=self.request_timeout,
-            )
-            project_ids = [project["gid"] for project in projects_response["data"]]
+            projects_response = self.fetch_projects(workspace_gid=workspace["gid"], opt_fields="gid",
+                                                    request_timeout=self.request_timeout)
+            project_ids = [project["gid"] for project in projects_response]
 
             # Iterate over all project IDs and fetch tasks
             for indx, project_id in enumerate(project_ids, 1):
