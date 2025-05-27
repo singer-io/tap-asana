@@ -44,7 +44,7 @@ class AsanaAutomaticFieldsTest(AsanaBase):
                 if messages is None:
                     print(f"No records found for stream: {stream}")
                     print(messages)
-                
+
                 record_messages_keys = [set(row['data'].keys())
                                         for row in messages['messages']]
 
