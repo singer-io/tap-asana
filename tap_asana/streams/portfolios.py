@@ -38,7 +38,7 @@ class Portfolios(Stream):
 
         for workspace in workspaces:
             # Paginate through portfolios for each workspace
-            offset = None
+            offset = True
             while True:
                 # Fetch portfolios for the current workspace using call_api
                 response = self.call_api(
