@@ -83,8 +83,7 @@ def asana_error_handling(fnc):
     )
     @backoff.on_exception(
         backoff.expo,
-        (requests.exceptions.RequestException,),
-        giveup=is_not_status_code_fn([412, 401]),
+        (InvalidTokenError, NoAuthorizationError),
         on_backoff=invalid_token_handler,
         max_tries=MAX_RETRIES,
     )
@@ -106,6 +105,25 @@ def asana_error_handling(fnc):
     def wrapper(*args, **kwargs):
         return fnc(*args, **kwargs)
     return wrapper
+
+
+class InvalidTokenError(Exception):
+    """Custom exception for Invalid Token (Status Code 412)"""
+
+    def __init__(self, response=None):
+        super().__init__("Invalid Token Error")
+        self.status_code = 412
+        self.response = response
+
+
+class NoAuthorizationError(Exception):
+    """Custom exception for Unauthorized Access (Status Code 401)"""
+
+    def __init__(self, response=None):
+        super().__init__("No Authorization Error")
+        self.status_code = 401
+        self.response = response
+
 
 class Stream():
     # Used for bookmarking and stream identification. Is overridden by
@@ -205,8 +223,13 @@ class Stream():
                 results["data"] = response
             else:
                 results["data"] = list(response)  # Convert generator to list
-        except requests.exceptions.RequestException as e:
+        except asana.rest.ApiException as e:
+            if e.status == 412:
+                raise InvalidTokenError(response=e) from e
+            if e.status == 401:
+                raise NoAuthorizationError(response=e) from e
             LOGGER.error("Error during API call: %s", e)
+            raise e from None
 
         return results
 
