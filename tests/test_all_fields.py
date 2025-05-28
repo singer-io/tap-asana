@@ -38,11 +38,6 @@ class AsanaAllFieldsTest(AsanaBase):
             'is_template',
             'project_brief'
         },
-        'tags': {
-            'offset',
-            'uri',
-            'path'
-        },
         'teams': {
             'team_member_removal_access_level',
             'team_content_management_access_level',
