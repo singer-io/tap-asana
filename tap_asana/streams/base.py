@@ -233,7 +233,7 @@ class Stream():
 
         return results
 
-# pylint: disable=use-yield-from
+    # pylint: disable=use-yield-from
     def sync(self):
         """Yield's processed SDK object dicts to the caller."""
         for obj in self.get_objects():
@@ -244,23 +244,34 @@ class Stream():
         """Fetch all workspaces using the Asana API."""
         if opts is None:  # Initialize opts as an empty dictionary if not provided
             opts = {}
-
+        result = []
         try:
             workspaces_api = asana.WorkspacesApi(Context.asana.client)
             response = list(workspaces_api.get_workspaces(opts=opts))
-            return response
+            result =  response
         except asana.rest.ApiException as e:
+            if e.status == 412:
+                raise InvalidTokenError(response=e) from e
+            if e.status == 401:
+                raise NoAuthorizationError(response=e) from e
             LOGGER.error("Failed to fetch workspaces: %s", e)
-            return []
+            raise e from None
+        return result
 
     @asana_error_handling
-    def fetch_projects(self,workspace_gid, opt_fields, request_timeout):
+    def fetch_projects(self, workspace_gid, opt_fields, request_timeout):
         """Fetch all projects using the Asana API."""
+        result = []
         try:
             projects_api = asana.ProjectsApi(Context.asana.client)
             response = projects_api.get_projects(opts={"workspace": workspace_gid, "opt_fields": opt_fields},
-                _request_timeout=request_timeout)
-            return list(response)
+                                                 _request_timeout=request_timeout)
+            result = list(response)
         except asana.rest.ApiException as e:
+            if e.status == 412:
+                raise InvalidTokenError(response=e) from e
+            if e.status == 401:
+                raise NoAuthorizationError(response=e) from e
             LOGGER.error("Failed to fetch projects: %s", e)
-            return []
+            raise e from None
+        return result
