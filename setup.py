@@ -17,7 +17,7 @@ setup(
         "test": [
             "pylint",
             "requests==2.32.3",
-            'nose'
+            "nose"
         ],
         "dev": [
             "ipdb"

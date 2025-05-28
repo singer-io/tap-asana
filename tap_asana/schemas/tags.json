@@ -107,24 +107,6 @@
           ]
         }
       }
-    },
-    "offset": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "path": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "uri": {
-      "type": [
-        "null",
-        "string"
-      ]
     }
   }
 }
