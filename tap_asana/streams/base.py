@@ -217,11 +217,14 @@ class Stream():
             yield obj
 
     @asana_error_handling
-    def fetch_workspaces(self):
+    def fetch_workspaces(self, opts=None):
         """Fetch all workspaces using the Asana API."""
+        if opts is None:  # Initialize opts as an empty dictionary if not provided
+            opts = {}
+
         try:
             workspaces_api = asana.WorkspacesApi(Context.asana.client)
-            response = list(workspaces_api.get_workspaces(opts={}))
+            response = list(workspaces_api.get_workspaces(opts=opts))
             return response
         except asana.rest.ApiException as e:
             LOGGER.error("Failed to fetch workspaces: %s", e)

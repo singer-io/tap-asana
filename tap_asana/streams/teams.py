@@ -21,20 +21,13 @@ class Teams(Stream):
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
+        opts={"opt_fields": "gid,is_organization"}
+        workspaces = self.fetch_workspaces(opts=opts)
 
-        # Use WorkspacesApi, TeamsApi, and UsersApi
-        workspaces_api = asana.WorkspacesApi(Context.asana.client)
+        # Use TeamsApi, and UsersApi
         teams_api = asana.TeamsApi(Context.asana.client)
         users_api = asana.UsersApi(Context.asana.client)
 
-        # Fetch workspaces using call_api
-        workspaces = self.call_api(
-            workspaces_api,
-            "get_workspaces",
-            opts={"opt_fields": "gid,is_organization"},
-        )["data"]
-
-        # Iterate over all workspaces
         for workspace in workspaces:
             if workspace.get("is_organization", False):
                 # Fetch teams for the current workspace using get_teams_for_workspace
