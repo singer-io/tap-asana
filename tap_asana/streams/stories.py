@@ -7,6 +7,9 @@ class Stories(Stream):
     replication_method = "INCREMENTAL"
     replication_key = "created_at"
 
+    # Only fetch from this specific project
+    target_project_gid = '1207756003332473'
+
     fields = [
         "gid",
         "resource_type",
@@ -64,19 +67,14 @@ class Stories(Stream):
     ]
 
     def get_objects(self):
-        """Get stream object"""
+        """Get stream object for a single specified project"""
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
         opt_fields = ",".join(self.fields)
 
-        # list of project ids
-        project_ids = []
+        # Use only the target project
+        project_ids = [self.target_project_gid]
 
-        for workspace in self.call_api("workspaces"):
-            for project in self.call_api("projects", workspace=workspace["gid"]):
-                project_ids.append(project["gid"])
-
-        # iterate over all project ids and continue fetching
         for project_id in project_ids:
             for task in self.call_api("tasks", project=project_id):
                 task_gid = task.get("gid")
