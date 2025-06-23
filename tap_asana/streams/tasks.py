@@ -1,7 +1,9 @@
+import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
+# pylint:disable=duplicate-code
 class Tasks(Stream):
     name = "tasks"
     replication_key = "modified_at"
@@ -49,32 +51,40 @@ class Tasks(Stream):
 
     def get_objects(self):
         """Get stream object"""
-        # list of project ids
-        project_ids = []
-
         opt_fields = ",".join(self.fields)
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
         modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
+        workspaces = self.fetch_workspaces()
 
-        for workspace in self.call_api("workspaces"):
-            for project in self.call_api("projects", workspace=workspace["gid"]):
-                project_ids.append(project["gid"])
+        # Use TasksApi to fetch tasks
+        tasks_api = asana.TasksApi(Context.asana.client)
 
-        # iterate over all project ids and continue fetching
-        for project_id in project_ids:
-            for task in self.call_api(
-                "tasks",
-                project=project_id,
-                opt_fields=opt_fields,
-                modified_since=modified_since,
-            ):
-                session_bookmark = self.get_updated_session_bookmark(
-                    session_bookmark, task[self.replication_key]
+        for workspace in workspaces:
+            response = self.fetch_projects(workspace_gid=workspace["gid"], opt_fields="gid",
+                                           request_timeout=self.request_timeout)
+            project_ids = [project["gid"] for project in response]
+
+            # Iterate over all project IDs and fetch tasks
+            for project_id in project_ids:
+                task_response = self.call_api(
+                    tasks_api,
+                    "get_tasks",
+                    opts={
+                        "project": project_id,
+                        "opt_fields": opt_fields,
+                        "modified_since": modified_since,
+                    },
+                    _request_timeout=self.request_timeout,
                 )
-                if self.is_bookmark_old(task[self.replication_key]):
-                    yield task
+                for task in task_response["data"]:
+                    session_bookmark = self.get_updated_session_bookmark(
+                        session_bookmark, task[self.replication_key]
+                    )
+                    if self.is_bookmark_old(task[self.replication_key]):
+                        yield task
 
+        # Update the bookmark after processing all tasks
         self.update_bookmark(session_bookmark)
 
 

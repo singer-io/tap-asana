@@ -1218,6 +1218,12 @@
         "null",
         "string"
       ]
+    },
+    "new_approval_status_updated": {
+      "type": [
+        "null",
+        "string"
+      ]
     }
   }
 }
