@@ -34,9 +34,9 @@ jobs:
           name: 'Integration Tests'
           no_output_timeout: 60m
           command: |
+            source /usr/local/share/virtualenvs/tap-tester/bin/activate
             aws s3 cp s3://com-stitchdata-dev-deployment-assets/environments/tap-tester/tap_tester_sandbox dev_env.sh
             source dev_env.sh
-            source /usr/local/share/virtualenvs/tap-tester/bin/activate
             run-test --tap=tap-asana tests
 workflows:
   version: 2
