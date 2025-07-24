@@ -10,20 +10,20 @@ jobs:
           command: |
             uv venv --python=3.9 /usr/local/share/virtualenvs/tap-asana
             source /usr/local/share/virtualenvs/tap-asana/bin/activate
-            pip install -U 'pip<19.2' 'setuptools<51.0.0'
-            pip install .[test]
+            uv pip install -U 'pip<19.2' 'setuptools<51.0.0'
+            uv pip install .[test]
       - run:
           name: 'Unit Tests'
           command: |
             source /usr/local/share/virtualenvs/tap-asana/bin/activate
-            pip install nose coverage parameterized
+            uv pip install nose coverage parameterized
             nosetests --with-coverage --cover-erase --cover-package=tap_asana --cover-html-dir=htmlcov tests/unittests
             coverage html
       - store_test_results:
           path: test_output/report.xml
       - store_artifacts:
           path: htmlcov
-            pip install .[test]
+            uv pip install .[test]
       - run:
           name: 'pylint'
           command: |
