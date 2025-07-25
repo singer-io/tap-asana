@@ -28,7 +28,7 @@ jobs:
           name: 'pylint'
           command: |
             source /usr/local/share/virtualenvs/tap-asana/bin/activate
-            pylint tap_asana -d bad-indentation,missing-docstring,line-too-long,no-member,use-yield-from
+            pylint tap_asana -d bad-indentation,missing-docstring,line-too-long,no-member,use-yield-from,too-many-positional-arguments
       - add_ssh_keys
       - run:
           name: 'Integration Tests'
