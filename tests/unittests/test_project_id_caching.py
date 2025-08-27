@@ -70,8 +70,8 @@ class TestProjectIdCaching(unittest.TestCase):
                 expected_data.append(d)
 
         # Verify the data we expected is returned
-        self.assertEquals(list_section, expected_data)
-        self.assertEquals(len(list_section), 6)
+        self.assertEqual(list_section, expected_data)
+        self.assertEqual(len(list_section), 6)
 
     # Verify the working if 'tasks' stream after caching Project IDs
     @mock.patch("tap_asana.streams.base.Stream.get_updated_session_bookmark")
@@ -100,8 +100,8 @@ class TestProjectIdCaching(unittest.TestCase):
                 expected_data.append(d)
 
         # Verify the data we expected is returned
-        self.assertEquals(list_task, expected_data)
-        self.assertEquals(len(list_task), 4)
+        self.assertEqual(list_task, expected_data)
+        self.assertEqual(len(list_task), 4)
 
     # Verify the working if 'stories' stream after caching Project IDs
     @mock.patch("tap_asana.streams.base.Stream.is_bookmark_old")
@@ -131,5 +131,5 @@ class TestProjectIdCaching(unittest.TestCase):
             for d in stories_data():
                 expected_data.append(d)
 
-        self.assertEquals(list_task, expected_data)
-        self.assertEquals(len(list_task), 12)
+        self.assertEqual(list_task, expected_data)
+        self.assertEqual(len(list_task), 12)
