@@ -24,14 +24,29 @@ class AsanaAllFieldsTest(AsanaBase):
             'new_name'
         },
         'sections': {
-            'projects'
+            'projects',
         },
         'portfolios': {
-            'is_template'
+            'is_template',
+            'default_access_level',
+            'project_templates',
+            'portfolio_items',
+            'archived',
+            'privacy_setting'
         },
         'projects': {
             'is_template',
             'project_brief'
+        },
+        'teams': {
+            'team_member_removal_access_level',
+            'team_content_management_access_level',
+            'edit_team_name_or_description_access_level',
+            'edit_team_visibility_or_trash_team_access_level',
+            'endorsed',
+            'member_invite_management_access_level',
+            'guest_invite_management_access_level',
+            'join_request_management_access_level'
         }
     }
     def name(self):

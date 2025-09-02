@@ -1,4 +1,4 @@
-# pylint:disable=duplicate-code
+import asana
 import singer
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
@@ -54,31 +54,41 @@ class SubTasks(Stream):
 
     def get_objects(self):
         """Get stream object"""
-        # list of project ids
-        project_ids = []
         opt_fields = ",".join(self.fields)
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
-        for workspace in self.call_api("workspaces"):
-            for project in self.call_api("projects", workspace=workspace["gid"]):
-                project_ids.append(project["gid"])
+        workspaces = self.fetch_workspaces()
 
-        for indx, project_id in enumerate(project_ids, 1):
-            LOGGER.info("Fetching Subtasks for project: %s/%s", indx, len(project_ids))
-            tasks_list = self.call_api("tasks", project=project_id, opt_fields=opt_fields)
-            for task in tasks_list:
-                for subt in self.fetch_children(task, opt_fields):
-                    session_bookmark = self.get_updated_session_bookmark(
-                        session_bookmark, subt[self.replication_key]
-                    )
-                    if self.is_bookmark_old(subt[self.replication_key]):
-                        yield subt
+        for workspace in workspaces:
+            projects_response = self.fetch_projects(workspace_gid=workspace["gid"], opt_fields="gid",
+                                                    request_timeout=self.request_timeout)
+            project_ids = [project["gid"] for project in projects_response]
+
+            # Iterate over all project IDs and fetch tasks
+            for indx, project_id in enumerate(project_ids, 1):
+                LOGGER.info("Fetching Subtasks for project: %s/%s", indx, len(project_ids))
+                tasks_response = self.call_api(
+                    asana.TasksApi(Context.asana.client),
+                    "get_tasks",
+                    opts={"project": project_id, "opt_fields": opt_fields},
+                    _request_timeout=self.request_timeout,
+                )
+                for task in tasks_response["data"]:
+                    # Fetch subtasks recursively
+                    for subt in self.fetch_children(task, opt_fields):
+                        session_bookmark = self.get_updated_session_bookmark(
+                            session_bookmark, subt[self.replication_key]
+                        )
+                        if self.is_bookmark_old(subt[self.replication_key]):
+                            yield subt
+
+        # Update the bookmark after processing all subtasks
         self.update_bookmark(session_bookmark)
 
     def fetch_children(self, p_task, opt_fields):
         subtasks_children = []
-        resource = getattr(Context.asana.client, "tasks")
-        subtasks = list(resource.get_subtasks_for_task(p_task.get("gid"), opt_fields=opt_fields))
+        resource = asana.TasksApi(Context.asana.client)
+        subtasks = list(resource.get_subtasks_for_task(task_gid=p_task.get("gid"), opts={"opt_fields": opt_fields}))
         for s_task in subtasks:
             subtasks_children.extend(self.fetch_children(s_task, opt_fields))
         return subtasks + subtasks_children

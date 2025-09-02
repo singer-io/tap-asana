@@ -1,3 +1,4 @@
+import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
@@ -30,24 +31,42 @@ class Portfolios(Stream):
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
-        for workspace in self.call_api("workspaces"):
-            # NOTE: Currently, API users can only get a list of portfolios that they themselves own; owner="me"
-            for portfolio in Context.asana.client.portfolios.get_portfolios(
-                workspace=workspace["gid"],
-                owner="me",
-                opt_fields=opt_fields,
-                timeout=self.request_timeout,
-            ):
-                # portfolio_items are typically the projects in a portfolio
-                portfolio_items = []
-                for (
-                    portfolio_item
-                ) in Context.asana.client.portfolios.get_items_for_portfolio(
-                    portfolio_gid=portfolio["gid"], timeout=self.request_timeout
-                ):
-                    portfolio_items.append(portfolio_item)
-                portfolio["portfolio_items"] = portfolio_items
-                yield portfolio
+        workspaces = self.fetch_workspaces()
+
+        # Use WorkspacesApi to fetch workspaces
+        portfolios_api = asana.PortfoliosApi(Context.asana.client)
+
+        for workspace in workspaces:
+            # Paginate through portfolios for each workspace
+            offset = True
+            while True:
+                # Fetch portfolios for the current workspace using call_api
+                response = self.call_api(
+                    portfolios_api,
+                    "get_portfolios",
+                    workspace=workspace["gid"],  # Workspace ID
+                    opts={"owner": "me", "opt_fields": opt_fields},
+                    _request_timeout=self.request_timeout,
+                )
+
+                for portfolio in response["data"]:
+                    # Fetch detailed portfolio information using get_portfolio
+                    portfolio_details = self.call_api(
+                        portfolios_api,
+                        "get_portfolio",
+                        portfolio_gid=portfolio["gid"],
+                        opts={"opt_fields": opt_fields},
+                        _request_timeout=self.request_timeout,
+                    )
+
+                    # Add detailed portfolio information to the portfolio object
+                    portfolio.update(portfolio_details)
+                    yield portfolio
+
+                # Check if there are more pages
+                offset = response.get("offset")
+                if not offset:
+                    break
 
 
 Context.stream_objects["portfolios"] = Portfolios

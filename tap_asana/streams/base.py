@@ -2,18 +2,11 @@ import math
 import functools
 import sys
 
+import asana
 import requests
 import backoff
 import simplejson
 import singer
-from asana.error import (
-    NoAuthorizationError,
-    RetryableAsanaError,
-    InvalidTokenError,
-    RateLimitEnforcedError,
-)
-from asana.page_iterator import CollectionPageIterator
-from oauthlib.oauth2 import TokenExpiredError
 from singer import utils
 from tap_asana.context import Context
 
@@ -61,14 +54,19 @@ def retry_handler(details):
 
 # pylint: disable=unused-argument
 def retry_after_wait_gen(**kwargs):
+    """Generator to handle Retry-After logic for HTTP 429 errors."""
     # This is called in an except block so we can retrieve the exception
     # and check it.
     exc_info = sys.exc_info()
-    resp = exc_info[1].response
-    # Retry-After is an undocumented header. But honoring
-    # it was proven to work in our spikes.
-    sleep_time_str = resp.headers.get("Retry-After")
-    yield math.floor(float(sleep_time_str))
+    if exc_info[1] is not None and hasattr(exc_info[1], "response"):
+        resp = exc_info[1].response
+        if resp.status_code == 429:
+            # Retry-After is an undocumented header. But honoring
+            # it was proven to work in our spikes.
+            sleep_time_str = resp.headers.get("Retry-After", "5")
+            yield math.floor(float(sleep_time_str))
+    else:
+        yield 0
 
 
 def invalid_token_handler(details):
@@ -85,23 +83,22 @@ def asana_error_handling(fnc):
     )
     @backoff.on_exception(
         backoff.expo,
-        (InvalidTokenError, NoAuthorizationError, TokenExpiredError),
+        (InvalidTokenError, NoAuthorizationError),
         on_backoff=invalid_token_handler,
         max_tries=MAX_RETRIES,
     )
     @backoff.on_exception(
         backoff.expo,
-        (simplejson.scanner.JSONDecodeError, RetryableAsanaError),
+        (simplejson.scanner.JSONDecodeError, requests.exceptions.HTTPError),
         giveup=is_not_status_code_fn(range(500, 599)),
         on_backoff=retry_handler,
         max_tries=MAX_RETRIES,
     )
     @backoff.on_exception(
         retry_after_wait_gen,
-        RateLimitEnforcedError,
+        (requests.exceptions.HTTPError, requests.exceptions.ConnectionError),
         giveup=is_not_status_code_fn([429]),
         on_backoff=leaky_bucket_handler,
-        # No jitter as we want a constant value
         jitter=None,
     )
     @functools.wraps(fnc)
@@ -109,14 +106,24 @@ def asana_error_handling(fnc):
         return fnc(*args, **kwargs)
     return wrapper
 
-# Added decorator over functions of asana SDK as functions from SDK returns generator and
-# tap is yielding data from that function so backoff is not working over tap functions.
-# Decorator can be put above get_objects() functions of every stream file but
-# it has multiple for loops so it's expensive to backoff everything.
-CollectionPageIterator.get_initial = asana_error_handling(
-    CollectionPageIterator.get_initial
-)
-CollectionPageIterator.get_next = asana_error_handling(CollectionPageIterator.get_next)
+
+class InvalidTokenError(Exception):
+    """Custom exception for Invalid Token (Status Code 412)"""
+
+    def __init__(self, response=None):
+        super().__init__("Invalid Token Error")
+        self.status_code = 412
+        self.response = response
+
+
+class NoAuthorizationError(Exception):
+    """Custom exception for Unauthorized Access (Status Code 401)"""
+
+    def __init__(self, response=None):
+        super().__init__("No Authorization Error")
+        self.status_code = 401
+        self.response = response
+
 
 class Stream():
     # Used for bookmarking and stream identification. Is overridden by
@@ -179,7 +186,7 @@ class Stream():
     def get_updated_session_bookmark(session_bookmark, value):
         """Returns the updated session bookmark"""
         try:
-            session_bookmark = utils.strptime_with_tz(session_bookmark)
+            session_bookmark = utils.strptime_with_tz(str(session_bookmark))
         except TypeError:
             pass
 
@@ -196,13 +203,75 @@ class Stream():
     # hence removed the condition: 'if query_params', as
     # there will be atleast 1 param: 'timeout'
     @asana_error_handling
-    def call_api(self, resource, **query_params):
-        """Function to make API call"""
-        api_function = getattr(Context.asana.client, resource)
-        query_params["timeout"] = self.request_timeout
-        return api_function.find_all(**query_params)
+    def call_api(self, api_instance, method_name, **query_params):
+        """Function to make API call with error handling"""
+        api_method = getattr(api_instance, method_name, None)
+        if not api_method:
+            raise AttributeError(f"Method '{method_name}' not found in {api_instance.__class__.__name__}.")
 
+        # Ensure the 'opts' parameter is included
+        if "opts" not in query_params:
+            query_params["opts"] = {}
+
+        # Call the API method without pagination
+        results = {"data": []}
+        try:
+            response = api_method(**query_params)
+
+            # Handle generator responses
+            if isinstance(response, (list, tuple)):
+                results["data"] = response
+            else:
+                results["data"] = list(response)  # Convert generator to list
+        except asana.rest.ApiException as e:
+            if e.status == 412:
+                raise InvalidTokenError(response=e) from e
+            if e.status == 401:
+                raise NoAuthorizationError(response=e) from e
+            LOGGER.error("Error during API call: %s", e)
+            raise e from None
+
+        return results
+
+    # pylint: disable=use-yield-from
     def sync(self):
         """Yield's processed SDK object dicts to the caller."""
         for obj in self.get_objects():
             yield obj
+
+    @asana_error_handling
+    def fetch_workspaces(self, opts=None):
+        """Fetch all workspaces using the Asana API."""
+        if opts is None:  # Initialize opts as an empty dictionary if not provided
+            opts = {}
+        result = []
+        try:
+            workspaces_api = asana.WorkspacesApi(Context.asana.client)
+            response = list(workspaces_api.get_workspaces(opts=opts))
+            result =  response
+        except asana.rest.ApiException as e:
+            if e.status == 412:
+                raise InvalidTokenError(response=e) from e
+            if e.status == 401:
+                raise NoAuthorizationError(response=e) from e
+            LOGGER.error("Failed to fetch workspaces: %s", e)
+            raise e from None
+        return result
+
+    @asana_error_handling
+    def fetch_projects(self, workspace_gid, opt_fields, request_timeout):
+        """Fetch all projects using the Asana API."""
+        result = []
+        try:
+            projects_api = asana.ProjectsApi(Context.asana.client)
+            response = projects_api.get_projects(opts={"workspace": workspace_gid, "opt_fields": opt_fields},
+                                                 _request_timeout=request_timeout)
+            result = list(response)
+        except asana.rest.ApiException as e:
+            if e.status == 412:
+                raise InvalidTokenError(response=e) from e
+            if e.status == 401:
+                raise NoAuthorizationError(response=e) from e
+            LOGGER.error("Failed to fetch projects: %s", e)
+            raise e from None
+        return result

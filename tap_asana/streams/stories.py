@@ -1,6 +1,6 @@
+import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
-
 
 class Stories(Stream):
     name = "stories"
@@ -68,29 +68,39 @@ class Stories(Stream):
         bookmark = self.get_bookmark()
         session_bookmark = bookmark
         opt_fields = ",".join(self.fields)
+        workspaces = self.fetch_workspaces()
 
-        # list of project ids
-        project_ids = []
+        for workspace in workspaces:
+            response = self.fetch_projects(workspace_gid=workspace["gid"], opt_fields=opt_fields, request_timeout=self.request_timeout)
+            project_ids = [project["gid"] for project in response]
 
-        for workspace in self.call_api("workspaces"):
-            for project in self.call_api("projects", workspace=workspace["gid"]):
-                project_ids.append(project["gid"])
+            # Iterate over all project IDs and fetch tasks
+            for project_id in project_ids:
+                task_response = self.call_api(
+                    asana.TasksApi(Context.asana.client),
+                    "get_tasks",
+                    opts={"project": project_id},
+                    _request_timeout=self.request_timeout,
+                )
+                for task in task_response["data"]:
+                    task_gid = task.get("gid")
 
-        # iterate over all project ids and continue fetching
-        for project_id in project_ids:
-            for task in self.call_api("tasks", project=project_id):
-                task_gid = task.get("gid")
-                for story in Context.asana.client.stories.get_stories_for_task(
-                    task_gid=task_gid,
-                    opt_fields=opt_fields,
-                    timeout=self.request_timeout,
-                ):
-                    session_bookmark = self.get_updated_session_bookmark(
-                        session_bookmark, story[self.replication_key]
+                    # Fetch stories for the current task
+                    story_response = self.call_api(
+                        asana.StoriesApi(Context.asana.client),
+                        "get_stories_for_task",
+                        task_gid=task_gid,
+                        opts={"opt_fields": opt_fields},
+                        _request_timeout=self.request_timeout,
                     )
-                    if self.is_bookmark_old(story[self.replication_key]):
-                        yield story
+                    for story in story_response["data"]:
+                        session_bookmark = self.get_updated_session_bookmark(
+                            session_bookmark, story[self.replication_key]
+                        )
+                        if self.is_bookmark_old(story[self.replication_key]):
+                            yield story
 
+        # Update the bookmark after processing all stories
         self.update_bookmark(session_bookmark)
 
 
