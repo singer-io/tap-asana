@@ -125,6 +125,7 @@ class Stream():
     replication_method = None
     replication_key = None
     key_properties = ["gid"]
+    parent_stream_id = None
     # Controls which SDK object we use to call the API by default.
 
     def __init__(self):

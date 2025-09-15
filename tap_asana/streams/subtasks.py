@@ -11,6 +11,7 @@ class SubTasks(Stream):
     name = "subtasks"
     replication_key = "modified_at"
     replication_method = "INCREMENTAL"
+    parent_stream_id = "tasks"
     fields = [
         "gid",
         "resource_type",

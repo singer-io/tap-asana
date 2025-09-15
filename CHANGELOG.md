@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.0
+ * Adds `forced-replication-method` and `parent-tap-stream-id` as discoverable metadata [SAC-28812]
+
 ## 2.3.0
  * New Stream Inclusion: Subtasks [#56](https://github.com/singer-io/tap-asana/pull/56)
  
