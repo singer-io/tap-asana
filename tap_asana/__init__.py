@@ -57,6 +57,9 @@ def get_discovery_metadata(stream, schema):
         mdata, (), "forced-replication-method", stream.replication_method
     )
 
+    if hasattr(stream, 'parent_stream_id') and stream.parent_stream_id:
+        mdata = metadata.write(mdata, (), "parent-tap-stream-id", stream.parent_stream_id)
+
     if stream.replication_key:
         mdata = metadata.write(
             mdata, (), "valid-replication-keys", [stream.replication_key]

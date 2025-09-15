@@ -6,6 +6,7 @@ class Stories(Stream):
     name = "stories"
     replication_method = "INCREMENTAL"
     replication_key = "created_at"
+    parent_stream_id = "tasks"
 
     fields = [
         "gid",

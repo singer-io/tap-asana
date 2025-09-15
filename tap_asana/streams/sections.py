@@ -5,6 +5,7 @@ from tap_asana.streams.base import Stream
 class Sections(Stream):
     replication_method = "FULL_TABLE"
     name = "sections"
+    parent_stream_id = "projects"
 
     fields = [
         "gid",
