@@ -19,7 +19,8 @@ class AsanaAutomaticFieldsTest(AsanaBase):
         - Verify that all replicated records have unique primary key values.
         """
         conn_id = connections.ensure_connection(self)
-        expected_streams = self.expected_streams()
+        # Removing Portfolios as they are only available for users in an Enterprise or Business plan.
+        expected_streams = self.expected_streams() - {"portfolios"}
 
         # Run check mode
         found_catalogs = self.run_and_verify_check_mode(conn_id)

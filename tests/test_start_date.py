@@ -14,7 +14,8 @@ class AsanaStartDateTest(AsanaBase):
         # running sync with multiple date timestamps accross different streams due to differences in bookmark values
         self.run_test("2021-11-09T00:00:00Z", "2023-11-10T00:00:00Z", {"projects",})
         self.run_test("2023-11-28T00:00:00Z", "2023-11-30T00:00:00Z", {"subtasks",})
-        self.run_test("2019-01-28T00:00:00Z", "2023-11-30T00:00:00Z", self.expected_streams() - {"subtasks","projects"})
+        # Removing Portfolios as they are only available for users in an Enterprise or Business plan.
+        self.run_test("2019-01-28T00:00:00Z", "2023-11-30T00:00:00Z", self.expected_streams() - {"subtasks","projects","portfolios"})
         
     def run_test(self, start_date_1, start_date_2, streams):
         """

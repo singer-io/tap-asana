@@ -59,7 +59,8 @@ class AsanaAllFieldsTest(AsanaBase):
         - Verify no unexpected streams were replicated
         - Verify that more than just the automatic fields are replicated for each stream
         """
-        expected_streams = self.expected_streams()
+        # Removing Portfolios as they are only available for users in an Enterprise or Business plan.
+        expected_streams = self.expected_streams() - {"portfolios"}
 
         # Instantiate connection
         conn_id = connections.ensure_connection(self)
