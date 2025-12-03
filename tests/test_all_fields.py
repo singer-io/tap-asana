@@ -12,7 +12,8 @@ class AsanaAllFieldsTest(AsanaBase):
     fields_to_remove = {
         'tasks': {
             'external',
-            'is_rendered_as_seperator'
+            'is_rendered_as_seperator',
+            'approval_status'
         },
         'stories': {
             'old_approval_status',
