@@ -466,7 +466,7 @@
                 ]
               }
             }
-          }    
+          }
         }
       }
     },
@@ -645,7 +645,7 @@
             "string"
           ]
         }
-      }      
+      }
     },
     "custom_fields": {
       "type": [
@@ -872,6 +872,57 @@
         "null",
         "boolean"
       ]
+    },
+    "archived": {
+      "type": [
+        "null",
+        "boolean"
+      ]
+    },
+    "default_access_level": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "privacy_setting": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "project_templates": {
+      "type": [
+        "null",
+        "array"
+      ],
+      "items": {
+        "type": [
+          "null",
+          "object"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gid": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "resource_type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      }
     }
   }
 }

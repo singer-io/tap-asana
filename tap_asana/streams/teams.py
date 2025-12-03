@@ -1,3 +1,4 @@
+import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
@@ -20,19 +21,33 @@ class Teams(Stream):
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
-        for workspace in self.call_api("workspaces", opt_fields="gid,is_organization"):
+        opts={"opt_fields": "gid,is_organization"}
+        workspaces = self.fetch_workspaces(opts=opts)
+
+        # Use TeamsApi, and UsersApi
+        teams_api = asana.TeamsApi(Context.asana.client)
+        users_api = asana.UsersApi(Context.asana.client)
+
+        for workspace in workspaces:
             if workspace.get("is_organization", False):
-                for team in Context.asana.client.teams.find_by_organization(
-                    organization=workspace["gid"],
-                    opt_fields=opt_fields,
-                    timeout=self.request_timeout,
-                ):
-                    users = []
-                    for user in Context.asana.client.teams.users(
-                        team=team["gid"], timeout=self.request_timeout
-                    ):
-                        users.append(user)
-                    team["users"] = users
+                # Fetch teams for the current workspace using get_teams_for_workspace
+                teams_response = self.call_api(
+                    teams_api,
+                    "get_teams_for_workspace",
+                    workspace_gid=workspace["gid"],
+                    opts={"opt_fields": opt_fields},
+                    _request_timeout=self.request_timeout,
+                )
+                for team in teams_response["data"]:
+                    # Fetch users for the current team using get_users_for_team
+                    users_response = self.call_api(
+                        users_api,
+                        "get_users_for_team",
+                        team_gid=team["gid"],
+                        opts={"opt_fields": "gid,name,email"},
+                        _request_timeout=self.request_timeout,
+                    )
+                    team["users"] = users_response["data"]
                     yield team
 
 

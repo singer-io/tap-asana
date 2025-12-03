@@ -1,3 +1,4 @@
+import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
@@ -21,17 +22,30 @@ class Tags(Stream):
     def get_objects(self):
         """Get stream object"""
         bookmark = self.get_bookmark()
-        opt_fields = ",".join(self.fields)
         session_bookmark = bookmark
-        for workspace in self.call_api("workspaces"):
-            for tag in self.call_api(
-                "tags", workspace=workspace["gid"], opt_fields=opt_fields
-            ):
+        opt_fields = ",".join(self.fields)
+        workspaces = self.fetch_workspaces()
+
+        # Use TagsApi to fetch tags
+        tags_api = asana.TagsApi(Context.asana.client)
+
+        # Iterate over all workspaces
+        for workspace in workspaces:
+            # Fetch tags for the current workspace
+            tag_response = self.call_api(
+                tags_api,
+                "get_tags",
+                opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
+                _request_timeout=self.request_timeout,
+            )
+            for tag in tag_response["data"]:
                 session_bookmark = self.get_updated_session_bookmark(
                     session_bookmark, tag[self.replication_key]
                 )
                 if self.is_bookmark_old(tag[self.replication_key]):
                     yield tag
+
+        # Update the bookmark after processing all tags
         self.update_bookmark(session_bookmark)
 
 

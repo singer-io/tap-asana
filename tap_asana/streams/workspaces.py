@@ -1,7 +1,9 @@
+import asana
 from tap_asana.context import Context
 from tap_asana.streams.base import Stream
 
 
+# pylint: disable=use-yield-from
 class Workspaces(Stream):
     name = "workspaces"
     replication_method = "FULL_TABLE"
@@ -17,7 +19,17 @@ class Workspaces(Stream):
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
-        for workspace in self.call_api("workspaces", opt_fields=opt_fields):
+
+        # Use WorkspacesApi
+        workspaces_api = asana.WorkspacesApi(Context.asana.client)
+
+        # Fetch workspaces using call_api
+        workspaces_response = self.call_api(
+            workspaces_api,
+            "get_workspaces",
+            opts={"opt_fields": opt_fields},
+        )
+        for workspace in workspaces_response["data"]:
             yield workspace
 
 

@@ -12,7 +12,8 @@ class AsanaAllFieldsTest(AsanaBase):
     fields_to_remove = {
         'tasks': {
             'external',
-            'is_rendered_as_seperator'
+            'is_rendered_as_seperator',
+            'approval_status'
         },
         'stories': {
             'old_approval_status',
@@ -24,14 +25,29 @@ class AsanaAllFieldsTest(AsanaBase):
             'new_name'
         },
         'sections': {
-            'projects'
+            'projects',
         },
         'portfolios': {
-            'is_template'
+            'is_template',
+            'default_access_level',
+            'project_templates',
+            'portfolio_items',
+            'archived',
+            'privacy_setting'
         },
         'projects': {
             'is_template',
             'project_brief'
+        },
+        'teams': {
+            'team_member_removal_access_level',
+            'team_content_management_access_level',
+            'edit_team_name_or_description_access_level',
+            'edit_team_visibility_or_trash_team_access_level',
+            'endorsed',
+            'member_invite_management_access_level',
+            'guest_invite_management_access_level',
+            'join_request_management_access_level'
         }
     }
     def name(self):
@@ -44,7 +60,8 @@ class AsanaAllFieldsTest(AsanaBase):
         - Verify no unexpected streams were replicated
         - Verify that more than just the automatic fields are replicated for each stream
         """
-        expected_streams = self.expected_streams()
+        # Removing Portfolios as they are only available for users in an Enterprise or Business plan.
+        expected_streams = self.expected_streams() - {"portfolios"}
 
         # Instantiate connection
         conn_id = connections.ensure_connection(self)

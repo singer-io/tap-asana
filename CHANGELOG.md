@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.0
+  * Upgrade asana SDK version to 5.1.0. [#61](https://github.com/singer-io/tap-asana/pull/61)
+
 ## 2.3.0
  * New Stream Inclusion: Subtasks [#56](https://github.com/singer-io/tap-asana/pull/56)
  
