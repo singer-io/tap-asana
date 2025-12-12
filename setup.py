@@ -16,8 +16,7 @@ setup(
     ],
     extras_require={
         "test": [
-            "pylint",
-            "coverage"
+            "pylint"
         ],
         "dev": [
             "ipdb"
