@@ -87,8 +87,8 @@ class TestProjectIdCaching(unittest.TestCase):
                 expected_data.append(d)
 
         # Verify the data we expected is returned
-        self.assertEquals(list_section, expected_data)
-        self.assertEquals(len(list_section), 6)
+        self.assertEqual(list_section, expected_data)
+        self.assertEqual(len(list_section), 6)
 
     # Verify the working if 'tasks' stream after caching Project IDs
     @mock.patch("tap_asana.streams.tasks.Tasks.get_objects")
@@ -140,8 +140,8 @@ class TestProjectIdCaching(unittest.TestCase):
         expected_data = mocked_get_objects.return_value
 
         # Verify the data we expected is returned
-        self.assertEquals(list_task, expected_data)
-        self.assertEquals(len(list_task), len(expected_data))
+        self.assertEqual(list_task, expected_data)
+        self.assertEqual(len(list_task), len(expected_data))
 
     # Verify the working if 'stories' stream after caching Project IDs
     @mock.patch("tap_asana.streams.stories.Stories.get_objects")
@@ -200,5 +200,5 @@ class TestProjectIdCaching(unittest.TestCase):
         expected_data = mocked_get_objects.return_value
 
         # Verify the data we expected is returned
-        self.assertEquals(list_story, expected_data)
-        self.assertEquals(len(list_story), len(expected_data))
+        self.assertEqual(list_story, expected_data)
+        self.assertEqual(len(list_story), len(expected_data))
