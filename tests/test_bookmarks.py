@@ -1,5 +1,6 @@
 from base import AsanaBase
 from tap_tester import connections, menagerie, runner
+from datetime import datetime, timedelta
 
 
 class AsanaBookmarksTest(AsanaBase):
@@ -13,7 +14,9 @@ class AsanaBookmarksTest(AsanaBase):
 
     def test_run(self):
         # running sync with multiple date timestamps accross different streams due to differences in bookmark values
-        self.run_test("2021-11-09T00:00:00Z", "2023-11-10T00:00:00Z", {"projects",})
+        projects_start_date_1 = (datetime.utcnow() - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00Z")
+        projects_start_date_2 = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%dT00:00:00Z")
+        self.run_test(projects_start_date_1, projects_start_date_2, {"projects",})
         self.run_test("2023-11-28T00:00:00Z", "2023-11-30T00:00:00Z", {"subtasks",})
         # Removing Portfolios as they are only available for users in an Enterprise or Business plan.
         self.run_test("2019-01-28T00:00:00Z", "2023-11-30T00:00:00Z", self.expected_streams() - {"subtasks","projects","portfolios"})

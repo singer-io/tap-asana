@@ -46,7 +46,7 @@ class Projects(Stream):
     opt_fields = ",".join(self.fields)
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
-    modified_since = bookmark.strftime("%Y-%m-%dT%H:%M:%S.%f")
+
 
     workspaces = self.fetch_workspaces()
 
@@ -63,7 +63,6 @@ class Projects(Stream):
               opts={
                 "workspace": workspace["gid"],
                 "opt_fields": opt_fields,
-                "modified_since": modified_since,
               },
                 _request_timeout=self.request_timeout,
             )
