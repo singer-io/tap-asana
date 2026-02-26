@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1
+  *  Refresh Asana API client after token refresh to prevent 401s with expired bearer tokens.[#69](https://github.com/singer-io/tap-asana/pull/69)
+  * Respect `start_date`/bookmarks for projects by passing `modified_since` to Asana.
+
 ## 2.4.0
   * Upgrade asana SDK version to 5.1.0. [#61](https://github.com/singer-io/tap-asana/pull/61)
 

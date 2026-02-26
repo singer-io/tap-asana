@@ -56,6 +56,7 @@ class Asana():
                 LOGGER.debug("Access token refreshed successfully.")
                 if "access_token" in response.json():
                     self.access_token = response.json()["access_token"]
+                    self._client = self._access_token_auth()
                     return response.json()["access_token"]
             return None
         except requests.exceptions.RequestException as e:
