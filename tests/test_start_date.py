@@ -1,6 +1,5 @@
 from tap_tester import connections, runner
 from base import AsanaBase
-from datetime import datetime, timedelta
 
 
 class AsanaStartDateTest(AsanaBase):
@@ -13,13 +12,24 @@ class AsanaStartDateTest(AsanaBase):
 
     def test_run(self):
         # running sync with multiple date timestamps accross different streams due to differences in bookmark values
-        projects_start_date_1 = (datetime.utcnow() - timedelta(days=365)).strftime("%Y-%m-%dT00:00:00Z")
-        projects_start_date_2 = (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%dT00:00:00Z")
+        # Use fixed timestamps for projects so both syncs return records in test data.
+        projects_start_date_1 = "2026-02-25T00:00:00Z"
+        projects_start_date_2 = "2026-02-25T05:45:35Z"
         self.run_test(projects_start_date_1, projects_start_date_2, {"projects",})
         self.run_test("2023-11-28T00:00:00Z", "2023-11-30T00:00:00Z", {"subtasks",})
         # Removing Portfolios as they are only available for users in an Enterprise or Business plan.
         self.run_test("2019-01-28T00:00:00Z", "2023-11-30T00:00:00Z", self.expected_streams() - {"subtasks","projects","portfolios"})
-        
+
+    def parse_start_date_ts(self, start_date):
+        """Parse either midnight-only or full timestamp start dates into epoch seconds."""
+        for dt_format in (self.START_DATE_FORMAT, "%Y-%m-%dT%H:%M:%SZ", self.BOOKMARK_FOMAT):
+            try:
+                return self.dt_to_ts(start_date, dt_format)
+            except ValueError:
+                continue
+
+        raise ValueError(f"Unsupported start_date format: {start_date}")
+
     def run_test(self, start_date_1, start_date_2, streams):
         """
         Testing that the tap respects the start date
@@ -42,8 +52,8 @@ class AsanaStartDateTest(AsanaBase):
         expected_streams = streams
 
 
-        start_date_1_epoch = self.dt_to_ts(self.first_start_date, self.START_DATE_FORMAT)
-        start_date_2_epoch = self.dt_to_ts(self.second_start_date, self.START_DATE_FORMAT)
+        start_date_1_epoch = self.parse_start_date_ts(self.first_start_date)
+        start_date_2_epoch = self.parse_start_date_ts(self.second_start_date)
 
         ##########################################################################
         # Update Start Date for 1st sync
