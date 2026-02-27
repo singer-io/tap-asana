@@ -54,6 +54,15 @@ def mock_call_api(*args, **kwargs):
 @mock.patch("tap_asana.streams.base.Stream.call_api")
 class TestProjectIdCaching(unittest.TestCase):
 
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context, 'asana') and hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
+
     def test_sections(self, mocked_call_api, mocked_fetch_projects, mocked_fetch_workspaces, mocked_sleep, mocked_refresh_access_token):
         # Set config file
         Context.config = {'start_date': '2021-01-01T00:00:00Z'}

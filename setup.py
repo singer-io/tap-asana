@@ -11,6 +11,7 @@ setup(
     py_modules=["tap_asana"],
     install_requires=[
         "asana==5.1.0",
+        "parameterized",
         "requests==2.32.4",
         "singer-python==6.1.1"
     ],
