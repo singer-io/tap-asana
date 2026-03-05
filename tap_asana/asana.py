@@ -27,12 +27,21 @@ class Asana():
         if self.access_token is None:
             self.access_token = self.refresh_access_token()
 
-        if self.access_token:
-            try:
-                configuration = asana.Configuration()
-                configuration.access_token = self.access_token
-                return asana.ApiClient(configuration)
-            except asana.rest.ApiException as e:
+        if not self.access_token:
+            return None
+
+        try:
+            configuration = asana.Configuration()
+            configuration.access_token = self.access_token
+            return asana.ApiClient(configuration)
+        except asana.rest.ApiException as e:
+            if e.status == 401:
+                self.access_token = self.refresh_access_token()
+                if self.access_token:
+                    configuration = asana.Configuration()
+                    configuration.access_token = self.access_token
+                    return asana.ApiClient(configuration)
+            else:
                 LOGGER.error("Error creating Asana client: %s", e)
         return None
 
