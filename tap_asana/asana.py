@@ -22,6 +22,13 @@ class Asana():
         self.access_token = access_token
         self._client = self._access_token_auth()
 
+    @staticmethod
+    def _build_client(access_token):
+        """Build an Asana API client from an access token."""
+        configuration = asana.Configuration()
+        configuration.access_token = access_token
+        return asana.ApiClient(configuration)
+
     def _access_token_auth(self):
         """Check for access token"""
         if self.access_token is None:
@@ -29,21 +36,7 @@ class Asana():
 
         if not self.access_token:
             return None
-
-        try:
-            configuration = asana.Configuration()
-            configuration.access_token = self.access_token
-            return asana.ApiClient(configuration)
-        except asana.rest.ApiException as e:
-            if e.status == 401:
-                self.access_token = self.refresh_access_token()
-                if self.access_token:
-                    configuration = asana.Configuration()
-                    configuration.access_token = self.access_token
-                    return asana.ApiClient(configuration)
-            else:
-                LOGGER.error("Error creating Asana client: %s", e)
-        return None
+        return self._build_client(self.access_token)
 
     def refresh_access_token(self):
         """Get the access token using the refresh token"""
@@ -63,12 +56,21 @@ class Asana():
 
             if response.status_code == 200:
                 LOGGER.debug("Access token refreshed successfully.")
-                if "access_token" in response.json():
-                    self.access_token = response.json()["access_token"]
-                    self._client = self._access_token_auth()
-                    return response.json()["access_token"]
+                access_token = response.json().get("access_token")
+                if access_token:
+                    self.access_token = access_token
+                    self._client = self._build_client(access_token)
+                    return access_token
+                LOGGER.error("Access token refresh response did not include access_token")
+                return None
+
+            LOGGER.error(
+                "Failed to refresh access token. Status code: %s, Response: %s",
+                response.status_code,
+                response.text,
+            )
             return None
-        except requests.exceptions.RequestException as e:
+        except (requests.exceptions.RequestException, ValueError) as e:
             LOGGER.error("Failed to refresh access token: %s", e)
             return None
 
