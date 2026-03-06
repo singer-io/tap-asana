@@ -46,7 +46,7 @@ class Projects(Stream):
     opt_fields = ",".join(self.fields)
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
-
+    
 
     workspaces = self.fetch_workspaces()
 
@@ -60,10 +60,7 @@ class Projects(Stream):
             response = self.call_api(
                 projects_api,
                 "get_projects",
-              opts={
-                "workspace": workspace["gid"],
-                "opt_fields": opt_fields,
-              },
+                opts={"workspace": workspace["gid"], "opt_fields": opt_fields},
                 _request_timeout=self.request_timeout,
             )
 
