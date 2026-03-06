@@ -46,7 +46,7 @@ class Projects(Stream):
     opt_fields = ",".join(self.fields)
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
-    
+
 
     workspaces = self.fetch_workspaces()
 
