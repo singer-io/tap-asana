@@ -22,12 +22,12 @@ class TestSubTasksErrorHandling(unittest.TestCase):
                 pass
 
     @mock.patch("time.sleep", return_value=None)
-    @mock.patch("asana.TasksApi.get_subtasks_for_task")
-    def test_fetch_children_retries_on_timeout(self, mocked_get_subtasks, _):
-        mocked_get_subtasks.side_effect = [requests.Timeout(), []]
+    @mock.patch("tap_asana.streams.subtasks.asana.TasksApi")
+    def test_fetch_children_retries_on_timeout(self, mocked_tasks_api, _):
+        mocked_tasks_api.return_value.get_subtasks_for_task.side_effect = [requests.Timeout(), []]
 
         stream = SubTasks()
         result = stream.fetch_children({"gid": "task_1"}, "gid")
 
         self.assertEqual(result, [])
-        self.assertEqual(mocked_get_subtasks.call_count, 2)
+        self.assertEqual(mocked_tasks_api.return_value.get_subtasks_for_task.call_count, 2)
