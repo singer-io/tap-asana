@@ -47,6 +47,7 @@ class Projects(Stream):
     bookmark = self.get_bookmark()
     session_bookmark = bookmark
 
+
     workspaces = self.fetch_workspaces()
 
     # Use ProjectsApi to fetch projects

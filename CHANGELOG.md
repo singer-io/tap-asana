@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1
+  *  Add Asana API error handling to recursive subtask fetching by decorating fetch_children with asana_error_handling.[#69](https://github.com/singer-io/tap-asana/pull/69)
+
+
 ## 2.4.0
   * Upgrade asana SDK version to 5.1.0. [#61](https://github.com/singer-io/tap-asana/pull/61)
 

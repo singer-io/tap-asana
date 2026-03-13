@@ -19,6 +19,15 @@ def token_expired_error_raiser(*args, **kwargs):
 @mock.patch("time.sleep")
 class TestRefreshAccessToken(unittest.TestCase):
 
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context, 'asana') and hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
+
     def test_invalid_token_error_for_get_initial(self, mocked_sleep, mocked_get_tasks, mocked_refresh_access_token):
         """
         Verify that refresh_access_token is called five times due to InvalidTokenError during the initial API call.

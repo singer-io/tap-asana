@@ -1,7 +1,7 @@
 import asana
 import singer
 from tap_asana.context import Context
-from tap_asana.streams.base import Stream
+from tap_asana.streams.base import asana_error_handling, Stream
 
 LOGGER = singer.get_logger()
 
@@ -85,6 +85,7 @@ class SubTasks(Stream):
         # Update the bookmark after processing all subtasks
         self.update_bookmark(session_bookmark)
 
+    @asana_error_handling
     def fetch_children(self, p_task, opt_fields):
         subtasks_children = []
         resource = asana.TasksApi(Context.asana.client)

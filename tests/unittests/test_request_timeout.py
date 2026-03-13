@@ -25,6 +25,15 @@ def valid_data(*args, **kwargs):
 
 class TestTimeoutErrorBase(unittest.TestCase):
 
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context, 'asana') and hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
+
     @parameterized.expand([
         ["string_request_timeout", "100", 100.0],
         ["int_request_timeout", 100, 100.0],
@@ -55,6 +64,15 @@ class TestTimeoutErrorBase(unittest.TestCase):
 
 class TestTimeoutValuesPortfolios(unittest.TestCase):
 
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context, 'asana') and hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
+
     @mock.patch("tap_asana.asana.Asana.refresh_access_token")
     def setUp(self, mocked_access_token):
         # Set Asana client in Context before test with mocked requests
@@ -84,7 +102,7 @@ class TestTimeoutValuesPortfolios(unittest.TestCase):
         Context.config = {"start_date": "2017-01-01T00:00:00Z", "request_timeout": actual_timeout}
 
         items_for_portfolios = list(Portfolios().get_objects())
-        
+
         # Verify requests is called with expected timeout
         asana.WorkspacesApi.get_workspaces = mock.MagicMock()
         asana.WorkspacesApi.get_workspaces(workspace='workspace_123', opts={"owner": "me", "opt_fields": "opt_fields"}, _request_timeout=expected_timeout)
@@ -102,6 +120,15 @@ class TestTimeoutValuesPortfolios(unittest.TestCase):
         self.assertEqual(kwargs.get('_request_timeout'), expected_timeout)
 
 class TestTimeoutValuesProjects(unittest.TestCase):
+
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context, 'asana') and hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
 
     @mock.patch("tap_asana.asana.Asana.refresh_access_token")
     def setUp(self,mocked_access_token):
@@ -140,6 +167,15 @@ class TestTimeoutValuesProjects(unittest.TestCase):
         self.assertEqual(kwargs.get('_request_timeout'), expected_timeout)
 
 class TestTimeoutValuesSections(unittest.TestCase):
+
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context, 'asana') and hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
 
     @mock.patch("tap_asana.asana.Asana.refresh_access_token")
     def setUp(self, mocked_access_token):
@@ -185,6 +221,15 @@ class TestTimeoutValuesSections(unittest.TestCase):
         self.assertEqual(kwargs.get('_request_timeout'), expected_timeout)
 
 class TestTimeoutValuesStories(unittest.TestCase):
+
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context, 'asana') and hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
 
     @mock.patch("tap_asana.asana.Asana.refresh_access_token")
     def setUp(self, mocked_access_token):
@@ -237,6 +282,15 @@ class TestTimeoutValuesStories(unittest.TestCase):
         self.assertEqual(kwargs.get('_request_timeout'), expected_timeout)
 
 class TestTimeoutValuesTeams(unittest.TestCase):
+
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context, 'asana') and hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
 
     @mock.patch("tap_asana.asana.Asana.refresh_access_token")
     def setUp(self, mocked_access_token):

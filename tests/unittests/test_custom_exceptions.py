@@ -16,6 +16,15 @@ class TestStreamExceptions(unittest.TestCase):
         """Set up the Asana client and mock context."""
         Context.asana = Asana("test", "test", "test", "test", "test")
 
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
+
     @mock.patch("asana.WorkspacesApi.get_workspaces")
     def test_call_api_invalid_token_error(self, mocked_get_workspaces):
         """Test call_api raises InvalidTokenError."""
@@ -79,6 +88,15 @@ class TestRetryBehavior(unittest.TestCase):
     def setUp(self):
         """Set up the Asana client and mock context."""
         Context.asana = Asana("test", "test", "test", "test", "test")
+
+    def tearDown(self):
+        """Close the Asana client to suppress ApiClient.__del__ warnings."""
+        if hasattr(Context.asana, 'client') and Context.asana.client:
+            try:
+                Context.asana.client.pool.close()
+                Context.asana.client.pool.join()
+            except Exception:
+                pass
 
     @mock.patch("asana.WorkspacesApi.get_workspaces")
     def test_call_api_retry_invalid_token_error(self, mocked_get_workspaces):

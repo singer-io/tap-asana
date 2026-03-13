@@ -13,10 +13,20 @@ class AsanaBookmarksTest(AsanaBase):
 
     def test_run(self):
         # running sync with multiple date timestamps accross different streams due to differences in bookmark values
-        self.run_test("2021-11-09T00:00:00Z", "2023-11-10T00:00:00Z", {"projects",})
         self.run_test("2023-11-28T00:00:00Z", "2023-11-30T00:00:00Z", {"subtasks",})
         # Removing Portfolios as they are only available for users in an Enterprise or Business plan.
+        # Removing Projects as data is available for the same date only.
         self.run_test("2019-01-28T00:00:00Z", "2023-11-30T00:00:00Z", self.expected_streams() - {"subtasks","projects","portfolios"})
+
+    def parse_start_date_ts(self, start_date):
+        """Parse either midnight-only or full timestamp start dates into epoch seconds."""
+        for dt_format in (self.START_DATE_FORMAT, "%Y-%m-%dT%H:%M:%SZ", self.BOOKMARK_FOMAT):
+            try:
+                return self.dt_to_ts(start_date, dt_format)
+            except ValueError:
+                continue
+
+        raise ValueError(f"Unsupported start_date format: {start_date}")
 
 
     def run_test(self, start_date_1, start_date_2, streams):
@@ -135,7 +145,7 @@ class AsanaBookmarksTest(AsanaBase):
                         # We have added 'second_start_date' as the bookmark, it is more recent than
                         # the default start date and it will work as a simulated bookmark
                         self.assertGreaterEqual(
-                            replication_key_value_parsed, self.dt_to_ts(self.second_start_date, self.START_DATE_FORMAT),
+                            replication_key_value_parsed, self.parse_start_date_ts(self.second_start_date),
                             msg="Second sync did not respect the bookmark, \
                                 a record with a smaller replication-key value was synced."
                         )
