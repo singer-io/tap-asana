@@ -12,7 +12,7 @@ setup(
     install_requires=[
         "asana==5.1.0",
         "parameterized",
-        "requests==2.32.4",
+        "requests==2.33.0",
         "singer-python==6.1.1"
     ],
     extras_require={
