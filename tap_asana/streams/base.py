@@ -72,7 +72,12 @@ def retry_after_wait_gen(**kwargs):
 def invalid_token_handler(details):
     """Function to handle invalid token"""
     LOGGER.info("Received invalid or expired token error, refreshing access token")
-    Context.asana.refresh_access_token()
+    new_token = Context.asana.refresh_access_token()
+    if new_token and Context.asana.client:
+        # Update the token on the existing ApiClient so all API instances
+        # sharing this client immediately use the refreshed token on retry.
+        Context.asana.client.configuration.access_token = new_token
+        LOGGER.info("ApiClient updated with refreshed access token.")
 
 
 def asana_error_handling(fnc):

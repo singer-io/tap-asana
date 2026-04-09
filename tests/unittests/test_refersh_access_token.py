@@ -3,6 +3,7 @@ import asana
 import tap_asana
 from unittest import mock
 from tap_asana.context import Context
+from tap_asana.streams.base import Stream, NoAuthorizationError
 
 
 def no_authorized_error_raiser(*args, **kwargs):
