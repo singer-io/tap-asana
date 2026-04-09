@@ -5,6 +5,7 @@ from tap_asana.context import Context
 from tap_asana.streams.base import Stream, NoAuthorizationError, MAX_RETRIES
 
 
+@mock.patch("time.sleep")  # prevent backoff from incurring real sleep delays
 class TestCallApiTokenRefresh(unittest.TestCase):
     """Tests for the 401 token-refresh retry logic via invalid_token_handler / asana_error_handling."""
 
@@ -30,7 +31,7 @@ class TestCallApiTokenRefresh(unittest.TestCase):
                 pass
 
     @mock.patch("asana.TasksApi.get_tasks")
-    def test_refreshes_token_on_401_and_retries_successfully(self, mocked_get_tasks):
+    def test_refreshes_token_on_401_and_retries_successfully(self, mocked_get_tasks, mocked_sleep):
         """On 401, backoff calls invalid_token_handler which patches the ApiClient
         in-place with the new token. The retry then succeeds."""
         success_response = [{"gid": "1", "name": "Task 1"}]
@@ -48,7 +49,7 @@ class TestCallApiTokenRefresh(unittest.TestCase):
         self.assertEqual(result["data"], success_response)
 
     @mock.patch("asana.TasksApi.get_tasks")
-    def test_client_token_not_updated_when_refresh_returns_none(self, mocked_get_tasks):
+    def test_client_token_not_updated_when_refresh_returns_none(self, mocked_get_tasks, mocked_sleep):
         """When refresh_access_token returns None, the ApiClient token must NOT be
         changed and NoAuthorizationError must eventually be raised."""
         mocked_get_tasks.side_effect = [self._make_401()] * MAX_RETRIES
@@ -64,7 +65,7 @@ class TestCallApiTokenRefresh(unittest.TestCase):
         self.assertGreaterEqual(Context.asana.refresh_access_token.call_count, 1)
 
     @mock.patch("asana.TasksApi.get_tasks")
-    def test_raises_no_authorization_error_after_exhausting_retries(self, mocked_get_tasks):
+    def test_raises_no_authorization_error_after_exhausting_retries(self, mocked_get_tasks, mocked_sleep):
         """When every retry returns a 401 (even after token refresh),
         NoAuthorizationError is raised after MAX_RETRIES attempts."""
         mocked_get_tasks.side_effect = [self._make_401()] * MAX_RETRIES
