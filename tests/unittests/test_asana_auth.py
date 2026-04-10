@@ -27,6 +27,8 @@ class TestAsanaAuth(unittest.TestCase):
         self.assertEqual(token, "new_token")
         self.assertEqual(self.asana_client.access_token, "new_token")
         self.assertIsNotNone(self.asana_client.client)
+        # The live ApiClient must also reflect the new token immediately
+        self.assertEqual(self.asana_client.client.configuration.access_token, "new_token")
 
     @mock.patch("tap_asana.asana.requests.post")
     def test_refresh_access_token_missing_access_token_returns_none(self, mocked_post):
