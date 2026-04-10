@@ -3,17 +3,17 @@ from setuptools import setup
 
 setup(
     name="tap-asana",
-    version="2.4.1",
+    version="2.5.0",
     description="Singer.io tap for extracting Asana data",
     author="Stitch",
     url="http://github.com/singer-io/tap-asana",
     classifiers=["Programming Language :: Python :: 3 :: Only"],
     py_modules=["tap_asana"],
     install_requires=[
-        "asana==5.1.0",
+        "asana==5.2.4",
         "parameterized",
-        "requests==2.32.4",
-        "singer-python==6.1.1"
+        "requests==2.33.1",
+        "singer-python==6.8.0"
     ],
     extras_require={
         "test": [

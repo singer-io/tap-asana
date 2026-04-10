@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.0
+  * Fix access token refresh: apply refreshed token to the live `ApiClient` so retries use the new token instead of the expired one. [#71](https://github.com/singer-io/tap-asana/pull/71)
+  * Bumped dependencies: `asana`, `requests`, and `singer-python`. [#71](https://github.com/singer-io/tap-asana/pull/71)
+
 ## 2.4.1
   *  Add Asana API error handling to recursive subtask fetching by decorating fetch_children with asana_error_handling.[#69](https://github.com/singer-io/tap-asana/pull/69)
 
