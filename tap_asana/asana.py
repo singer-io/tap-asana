@@ -56,7 +56,14 @@ class Asana():
                 LOGGER.debug("Access token refreshed successfully.")
                 if "access_token" in response.json():
                     self.access_token = response.json()["access_token"]
-                    return response.json()["access_token"]
+                    # Push the new token into the live ApiClient so all active
+                    # API instances sharing this client immediately use it.
+                    # Use getattr to guard against being called before _client
+                    # is assigned (e.g. during __init__ when no access_token
+                    # is provided and refresh is needed to obtain the first one).
+                    if getattr(self, "_client", None):
+                        self._client.configuration.access_token = self.access_token
+                    return self.access_token
             return None
         except requests.exceptions.RequestException as e:
             LOGGER.error("Failed to refresh access token: %s", e)
