@@ -103,7 +103,14 @@ def asana_error_handling(fnc):
     )
     @functools.wraps(fnc)
     def wrapper(*args, **kwargs):
-        return fnc(*args, **kwargs)
+        try:
+            return fnc(*args, **kwargs)
+        except asana.rest.ApiException as e:
+            if e.status == 401:
+                raise NoAuthorizationError(response=e) from e
+            if e.status == 412:
+                raise InvalidTokenError(response=e) from e
+            raise
     return wrapper
 
 
