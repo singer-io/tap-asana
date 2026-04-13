@@ -1,26 +1,13 @@
 import unittest
 from unittest import mock
-from unittest.mock import MagicMock
 
 import asana
 import requests
 
 from tap_asana.asana import Asana
 from tap_asana.context import Context
-from tap_asana.streams.base import NoAuthorizationError
+from tap_asana.streams.base import InvalidTokenError, MAX_RETRIES, NoAuthorizationError
 from tap_asana.streams.subtasks import SubTasks
-
-
-def make_api_exception(status, reason="Unauthorized"):
-    """Build an asana.rest.ApiException with the given HTTP status code."""
-    http_resp = MagicMock()
-    http_resp.status = status
-    http_resp.reason = reason
-    http_resp.data = (
-        b'{"errors":[{"message":"The bearer token has expired."}]}'
-    )
-    http_resp.getheaders.return_value = {}
-    return asana.rest.ApiException(http_resp=http_resp)
 
 
 class TestSubTasksErrorHandling(unittest.TestCase):
@@ -62,8 +49,9 @@ class TestSubTasksErrorHandling(unittest.TestCase):
         After MAX_RETRIES exhausted, NoAuthorizationError (not the raw
         ApiException) is raised.
         """
-        expired_token_exc = make_api_exception(401)
-        mocked_tasks_api.return_value.get_subtasks_for_task.side_effect = expired_token_exc
+        mocked_tasks_api.return_value.get_subtasks_for_task.side_effect = (
+            asana.rest.ApiException(status=401, reason="Unauthorized")
+        )
         mocked_refresh_token.return_value = "new_access_token"
 
         stream = SubTasks()
@@ -73,12 +61,50 @@ class TestSubTasksErrorHandling(unittest.TestCase):
         with self.assertRaises(NoAuthorizationError):
             stream.fetch_children({"gid": "task_1"}, "gid")
 
-        # Backoff retried MAX_RETRIES (5) times total
-        self.assertEqual(mocked_tasks_api.return_value.get_subtasks_for_task.call_count, 5)
+        # Backoff retried MAX_RETRIES times total
+        self.assertEqual(
+            mocked_tasks_api.return_value.get_subtasks_for_task.call_count,
+            MAX_RETRIES,
+        )
 
-        # refresh_access_token was called on each backoff (MAX_RETRIES - 1 = 4 times)
+        # refresh_access_token was called on each backoff (MAX_RETRIES - 1 times)
         self.assertEqual(
             mocked_refresh_token.call_count,
-            4,
+            MAX_RETRIES - 1,
+            "refresh_access_token should be called on each backoff retry",
+        )
+
+    @mock.patch("time.sleep", return_value=None)
+    @mock.patch("tap_asana.asana.Asana.refresh_access_token")
+    @mock.patch("tap_asana.streams.subtasks.asana.TasksApi")
+    def test_fetch_children_retries_and_refreshes_token_on_412(
+        self, mocked_tasks_api, mocked_refresh_token, _
+    ):
+        """
+        Verify that ApiException(412) raised by the SDK iterator inside
+        fetch_children is also converted to InvalidTokenError by the wrapper,
+        triggering the same backoff/refresh behaviour as the 401 case.
+        """
+        mocked_tasks_api.return_value.get_subtasks_for_task.side_effect = (
+            asana.rest.ApiException(status=412, reason="Precondition Failed")
+        )
+        mocked_refresh_token.return_value = "new_access_token"
+
+        stream = SubTasks()
+
+        # InvalidTokenError (not raw ApiException) should be raised after retries
+        with self.assertRaises(InvalidTokenError):
+            stream.fetch_children({"gid": "task_1"}, "gid")
+
+        # Backoff retried MAX_RETRIES times total
+        self.assertEqual(
+            mocked_tasks_api.return_value.get_subtasks_for_task.call_count,
+            MAX_RETRIES,
+        )
+
+        # refresh_access_token was called on each backoff (MAX_RETRIES - 1 times)
+        self.assertEqual(
+            mocked_refresh_token.call_count,
+            MAX_RETRIES - 1,
             "refresh_access_token should be called on each backoff retry",
         )
