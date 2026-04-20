@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.5.1
+  * Added a try/except asana.rest.ApiException block inside the wrapper function of asana_error_handling in base.py. Fix for api exception. [#72](https://github.com/singer-io/tap-asana/pull/72)
+
 ## 2.5.0
   * Fix access token refresh: apply refreshed token to the live `ApiClient` so retries use the new token instead of the expired one.
   * Bumped dependencies: `asana`, `requests`, and `singer-python`. [#71](https://github.com/singer-io/tap-asana/pull/71)
@@ -13,7 +16,7 @@
 
 ## 2.3.0
  * New Stream Inclusion: Subtasks [#56](https://github.com/singer-io/tap-asana/pull/56)
- 
+
 ## 2.2.0
  * Below are the changes [#48](https://github.com/singer-io/tap-asana/pull/48)
    * Upgraded the asana-python SDK
