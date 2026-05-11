@@ -8,6 +8,7 @@ from singer import metadata
 from singer import Transformer
 from tap_asana.asana import Asana
 from tap_asana.context import Context
+import tap_asana.streams  # Load stream objects into Context
 
 _AsanaApiException = sys.modules["asana.rest"].ApiException
 
