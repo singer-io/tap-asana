@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 import os
-import datetime
 import json
-import time
-import math
-import functools
-import asana
+import sys
 import singer
 from singer import utils
 from singer import metadata
 from singer import Transformer
 from tap_asana.asana import Asana
 from tap_asana.context import Context
-import tap_asana.streams  # Load stream objects into Context
+
+_AsanaApiException = sys.modules["asana.rest"].ApiException
 
 REQUIRED_CONFIG_KEYS = [
     "start_date",
@@ -81,6 +78,21 @@ def discover():
     raw_schemas = load_schemas()
 
     streams = []
+    error_list = []
+
+    # Probe workspace access once — this is the common gate for all streams.
+    workspaces = None
+    if hasattr(Context.asana, "client"):
+        try:
+            workspaces = Context.stream_objects["workspaces"]().fetch_workspaces()
+        except _AsanaApiException as e:
+            if e.status in [402, 403]:
+                raise RuntimeError(
+                    f"HTTP-error-code: {e.status}, Error: The account credentials supplied do not have "
+                    "'read' access to any of the streams supported by the tap. "
+                    "Data collection cannot be initiated due to lack of permissions."
+                ) from e
+            raise
 
     refs = {}
     for schema_name, schema in raw_schemas.items():
@@ -88,6 +100,21 @@ def discover():
             continue
 
         stream = Context.stream_objects[schema_name]()
+
+        # Only probe streams that require a stream-specific access check
+        # (e.g., Portfolios which needs a premium workspace — HTTP 402).
+        if workspaces is not None and stream.requires_access_check:
+            try:
+                stream.check_access(workspaces)
+            except _AsanaApiException as e:
+                if e.status in [402, 403]:
+                    LOGGER.warning(
+                        "Stream '%s' is not accessible (HTTP %s), excluding from catalog.",
+                        schema_name, e.status,
+                    )
+                    error_list.append(schema_name)
+                    continue
+                raise
 
         # Create and add catalog entry
         catalog_entry = {
@@ -100,6 +127,19 @@ def discover():
             "replication_method": stream.replication_method,
         }
         streams.append(catalog_entry)
+
+    if error_list:
+        if not streams:
+            raise RuntimeError(
+                "HTTP-error-code: 403, Error: The account credentials supplied do not have "
+                "'read' access to any of the streams supported by the tap. "
+                "Data collection cannot be initiated due to lack of permissions."
+            )
+        LOGGER.warning(
+            "The account credentials supplied do not have 'read' access to the following "
+            "stream(s): %s. These streams have been excluded from the catalog.",
+            ", ".join(error_list),
+        )
 
     LOGGER.info("Finished discover")
 

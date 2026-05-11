@@ -139,6 +139,9 @@ class Stream():
     replication_method = None
     replication_key = None
     key_properties = ["gid"]
+    # Set to True in subclasses that need a stream-specific access probe
+    # beyond the common workspace check performed once in discover().
+    requires_access_check = False
     # Controls which SDK object we use to call the API by default.
 
     def __init__(self):
@@ -235,8 +238,7 @@ class Stream():
                 raise InvalidTokenError(response=e) from e
             if e.status == 401:
                 raise NoAuthorizationError(response=e) from e
-            LOGGER.error("Error during API call: %s", e)
-            raise e from None
+            raise
 
         return results
 
@@ -245,6 +247,10 @@ class Stream():
         """Yield's processed SDK object dicts to the caller."""
         for obj in self.get_objects():
             yield obj
+
+    def check_access(self, workspaces):
+        """Stream-specific access probe. Override in subclasses that require
+        an endpoint check beyond the common workspace check in discover()."""
 
     @asana_error_handling
     def fetch_workspaces(self, opts=None):
