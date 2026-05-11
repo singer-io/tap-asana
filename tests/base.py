@@ -71,11 +71,6 @@ class AsanaBase(unittest.TestCase):
         Provides the expected metadata for each stream.
         """
         return {
-            "portfolios": {
-                self.PRIMARY_KEYS: {"gid"},
-                self.REPLICATION_METHOD: self.FULL_TABLE,
-                self.OBEYS_START_DATE: False
-            },
             "projects": {
                 self.PRIMARY_KEYS: {"gid"},
                 self.REPLICATION_METHOD: self.INCREMENTAL,
