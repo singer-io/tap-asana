@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 import os
 import json
-import sys
+import asana.rest
 import singer
 from singer import utils
 from singer import metadata
 from singer import Transformer
+# Import directly before 'from tap_asana.asana import Asana' shadows the 'asana' name in globals
+from asana.rest import ApiException as _AsanaApiException
 from tap_asana.asana import Asana
 from tap_asana.context import Context
 import tap_asana.streams  # Load stream objects into Context
-
-_AsanaApiException = sys.modules["asana.rest"].ApiException
 
 REQUIRED_CONFIG_KEYS = [
     "start_date",
@@ -83,7 +83,7 @@ def discover():
 
     # Probe workspace access once — this is the common gate for all streams.
     workspaces = None
-    if hasattr(Context.asana, "client"):
+    if getattr(Context.asana, "client", None):
         try:
             workspaces = Context.stream_objects["workspaces"]().fetch_workspaces()
         except _AsanaApiException as e:
@@ -113,7 +113,7 @@ def discover():
                         "Stream '%s' is not accessible (HTTP %s), excluding from catalog.",
                         schema_name, e.status,
                     )
-                    error_list.append(schema_name)
+                    error_list.append((schema_name, e.status))
                     continue
                 raise
 
@@ -130,16 +130,18 @@ def discover():
         streams.append(catalog_entry)
 
     if error_list:
+        excluded_streams = ", ".join(name for name, _ in error_list)
+        status_codes = "/".join(str(s) for s in sorted({status for _, status in error_list}))
         if not streams:
             raise RuntimeError(
-                "HTTP-error-code: 403, Error: The account credentials supplied do not have "
+                f"HTTP-error-code: {status_codes}, Error: The account credentials supplied do not have "
                 "'read' access to any of the streams supported by the tap. "
                 "Data collection cannot be initiated due to lack of permissions."
             )
         LOGGER.warning(
             "The account credentials supplied do not have 'read' access to the following "
             "stream(s): %s. These streams have been excluded from the catalog.",
-            ", ".join(error_list),
+            excluded_streams,
         )
 
     LOGGER.info("Finished discover")

@@ -41,7 +41,7 @@ class Portfolios(Stream):
                 portfolios_api,
                 "get_portfolios",
                 workspace=workspaces[0]["gid"],
-                opts={"owner": "me"},
+                opts={"owner": "me", "limit": 1},
                 _request_timeout=self.request_timeout,
             )
 
