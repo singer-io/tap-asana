@@ -139,9 +139,6 @@ class Stream():
     replication_method = None
     replication_key = None
     key_properties = ["gid"]
-    # Set to True in subclasses that need a stream-specific access probe
-    # beyond the common workspace check performed once in discover().
-    requires_access_check = False
     # Controls which SDK object we use to call the API by default.
 
     def __init__(self):
@@ -250,7 +247,8 @@ class Stream():
 
     def check_access(self, workspaces):
         """Stream-specific access probe. Override in subclasses that require
-        an endpoint check beyond the common workspace check in discover()."""
+        an endpoint check beyond the common workspace check in discover().
+        Return False to exclude the stream from the catalog; None (default) means no check."""
 
     @asana_error_handling
     def fetch_workspaces(self, opts=None):

@@ -6,7 +6,6 @@ from tap_asana.streams.base import Stream
 class Portfolios(Stream):
     name = "portfolios"
     replication_method = "FULL_TABLE"
-    requires_access_check = True
 
     fields = [
         "gid",
@@ -33,9 +32,11 @@ class Portfolios(Stream):
         """
         Verify access to the portfolios endpoint.
         Portfolios require a premium/business workspace (HTTP 402 if not eligible).
-        Probes the portfolios API with the first available workspace.
+        Returns True when accessible, False when the workspace does not support portfolios.
         """
-        if workspaces:
+        if not workspaces:
+            return True
+        try:
             portfolios_api = asana.PortfoliosApi(Context.asana.client)
             self.call_api(
                 portfolios_api,
@@ -44,6 +45,11 @@ class Portfolios(Stream):
                 opts={"owner": "me", "limit": 1},
                 _request_timeout=self.request_timeout,
             )
+            return True
+        except asana.rest.ApiException as e:
+            if e.status in [402, 403]:
+                return False
+            raise
 
     def get_objects(self):
         """Get stream object"""

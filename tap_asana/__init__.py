@@ -75,13 +75,8 @@ def get_discovery_metadata(stream, schema):
 
 def _probe_workspaces():
     """Fetch the list of workspaces from the Asana API.
-
-    Returns the workspace list, or None when no authenticated client is
-    available (e.g. during unit tests). Raises RuntimeError immediately
-    when the credentials have no access at all (HTTP 402/403).
+    Raises RuntimeError when the credentials have no access (HTTP 402/403).
     """
-    if not getattr(Context.asana, "client", None):
-        return None
     try:
         return Context.stream_objects["workspaces"]().fetch_workspaces()
     except _AsanaApiException as e:
@@ -94,48 +89,11 @@ def _probe_workspaces():
         raise
 
 
-def _check_stream_access(schema_name, stream, workspaces):
-    """Probe stream-specific access when required (e.g. Portfolios / HTTP 402).
-
-    Returns True when the stream is accessible or does not require a check.
-    Returns False and logs a warning when the stream is inaccessible (HTTP 402/403).
-    Re-raises for any other API error.
-    """
-    if workspaces is None or not stream.requires_access_check:
-        return True
-    try:
-        stream.check_access(workspaces)
-        return True
-    except _AsanaApiException as e:
-        if e.status in [402, 403]:
-            LOGGER.warning(
-                "Stream '%s' is not accessible (HTTP %s), excluding from catalog.",
-                schema_name, e.status,
-            )
-            return False
-        raise
-
-
-def _build_catalog_entry(schema_name, schema, stream):
-    """Build a single Singer catalog entry dict from schema and stream metadata."""
-    return {
-        "stream": schema_name,
-        "tap_stream_id": schema_name,
-        "schema": singer.resolve_schema_references(schema, {}),
-        "metadata": get_discovery_metadata(stream, schema),
-        "key_properties": stream.key_properties,
-        "replication_key": stream.replication_key,
-        "replication_method": stream.replication_method,
-    }
-
-
 def _handle_excluded_streams(error_list, streams):
     """Raise RuntimeError when no streams are accessible; otherwise warn.
 
     Mutates nothing — callers are responsible for the streams list.
     """
-    if not error_list:
-        return
     excluded_streams = ", ".join(name for name, _ in error_list)
     status_codes = "/".join(str(s) for s in sorted({status for _, status in error_list}))
     if not streams:
@@ -171,13 +129,26 @@ def discover():
 
         stream = Context.stream_objects[schema_name]()
 
-        if not _check_stream_access(schema_name, stream, workspaces):
+        if stream.check_access(workspaces) is False:
+            LOGGER.warning(
+                "Stream '%s' is not accessible, excluding from catalog.",
+                schema_name,
+            )
             error_list.append((schema_name, None))
             continue
 
-        streams.append(_build_catalog_entry(schema_name, schema, stream))
+        streams.append({
+            "stream": schema_name,
+            "tap_stream_id": schema_name,
+            "schema": singer.resolve_schema_references(schema, {}),
+            "metadata": get_discovery_metadata(stream, schema),
+            "key_properties": stream.key_properties,
+            "replication_key": stream.replication_key,
+            "replication_method": stream.replication_method,
+        })
 
-    _handle_excluded_streams(error_list, streams)
+    if error_list:
+        _handle_excluded_streams(error_list, streams)
     LOGGER.info("Finished discover")
     return {"streams": streams}
 
@@ -196,66 +167,47 @@ def shuffle_streams(stream_name):
     Context.catalog["streams"] = top_half + bottom_half
 
 
-def _emit_schemas():
-    """Write Singer schema messages for every selected stream in the catalog."""
+def sync():
+    """Sync logic for tap"""
+    # Emit all schemas first so we have them for child streams
     for stream in Context.catalog["streams"]:
         if Context.is_selected(stream["tap_stream_id"]):
-            singer.write_schema(
-                stream["tap_stream_id"],
-                stream["schema"],
-                stream["key_properties"],
-            )
+            singer.write_schema(stream["tap_stream_id"],
+                                stream["schema"],
+                                stream["key_properties"])
             Context.counts[stream["tap_stream_id"]] = 0
 
+    # Loop over streams in catalog
+    for catalog_entry in Context.catalog["streams"]:
+        stream_id = catalog_entry["tap_stream_id"]
+        stream = Context.stream_objects[stream_id]()
 
-def _sync_stream(catalog_entry):
-    """Sync a single stream: transform each record, write it, and update state."""
-    stream_id = catalog_entry["tap_stream_id"]
-    stream = Context.stream_objects[stream_id]()
+        if not Context.is_selected(stream_id):
+            LOGGER.info("Skipping stream: %s", stream_id)
+            continue
 
-    LOGGER.info("Syncing stream: %s", stream_id)
+        LOGGER.info("Syncing stream: %s", stream_id)
 
-    if not Context.state.get("bookmarks"):
-        Context.state["bookmarks"] = {}
-    Context.state["bookmarks"]["currently_sync_stream"] = stream_id
+        if not Context.state.get('bookmarks'):
+            Context.state['bookmarks'] = {}
+        Context.state['bookmarks']['currently_sync_stream'] = stream_id
 
-    with Transformer() as transformer:
-        for rec in stream.sync():
-            extraction_time = singer.utils.now()
-            record_schema = catalog_entry["schema"]
-            record_metadata = metadata.to_map(catalog_entry["metadata"])
-            rec = transformer.transform(rec, record_schema, record_metadata)
-            singer.write_record(stream_id, rec, time_extracted=extraction_time)
-            Context.counts[stream_id] += 1
+        with Transformer() as transformer:
+            for rec in stream.sync():
+                extraction_time = singer.utils.now()
+                record_schema = catalog_entry["schema"]
+                record_metadata = metadata.to_map(catalog_entry["metadata"])
+                rec = transformer.transform(rec, record_schema, record_metadata)
+                singer.write_record(stream_id, rec, time_extracted=extraction_time)
+                Context.counts[stream_id] += 1
 
-    Context.state["bookmarks"].pop("currently_sync_stream")
-    singer.write_state(Context.state)
+        Context.state["bookmarks"].pop("currently_sync_stream")
+        singer.write_state(Context.state)
 
-
-def _log_sync_counts():
-    """Log the number of records synced per stream."""
     LOGGER.info("----------------------")
     for stream_id, stream_count in Context.counts.items():
         LOGGER.info("%s: %d", stream_id, stream_count)
     LOGGER.info("----------------------")
-
-
-def sync():
-    """Sync all selected streams in the catalog.
-
-    Emits schemas first so child streams receive their parent schema,
-    then iterates over the catalog and syncs each selected stream.
-    """
-    _emit_schemas()
-
-    for catalog_entry in Context.catalog["streams"]:
-        stream_id = catalog_entry["tap_stream_id"]
-        if not Context.is_selected(stream_id):
-            LOGGER.info("Skipping stream: %s", stream_id)
-            continue
-        _sync_stream(catalog_entry)
-
-    _log_sync_counts()
 
 
 @utils.handle_top_exception(LOGGER)
