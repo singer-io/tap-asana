@@ -89,13 +89,13 @@ def _probe_workspaces():
         raise
 
 
-def _handle_excluded_streams(error_list, streams):
+def _handle_excluded_streams(inaccessible_streams, streams):
     """Raise RuntimeError when no streams are accessible; otherwise warn.
 
     Mutates nothing — callers are responsible for the streams list.
     """
-    excluded_streams = ", ".join(name for name, _ in error_list)
-    status_codes = "/".join(str(s) for s in sorted({status for _, status in error_list}))
+    excluded_streams = ", ".join(name for name in inaccessible_streams)
+    status_codes = "/".join(str(s) for s in sorted({status for _, status in inaccessible_streams}))
     if not streams:
         raise RuntimeError(
             f"HTTP-error-code: {status_codes}, Error: The account credentials supplied do not have "
@@ -121,7 +121,7 @@ def discover():
     workspaces = _probe_workspaces()
 
     streams = []
-    error_list = []
+    inaccessible_streams = []
 
     for schema_name, schema in raw_schemas.items():
         if schema_name not in Context.stream_objects:
@@ -134,7 +134,7 @@ def discover():
                 "Stream '%s' is not accessible, excluding from catalog.",
                 schema_name,
             )
-            error_list.append((schema_name, None))
+            inaccessible_streams.append(schema_name)
             continue
 
         streams.append({
@@ -147,8 +147,8 @@ def discover():
             "replication_method": stream.replication_method,
         })
 
-    if error_list:
-        _handle_excluded_streams(error_list, streams)
+    if inaccessible_streams:
+        _handle_excluded_streams(inaccessible_streams, streams)
     LOGGER.info("Finished discover")
     return {"streams": streams}
 
