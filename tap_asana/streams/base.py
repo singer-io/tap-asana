@@ -248,7 +248,8 @@ class Stream():
     def check_access(self, workspaces):
         """Stream-specific access probe. Override in subclasses that require
         an endpoint check beyond the common workspace check in discover().
-        Return False to exclude the stream from the catalog; None (default) means no check."""
+        Return False to exclude the stream from the catalog; True (default) means accessible."""
+        return True
 
     @asana_error_handling
     def fetch_workspaces(self, opts=None):

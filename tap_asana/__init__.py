@@ -94,8 +94,8 @@ def _handle_excluded_streams(inaccessible_streams, streams):
 
     Mutates nothing — callers are responsible for the streams list.
     """
-    excluded_streams = ", ".join(name for name in inaccessible_streams)
-    status_codes = "/".join(str(s) for s in sorted({status for _, status in inaccessible_streams}))
+    excluded_streams = ", ".join(name for name, _ in inaccessible_streams)
+    status_codes = "/".join(str(s) for s in sorted({status for _, status in inaccessible_streams if status is not None}))
     if not streams:
         raise RuntimeError(
             f"HTTP-error-code: {status_codes}, Error: The account credentials supplied do not have "
@@ -134,7 +134,7 @@ def discover():
                 "Stream '%s' is not accessible, excluding from catalog.",
                 schema_name,
             )
-            inaccessible_streams.append(schema_name)
+            inaccessible_streams.append((schema_name, None))
             continue
 
         streams.append({

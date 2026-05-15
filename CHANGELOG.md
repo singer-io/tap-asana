@@ -1,7 +1,7 @@
 # Changelog
 
-## 2.5.2
-  * Streams that the credentials cannot access (402/403) are now excluded from the catalog during discovery instead of raising an error. A warning is logged for each excluded stream. [#73](https://github.com/singer-io/tap-asana/pull/73)
+## 2.6.0
+  * Exclude inaccessible streams (402/403) from the catalog during discovery instead of raising an error. [#73](https://github.com/singer-io/tap-asana/pull/73)
 
 ## 2.5.1
   * Added a try/except asana.rest.ApiException block inside the wrapper function of asana_error_handling in base.py. Fix for api exception. [#72](https://github.com/singer-io/tap-asana/pull/72)

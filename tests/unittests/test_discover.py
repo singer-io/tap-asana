@@ -80,17 +80,17 @@ class TestHandleExcludedStreams(unittest.TestCase):
 
     def test_raises_when_no_accessible_streams_remain(self):
         """_handle_excluded_streams() should raise RuntimeError when the streams list is empty (all excluded)."""
-        error_list = [("portfolios", None)]
+        inaccessible_streams = [("portfolios", None)]
         with self.assertRaises(RuntimeError) as ctx:
-            tap_asana._handle_excluded_streams(error_list, streams=[])
+            tap_asana._handle_excluded_streams(inaccessible_streams, streams=[])
         self.assertIn("lack of permissions", str(ctx.exception))
 
     def test_warns_when_some_streams_still_accessible(self):
         """_handle_excluded_streams() should log a warning naming the excluded streams when others remain accessible."""
-        error_list = [("portfolios", None)]
+        inaccessible_streams = [("portfolios", None)]
         remaining = [{"stream": "tasks"}]
         with mock.patch.object(tap_asana.LOGGER, "warning") as mocked_warn:
-            tap_asana._handle_excluded_streams(error_list, remaining)
+            tap_asana._handle_excluded_streams(inaccessible_streams, remaining)
         mocked_warn.assert_called_once()
         self.assertIn("portfolios", mocked_warn.call_args[0][1])
 
