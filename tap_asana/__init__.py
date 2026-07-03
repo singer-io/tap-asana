@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 import os
-import datetime
 import json
-import time
-import math
-import functools
-import asana
+import asana.rest
 import singer
 from singer import utils
 from singer import metadata
 from singer import Transformer
+# Import directly before 'from tap_asana.asana import Asana' shadows the 'asana' name in globals
+from asana.rest import ApiException as _AsanaApiException
 from tap_asana.asana import Asana
 from tap_asana.context import Context
 import tap_asana.streams  # Load stream objects into Context
@@ -75,34 +73,83 @@ def get_discovery_metadata(stream, schema):
     return metadata.to_list(mdata)
 
 
+def _probe_workspaces():
+    """Fetch the list of workspaces from the Asana API.
+    Raises RuntimeError when the credentials have no access (HTTP 402/403).
+    """
+    try:
+        return Context.stream_objects["workspaces"]().fetch_workspaces()
+    except _AsanaApiException as e:
+        if e.status in [402, 403]:
+            raise RuntimeError(
+                f"HTTP-error-code: {e.status}, Error: The account credentials supplied do not have "
+                "'read' access to any of the streams supported by the tap. "
+                "Data collection cannot be initiated due to lack of permissions."
+            ) from e
+        raise
+
+
+def _handle_excluded_streams(inaccessible_streams, streams):
+    """Raise RuntimeError when no streams are accessible; otherwise warn.
+
+    Mutates nothing — callers are responsible for the streams list.
+    """
+    excluded_streams = ", ".join(name for name, _ in inaccessible_streams)
+    status_codes = "/".join(str(s) for s in sorted({status for _, status in inaccessible_streams if status is not None}))
+    if not streams:
+        raise RuntimeError(
+            f"HTTP-error-code: {status_codes}, Error: The account credentials supplied do not have "
+            "'read' access to any of the streams supported by the tap. "
+            "Data collection cannot be initiated due to lack of permissions."
+        )
+    LOGGER.warning(
+        "The account credentials supplied do not have 'read' access to the following "
+        "stream(s): %s. These streams have been excluded from the catalog.",
+        excluded_streams,
+    )
+
+
 def discover():
-    """Discover logic for tap"""
+    """Build and return the Singer catalog.
+
+    Probes workspace and per-stream access when a client is present;
+    streams that are inaccessible (HTTP 402/403) are excluded from the
+    catalog and a warning is logged for each.
+    """
     LOGGER.info("Starting discover")
     raw_schemas = load_schemas()
+    workspaces = _probe_workspaces()
 
     streams = []
+    inaccessible_streams = []
 
-    refs = {}
     for schema_name, schema in raw_schemas.items():
         if schema_name not in Context.stream_objects:
             continue
 
         stream = Context.stream_objects[schema_name]()
 
-        # Create and add catalog entry
-        catalog_entry = {
+        if stream.check_access(workspaces) is False:
+            LOGGER.warning(
+                "Stream '%s' is not accessible, excluding from catalog.",
+                schema_name,
+            )
+            inaccessible_streams.append((schema_name, None))
+            continue
+
+        streams.append({
             "stream": schema_name,
             "tap_stream_id": schema_name,
-            "schema": singer.resolve_schema_references(schema, refs),
+            "schema": singer.resolve_schema_references(schema, {}),
             "metadata": get_discovery_metadata(stream, schema),
             "key_properties": stream.key_properties,
             "replication_key": stream.replication_key,
             "replication_method": stream.replication_method,
-        }
-        streams.append(catalog_entry)
+        })
 
+    if inaccessible_streams:
+        _handle_excluded_streams(inaccessible_streams, streams)
     LOGGER.info("Finished discover")
-
     return {"streams": streams}
 
 

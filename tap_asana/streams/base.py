@@ -235,8 +235,7 @@ class Stream():
                 raise InvalidTokenError(response=e) from e
             if e.status == 401:
                 raise NoAuthorizationError(response=e) from e
-            LOGGER.error("Error during API call: %s", e)
-            raise e from None
+            raise
 
         return results
 
@@ -245,6 +244,12 @@ class Stream():
         """Yield's processed SDK object dicts to the caller."""
         for obj in self.get_objects():
             yield obj
+
+    def check_access(self, workspaces):
+        """Stream-specific access probe. Override in subclasses that require
+        an endpoint check beyond the common workspace check in discover().
+        Return False to exclude the stream from the catalog; True (default) means accessible."""
+        return True
 
     @asana_error_handling
     def fetch_workspaces(self, opts=None):

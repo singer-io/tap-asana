@@ -28,6 +28,29 @@ class Portfolios(Stream):
         "public"
     ]
 
+    def check_access(self, workspaces):
+        """
+        Verify access to the portfolios endpoint.
+        Portfolios require a premium/business workspace (HTTP 402 if not eligible).
+        Returns True when accessible, False when the workspace does not support portfolios.
+        """
+        if not workspaces:
+            return True
+        try:
+            portfolios_api = asana.PortfoliosApi(Context.asana.client)
+            self.call_api(
+                portfolios_api,
+                "get_portfolios",
+                workspace=workspaces[0]["gid"],
+                opts={"owner": "me", "limit": 1},
+                _request_timeout=self.request_timeout,
+            )
+            return True
+        except asana.rest.ApiException as e:
+            if e.status in [402, 403]:
+                return False
+            raise
+
     def get_objects(self):
         """Get stream object"""
         opt_fields = ",".join(self.fields)
