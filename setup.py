@@ -11,12 +11,12 @@ setup(
     py_modules=["tap_asana"],
     install_requires=[
         "asana==5.2.4",
-        "parameterized",
         "requests==2.33.1",
         "singer-python==6.8.0"
     ],
     extras_require={
         "test": [
+            "parameterized",
             "pylint"
         ],
         "dev": [
